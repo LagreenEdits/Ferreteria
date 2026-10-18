@@ -9,6 +9,7 @@ import com.xorr.common.ContextoActual;
 import com.xorr.common.OperacionInvalidaException;
 import com.xorr.common.RecursoNoEncontradoException;
 import com.xorr.common.StockInsuficienteException;
+import com.xorr.compras.service.MovimientosCompraService;
 import com.xorr.inventario.dto.ProductoRequest;
 import com.xorr.inventario.dto.ProductoResponse;
 import com.xorr.inventario.entity.Producto;
@@ -20,13 +21,16 @@ public class ProductoService {
 
     private final ProductoRepository repositorio;
     private final ProveedorProductoRepository asociaciones;
+    private final MovimientosCompraService movimientosCompra;
     private final ContextoActual contexto;
 
     public ProductoService(ProductoRepository repositorio,
             ProveedorProductoRepository asociaciones,
+            MovimientosCompraService movimientosCompra,
             ContextoActual contexto) {
         this.repositorio = repositorio;
         this.asociaciones = asociaciones;
+        this.movimientosCompra = movimientosCompra;
         this.contexto = contexto;
     }
 
@@ -55,12 +59,13 @@ public class ProductoService {
         return ProductoResponse.desde(repositorio.save(producto));
     }
 
-    // Las asociaciones guardan solo el id del producto (sin clave foránea), por eso
-    // se
-    // borran aquí para no dejarlas apuntando a un producto que ya no existe.
+    // RN-12: no se elimina un producto con movimientos. RN-14: las asociaciones
+    // guardan solo el id del producto (sin clave foránea), por eso se borran aquí
+    // para no dejarlas apuntando a un producto que ya no existe.
     @Transactional
     public void eliminar(Long idProducto) {
         Producto producto = buscarProducto(idProducto);
+        validarSinOrdenesDeCompra(idProducto, producto);
         asociaciones.deleteByIdEmpresaAndIdProducto(contexto.getIdEmpresa(), idProducto);
         repositorio.delete(producto);
     }
@@ -109,6 +114,16 @@ public class ProductoService {
             throw new StockInsuficienteException(
                     "Stock insuficiente para '" + producto.getNombre() + "': disponible "
                             + producto.getStock() + ", solicitado " + cantidad);
+        }
+    }
+
+    // RN-12 (órdenes de compra). Cuando exista Ventas, añadir aquí la consulta de
+    // facturas.
+    private void validarSinOrdenesDeCompra(Long idProducto, Producto producto) {
+        if (movimientosCompra.productoTieneOrdenes(idProducto)) {
+            throw new OperacionInvalidaException(
+                    "No se puede eliminar el producto '" + producto.getNombre()
+                            + "' porque tiene órdenes de compra");
         }
     }
 

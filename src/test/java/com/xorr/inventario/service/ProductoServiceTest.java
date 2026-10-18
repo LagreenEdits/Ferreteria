@@ -25,6 +25,7 @@ import com.xorr.common.ContextoActual;
 import com.xorr.common.OperacionInvalidaException;
 import com.xorr.common.RecursoNoEncontradoException;
 import com.xorr.common.StockInsuficienteException;
+import com.xorr.compras.service.MovimientosCompraService;
 import com.xorr.inventario.dto.ProductoResponse;
 import com.xorr.inventario.entity.Producto;
 import com.xorr.inventario.repository.ProductoRepository;
@@ -42,11 +43,14 @@ class ProductoServiceTest {
     @Mock
     private ProveedorProductoRepository asociaciones;
 
+    @Mock
+    private MovimientosCompraService movimientosCompra;
+
     private ProductoService servicio;
 
     @BeforeEach
     void preparar() {
-        servicio = new ProductoService(repositorio, asociaciones, new ContextoActual());
+        servicio = new ProductoService(repositorio, asociaciones, movimientosCompra, new ContextoActual());
     }
 
     // ---- decrementarStock (RN-01, RN-06, RN-07) ----
@@ -138,17 +142,32 @@ class ProductoServiceTest {
         assertTrue(servicio.listarStockBajo().isEmpty());
     }
 
-    // ---- eliminar: se borran también las asociaciones del producto ----
+    // ---- eliminar (RN-12 y RN-14) ----
 
     @Test
-    void eliminar_conProductoPropio_loEliminaJuntoConSusAsociaciones() {
+    void eliminar_conProductoSinOrdenes_loEliminaJuntoConSusAsociaciones() {
         Producto producto = productoConStock(5, 2);
         existeProductoPropio(producto);
+        when(movimientosCompra.productoTieneOrdenes(ID_PRODUCTO)).thenReturn(false);
 
         servicio.eliminar(ID_PRODUCTO);
 
         verify(asociaciones).deleteByIdEmpresaAndIdProducto(ID_EMPRESA, ID_PRODUCTO);
         verify(repositorio).delete(producto);
+    }
+
+    @Test
+    void eliminar_conProductoConOrdenesDeCompra_seRechazaYNoBorraNada() {
+        existeProductoPropio(productoConStock(5, 2));
+        when(movimientosCompra.productoTieneOrdenes(ID_PRODUCTO)).thenReturn(true);
+
+        OperacionInvalidaException error = assertThrows(OperacionInvalidaException.class,
+                () -> servicio.eliminar(ID_PRODUCTO));
+
+        assertEquals("No se puede eliminar el producto 'Martillo' porque tiene órdenes de compra",
+                error.getMessage());
+        verify(repositorio, never()).delete(any());
+        verifyNoInteractions(asociaciones);
     }
 
     @Test
@@ -158,7 +177,7 @@ class ProductoServiceTest {
         assertThrows(RecursoNoEncontradoException.class, () -> servicio.eliminar(ID_PRODUCTO));
 
         verify(repositorio, never()).delete(any());
-        verifyNoInteractions(asociaciones);
+        verifyNoInteractions(asociaciones, movimientosCompra);
     }
 
     // ---- multi-tenant (RN-05) ----

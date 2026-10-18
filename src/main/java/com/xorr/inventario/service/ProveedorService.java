@@ -6,7 +6,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.xorr.common.ContextoActual;
+import com.xorr.common.OperacionInvalidaException;
 import com.xorr.common.RecursoNoEncontradoException;
+import com.xorr.compras.service.MovimientosCompraService;
 import com.xorr.inventario.dto.ProveedorRequest;
 import com.xorr.inventario.dto.ProveedorResponse;
 import com.xorr.inventario.entity.Proveedor;
@@ -18,13 +20,16 @@ public class ProveedorService {
 
     private final ProveedorRepository repositorio;
     private final ProveedorProductoRepository asociaciones;
+    private final MovimientosCompraService movimientosCompra;
     private final ContextoActual contexto;
 
     public ProveedorService(ProveedorRepository repositorio,
             ProveedorProductoRepository asociaciones,
+            MovimientosCompraService movimientosCompra,
             ContextoActual contexto) {
         this.repositorio = repositorio;
         this.asociaciones = asociaciones;
+        this.movimientosCompra = movimientosCompra;
         this.contexto = contexto;
     }
 
@@ -55,12 +60,13 @@ public class ProveedorService {
         return ProveedorResponse.desde(repositorio.save(proveedor));
     }
 
-    // Las asociaciones guardan solo el id del proveedor (sin clave foránea), por
-    // eso se
-    // borran aquí para no dejarlas apuntando a un proveedor que ya no existe.
+    // RN-12: no se elimina un proveedor con movimientos. RN-14: las asociaciones
+    // guardan solo el id del proveedor (sin clave foránea), por eso se borran aquí
+    // para no dejarlas apuntando a un proveedor que ya no existe.
     @Transactional
     public void eliminar(Long idProveedor) {
         Proveedor proveedor = buscarProveedor(idProveedor);
+        validarSinOrdenesDeCompra(idProveedor, proveedor);
         asociaciones.deleteByIdEmpresaAndIdProveedor(contexto.getIdEmpresa(), idProveedor);
         repositorio.delete(proveedor);
     }
@@ -70,6 +76,16 @@ public class ProveedorService {
         return repositorio.findByIdAndIdEmpresa(idProveedor, contexto.getIdEmpresa())
                 .orElseThrow(() -> new RecursoNoEncontradoException(
                         "Proveedor no encontrado: " + idProveedor));
+    }
+
+    // RN-12: las facturas no llevan proveedor, así que solo cuentan las órdenes de
+    // compra.
+    private void validarSinOrdenesDeCompra(Long idProveedor, Proveedor proveedor) {
+        if (movimientosCompra.proveedorTieneOrdenes(idProveedor)) {
+            throw new OperacionInvalidaException(
+                    "No se puede eliminar el proveedor '" + proveedor.getNombre()
+                            + "' porque tiene órdenes de compra");
+        }
     }
 
     private void copiarDatos(Proveedor proveedor, ProveedorRequest datos) {

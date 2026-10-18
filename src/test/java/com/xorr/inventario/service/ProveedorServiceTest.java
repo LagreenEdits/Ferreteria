@@ -19,7 +19,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.xorr.common.ContextoActual;
+import com.xorr.common.OperacionInvalidaException;
 import com.xorr.common.RecursoNoEncontradoException;
+import com.xorr.compras.service.MovimientosCompraService;
 import com.xorr.inventario.dto.ProveedorRequest;
 import com.xorr.inventario.dto.ProveedorResponse;
 import com.xorr.inventario.entity.Proveedor;
@@ -38,11 +40,14 @@ class ProveedorServiceTest {
     @Mock
     private ProveedorProductoRepository asociaciones;
 
+    @Mock
+    private MovimientosCompraService movimientosCompra;
+
     private ProveedorService servicio;
 
     @BeforeEach
     void preparar() {
-        servicio = new ProveedorService(repositorio, asociaciones, new ContextoActual());
+        servicio = new ProveedorService(repositorio, asociaciones, movimientosCompra, new ContextoActual());
     }
 
     @Test
@@ -79,15 +84,32 @@ class ProveedorServiceTest {
         assertEquals("3109998888", proveedor.getTelefono());
     }
 
+    // ---- eliminar (RN-12 y RN-14) ----
+
     @Test
-    void eliminar_conProveedorPropio_loEliminaJuntoConSusAsociaciones() {
+    void eliminar_conProveedorSinOrdenes_loEliminaJuntoConSusAsociaciones() {
         Proveedor proveedor = proveedorPropio();
         when(repositorio.findByIdAndIdEmpresa(ID_PROVEEDOR, ID_EMPRESA)).thenReturn(Optional.of(proveedor));
+        when(movimientosCompra.proveedorTieneOrdenes(ID_PROVEEDOR)).thenReturn(false);
 
         servicio.eliminar(ID_PROVEEDOR);
 
         verify(asociaciones).deleteByIdEmpresaAndIdProveedor(ID_EMPRESA, ID_PROVEEDOR);
         verify(repositorio).delete(proveedor);
+    }
+
+    @Test
+    void eliminar_conProveedorConOrdenesDeCompra_seRechazaYNoBorraNada() {
+        when(repositorio.findByIdAndIdEmpresa(ID_PROVEEDOR, ID_EMPRESA)).thenReturn(Optional.of(proveedorPropio()));
+        when(movimientosCompra.proveedorTieneOrdenes(ID_PROVEEDOR)).thenReturn(true);
+
+        OperacionInvalidaException error = assertThrows(OperacionInvalidaException.class,
+                () -> servicio.eliminar(ID_PROVEEDOR));
+
+        assertEquals("No se puede eliminar el proveedor 'Ferrelectro' porque tiene órdenes de compra",
+                error.getMessage());
+        verify(repositorio, never()).delete(any());
+        verifyNoInteractions(asociaciones);
     }
 
     @Test
@@ -114,7 +136,7 @@ class ProveedorServiceTest {
         assertThrows(RecursoNoEncontradoException.class, () -> servicio.eliminar(ID_PROVEEDOR));
 
         verify(repositorio, never()).delete(any());
-        verifyNoInteractions(asociaciones);
+        verifyNoInteractions(asociaciones, movimientosCompra);
     }
 
     private Proveedor proveedorPropio() {
