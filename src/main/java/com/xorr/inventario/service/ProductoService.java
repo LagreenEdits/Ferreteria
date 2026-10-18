@@ -15,6 +15,7 @@ import com.xorr.inventario.dto.ProductoResponse;
 import com.xorr.inventario.entity.Producto;
 import com.xorr.inventario.repository.ProductoRepository;
 import com.xorr.inventario.repository.ProveedorProductoRepository;
+import com.xorr.ventas.service.MovimientosVentaService;
 
 @Service
 public class ProductoService {
@@ -22,15 +23,18 @@ public class ProductoService {
     private final ProductoRepository repositorio;
     private final ProveedorProductoRepository asociaciones;
     private final MovimientosCompraService movimientosCompra;
+    private final MovimientosVentaService movimientosVenta;
     private final ContextoActual contexto;
 
     public ProductoService(ProductoRepository repositorio,
             ProveedorProductoRepository asociaciones,
             MovimientosCompraService movimientosCompra,
+            MovimientosVentaService movimientosVenta,
             ContextoActual contexto) {
         this.repositorio = repositorio;
         this.asociaciones = asociaciones;
         this.movimientosCompra = movimientosCompra;
+        this.movimientosVenta = movimientosVenta;
         this.contexto = contexto;
     }
 
@@ -66,6 +70,7 @@ public class ProductoService {
     public void eliminar(Long idProducto) {
         Producto producto = buscarProducto(idProducto);
         validarSinOrdenesDeCompra(idProducto, producto);
+        validarSinFacturas(idProducto, producto);
         asociaciones.deleteByIdEmpresaAndIdProducto(contexto.getIdEmpresa(), idProducto);
         repositorio.delete(producto);
     }
@@ -117,13 +122,21 @@ public class ProductoService {
         }
     }
 
-    // RN-12 (órdenes de compra). Cuando exista Ventas, añadir aquí la consulta de
-    // facturas.
+    // RN-12 (órdenes de compra).
     private void validarSinOrdenesDeCompra(Long idProducto, Producto producto) {
         if (movimientosCompra.productoTieneOrdenes(idProducto)) {
             throw new OperacionInvalidaException(
                     "No se puede eliminar el producto '" + producto.getNombre()
                             + "' porque tiene órdenes de compra");
+        }
+    }
+
+    // RN-12 (facturas).
+    private void validarSinFacturas(Long idProducto, Producto producto) {
+        if (movimientosVenta.productoTieneFacturas(idProducto)) {
+            throw new OperacionInvalidaException(
+                    "No se puede eliminar el producto '" + producto.getNombre()
+                            + "' porque tiene facturas");
         }
     }
 
