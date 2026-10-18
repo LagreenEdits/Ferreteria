@@ -10,16 +10,21 @@ import com.xorr.common.RecursoNoEncontradoException;
 import com.xorr.inventario.dto.ProveedorRequest;
 import com.xorr.inventario.dto.ProveedorResponse;
 import com.xorr.inventario.entity.Proveedor;
+import com.xorr.inventario.repository.ProveedorProductoRepository;
 import com.xorr.inventario.repository.ProveedorRepository;
 
 @Service
 public class ProveedorService {
 
     private final ProveedorRepository repositorio;
+    private final ProveedorProductoRepository asociaciones;
     private final ContextoActual contexto;
 
-    public ProveedorService(ProveedorRepository repositorio, ContextoActual contexto) {
+    public ProveedorService(ProveedorRepository repositorio,
+            ProveedorProductoRepository asociaciones,
+            ContextoActual contexto) {
         this.repositorio = repositorio;
+        this.asociaciones = asociaciones;
         this.contexto = contexto;
     }
 
@@ -50,9 +55,14 @@ public class ProveedorService {
         return ProveedorResponse.desde(repositorio.save(proveedor));
     }
 
+    // Las asociaciones guardan solo el id del proveedor (sin clave foránea), por
+    // eso se
+    // borran aquí para no dejarlas apuntando a un proveedor que ya no existe.
     @Transactional
     public void eliminar(Long idProveedor) {
-        repositorio.delete(buscarProveedor(idProveedor));
+        Proveedor proveedor = buscarProveedor(idProveedor);
+        asociaciones.deleteByIdEmpresaAndIdProveedor(contexto.getIdEmpresa(), idProveedor);
+        repositorio.delete(proveedor);
     }
 
     // RN-05: un proveedor de otra empresa se trata como no encontrado.

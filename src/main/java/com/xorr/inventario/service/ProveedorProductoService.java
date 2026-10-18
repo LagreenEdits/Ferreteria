@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.xorr.common.ContextoActual;
+import com.xorr.common.OperacionInvalidaException;
 import com.xorr.common.RecursoNoEncontradoException;
 import com.xorr.inventario.dto.ProveedorProductoRequest;
 import com.xorr.inventario.dto.ProveedorProductoResponse;
@@ -14,6 +15,8 @@ import com.xorr.inventario.repository.ProveedorProductoRepository;
 
 @Service
 public class ProveedorProductoService {
+
+    private static final String MENSAJE_DUPLICADA = "Ya existe esa asociación";
 
     private final ProveedorProductoRepository repositorio;
     private final ContextoActual contexto;
@@ -33,6 +36,7 @@ public class ProveedorProductoService {
     @Transactional
     public ProveedorProductoResponse crear(ProveedorProductoRequest datos) {
         validarReferencias(datos);
+        validarSinDuplicado(datos);
         ProveedorProducto asociacion = new ProveedorProducto();
         asociacion.setIdEmpresa(contexto.getIdEmpresa());
         copiarDatos(asociacion, datos);
@@ -55,6 +59,7 @@ public class ProveedorProductoService {
     public ProveedorProductoResponse actualizar(Long idAsociacion, ProveedorProductoRequest datos) {
         ProveedorProducto asociacion = buscarAsociacion(idAsociacion);
         validarReferencias(datos);
+        validarSinDuplicadoAlActualizar(datos, idAsociacion);
         copiarDatos(asociacion, datos);
         return ProveedorProductoResponse.desde(repositorio.save(asociacion));
     }
@@ -69,6 +74,26 @@ public class ProveedorProductoService {
     private void validarReferencias(ProveedorProductoRequest datos) {
         proveedorService.obtener(datos.idProveedor());
         productoService.obtener(datos.idProducto());
+    }
+
+    private void validarSinDuplicado(ProveedorProductoRequest datos) {
+        boolean existe = repositorio.existsByIdEmpresaAndIdProveedorAndIdProducto(
+                contexto.getIdEmpresa(), datos.idProveedor(), datos.idProducto());
+        rechazarSiExiste(existe);
+    }
+
+    // Al actualizar se excluye la propia fila: cambiar solo el precio no es un
+    // duplicado.
+    private void validarSinDuplicadoAlActualizar(ProveedorProductoRequest datos, Long idAsociacion) {
+        boolean existe = repositorio.existsByIdEmpresaAndIdProveedorAndIdProductoAndIdNot(
+                contexto.getIdEmpresa(), datos.idProveedor(), datos.idProducto(), idAsociacion);
+        rechazarSiExiste(existe);
+    }
+
+    private void rechazarSiExiste(boolean existe) {
+        if (existe) {
+            throw new OperacionInvalidaException(MENSAJE_DUPLICADA);
+        }
     }
 
     private ProveedorProducto buscarAsociacion(Long idAsociacion) {

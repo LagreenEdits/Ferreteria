@@ -19,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.xorr.common.ContextoActual;
+import com.xorr.common.OperacionInvalidaException;
 import com.xorr.common.RecursoNoEncontradoException;
 import com.xorr.inventario.dto.ProveedorProductoRequest;
 import com.xorr.inventario.dto.ProveedorProductoResponse;
@@ -49,6 +50,8 @@ class ProveedorProductoServiceTest {
         servicio = new ProveedorProductoService(
                 repositorio, new ContextoActual(), proveedorService, productoService);
     }
+
+    // ---- crear ----
 
     @Test
     void crear_conProveedorYProductoPropios_guardaConLaEmpresaActual() {
@@ -87,6 +90,20 @@ class ProveedorProductoServiceTest {
     }
 
     @Test
+    void crear_conAsociacionDuplicada_seRechazaYNoGuarda() {
+        when(repositorio.existsByIdEmpresaAndIdProveedorAndIdProducto(ID_EMPRESA, ID_PROVEEDOR, ID_PRODUCTO))
+                .thenReturn(true);
+
+        OperacionInvalidaException error = assertThrows(OperacionInvalidaException.class,
+                () -> servicio.crear(solicitud("9000")));
+
+        assertEquals("Ya existe esa asociación", error.getMessage());
+        verify(repositorio, never()).save(any());
+    }
+
+    // ---- actualizar ----
+
+    @Test
     void actualizar_conAsociacionPropia_cambiaElPrecio() {
         ProveedorProducto asociacion = asociacionPropia();
         when(repositorio.findByIdAndIdEmpresa(ID_ASOCIACION, ID_EMPRESA)).thenReturn(Optional.of(asociacion));
@@ -95,6 +112,19 @@ class ProveedorProductoServiceTest {
         servicio.actualizar(ID_ASOCIACION, solicitud("12000"));
 
         assertEquals(new BigDecimal("12000"), asociacion.getPrecioCompra());
+    }
+
+    @Test
+    void actualizar_haciaUnaParejaQueYaExiste_seRechazaYNoGuarda() {
+        ProveedorProducto asociacion = asociacionPropia();
+        when(repositorio.findByIdAndIdEmpresa(ID_ASOCIACION, ID_EMPRESA)).thenReturn(Optional.of(asociacion));
+        when(repositorio.existsByIdEmpresaAndIdProveedorAndIdProductoAndIdNot(
+                ID_EMPRESA, ID_PROVEEDOR, ID_PRODUCTO, ID_ASOCIACION)).thenReturn(true);
+
+        assertThrows(OperacionInvalidaException.class,
+                () -> servicio.actualizar(ID_ASOCIACION, solicitud("12000")));
+
+        verify(repositorio, never()).save(any());
     }
 
     @Test
@@ -107,6 +137,8 @@ class ProveedorProductoServiceTest {
         verify(repositorio, never()).save(any());
         verifyNoInteractions(proveedorService, productoService);
     }
+
+    // ---- eliminar ----
 
     @Test
     void eliminar_conAsociacionPropia_laElimina() {
@@ -126,6 +158,8 @@ class ProveedorProductoServiceTest {
 
         verify(repositorio, never()).delete(any());
     }
+
+    // ---- ayudas ----
 
     private ProveedorProductoRequest solicitud(String precioCompra) {
         return new ProveedorProductoRequest(ID_PROVEEDOR, ID_PRODUCTO, new BigDecimal(precioCompra));

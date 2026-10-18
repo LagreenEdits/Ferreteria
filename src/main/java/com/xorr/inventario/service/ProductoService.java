@@ -13,15 +13,20 @@ import com.xorr.inventario.dto.ProductoRequest;
 import com.xorr.inventario.dto.ProductoResponse;
 import com.xorr.inventario.entity.Producto;
 import com.xorr.inventario.repository.ProductoRepository;
+import com.xorr.inventario.repository.ProveedorProductoRepository;
 
 @Service
 public class ProductoService {
 
     private final ProductoRepository repositorio;
+    private final ProveedorProductoRepository asociaciones;
     private final ContextoActual contexto;
 
-    public ProductoService(ProductoRepository repositorio, ContextoActual contexto) {
+    public ProductoService(ProductoRepository repositorio,
+            ProveedorProductoRepository asociaciones,
+            ContextoActual contexto) {
         this.repositorio = repositorio;
+        this.asociaciones = asociaciones;
         this.contexto = contexto;
     }
 
@@ -50,9 +55,14 @@ public class ProductoService {
         return ProductoResponse.desde(repositorio.save(producto));
     }
 
+    // Las asociaciones guardan solo el id del producto (sin clave foránea), por eso
+    // se
+    // borran aquí para no dejarlas apuntando a un producto que ya no existe.
     @Transactional
     public void eliminar(Long idProducto) {
-        repositorio.delete(buscarProducto(idProducto));
+        Producto producto = buscarProducto(idProducto);
+        asociaciones.deleteByIdEmpresaAndIdProducto(contexto.getIdEmpresa(), idProducto);
+        repositorio.delete(producto);
     }
 
     // RN-04: stock bajo es stock < stockMinimo (la consulta del repositorio usa "<"

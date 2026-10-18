@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -22,6 +23,7 @@ import com.xorr.common.RecursoNoEncontradoException;
 import com.xorr.inventario.dto.ProveedorRequest;
 import com.xorr.inventario.dto.ProveedorResponse;
 import com.xorr.inventario.entity.Proveedor;
+import com.xorr.inventario.repository.ProveedorProductoRepository;
 import com.xorr.inventario.repository.ProveedorRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,11 +35,14 @@ class ProveedorServiceTest {
     @Mock
     private ProveedorRepository repositorio;
 
+    @Mock
+    private ProveedorProductoRepository asociaciones;
+
     private ProveedorService servicio;
 
     @BeforeEach
     void preparar() {
-        servicio = new ProveedorService(repositorio, new ContextoActual());
+        servicio = new ProveedorService(repositorio, asociaciones, new ContextoActual());
     }
 
     @Test
@@ -75,12 +80,13 @@ class ProveedorServiceTest {
     }
 
     @Test
-    void eliminar_conProveedorPropio_loElimina() {
+    void eliminar_conProveedorPropio_loEliminaJuntoConSusAsociaciones() {
         Proveedor proveedor = proveedorPropio();
         when(repositorio.findByIdAndIdEmpresa(ID_PROVEEDOR, ID_EMPRESA)).thenReturn(Optional.of(proveedor));
 
         servicio.eliminar(ID_PROVEEDOR);
 
+        verify(asociaciones).deleteByIdEmpresaAndIdProveedor(ID_EMPRESA, ID_PROVEEDOR);
         verify(repositorio).delete(proveedor);
     }
 
@@ -102,12 +108,13 @@ class ProveedorServiceTest {
     }
 
     @Test
-    void eliminar_proveedorDeOtraEmpresa_seTrataComoNoEncontradoYNoElimina() {
+    void eliminar_proveedorDeOtraEmpresa_seTrataComoNoEncontradoYNoBorraNada() {
         proveedorEsDeOtraEmpresa();
 
         assertThrows(RecursoNoEncontradoException.class, () -> servicio.eliminar(ID_PROVEEDOR));
 
         verify(repositorio, never()).delete(any());
+        verifyNoInteractions(asociaciones);
     }
 
     private Proveedor proveedorPropio() {

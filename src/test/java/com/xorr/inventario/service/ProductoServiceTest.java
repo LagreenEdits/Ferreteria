@@ -28,6 +28,7 @@ import com.xorr.common.StockInsuficienteException;
 import com.xorr.inventario.dto.ProductoResponse;
 import com.xorr.inventario.entity.Producto;
 import com.xorr.inventario.repository.ProductoRepository;
+import com.xorr.inventario.repository.ProveedorProductoRepository;
 
 @ExtendWith(MockitoExtension.class)
 class ProductoServiceTest {
@@ -38,11 +39,14 @@ class ProductoServiceTest {
     @Mock
     private ProductoRepository repositorio;
 
+    @Mock
+    private ProveedorProductoRepository asociaciones;
+
     private ProductoService servicio;
 
     @BeforeEach
     void preparar() {
-        servicio = new ProductoService(repositorio, new ContextoActual());
+        servicio = new ProductoService(repositorio, asociaciones, new ContextoActual());
     }
 
     // ---- decrementarStock (RN-01, RN-06, RN-07) ----
@@ -115,8 +119,7 @@ class ProductoServiceTest {
     // ---- stock bajo (RN-04) ----
     // El "<" estricto vive en la consulta JPQL del repositorio; aquí solo se
     // comprueba que el
-    // servicio la usa con la empresa actual y devuelve DTOs (ver nota en los
-    // supuestos).
+    // servicio la usa con la empresa actual y devuelve DTOs.
 
     @Test
     void listarStockBajo_devuelveLosProductosQueElRepositorioReportaBajoElMinimo() {
@@ -133,6 +136,29 @@ class ProductoServiceTest {
         when(repositorio.buscarConStockBajo(ID_EMPRESA)).thenReturn(List.of());
 
         assertTrue(servicio.listarStockBajo().isEmpty());
+    }
+
+    // ---- eliminar: se borran también las asociaciones del producto ----
+
+    @Test
+    void eliminar_conProductoPropio_loEliminaJuntoConSusAsociaciones() {
+        Producto producto = productoConStock(5, 2);
+        existeProductoPropio(producto);
+
+        servicio.eliminar(ID_PRODUCTO);
+
+        verify(asociaciones).deleteByIdEmpresaAndIdProducto(ID_EMPRESA, ID_PRODUCTO);
+        verify(repositorio).delete(producto);
+    }
+
+    @Test
+    void eliminar_productoDeOtraEmpresa_seTrataComoNoEncontradoYNoBorraNada() {
+        productoEsDeOtraEmpresa();
+
+        assertThrows(RecursoNoEncontradoException.class, () -> servicio.eliminar(ID_PRODUCTO));
+
+        verify(repositorio, never()).delete(any());
+        verifyNoInteractions(asociaciones);
     }
 
     // ---- multi-tenant (RN-05) ----

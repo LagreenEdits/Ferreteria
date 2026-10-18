@@ -12,4 +12,13 @@ public interface ProveedorProductoRepository extends JpaRepository<ProveedorProd
     Optional<ProveedorProducto> findByIdAndIdEmpresa(Long id, Long idEmpresa);
 
     List<ProveedorProducto> findByIdEmpresa(Long idEmpresa);
+
+    boolean existsByIdEmpresaAndIdProveedorAndIdProducto(Long idEmpresa, Long idProveedor, Long idProducto);
+
+    boolean existsByIdEmpresaAndIdProveedorAndIdProductoAndIdNot(
+            Long idEmpresa, Long idProveedor, Long idProducto, Long id);
+
+    void deleteByIdEmpresaAndIdProducto(Long idEmpresa, Long idProducto);
+
+    void deleteByIdEmpresaAndIdProveedor(Long idEmpresa, Long idProveedor);
 }
