@@ -159,6 +159,25 @@ class ProveedorProductoServiceTest {
         verify(repositorio, never()).delete(any());
     }
 
+    // ---- precio de compra (RN-09) ----
+
+    @Test
+    void obtenerPrecioCompra_conAsociacion_devuelveElPrecioDeLaAsociacion() {
+        when(repositorio.findByIdEmpresaAndIdProveedorAndIdProducto(ID_EMPRESA, ID_PROVEEDOR, ID_PRODUCTO))
+                .thenReturn(Optional.of(asociacionPropia()));
+
+        assertEquals(new BigDecimal("9000"), servicio.obtenerPrecioCompra(ID_PROVEEDOR, ID_PRODUCTO));
+    }
+
+    @Test
+    void obtenerPrecioCompra_sinAsociacion_seRechaza() {
+        when(repositorio.findByIdEmpresaAndIdProveedorAndIdProducto(ID_EMPRESA, ID_PROVEEDOR, ID_PRODUCTO))
+                .thenReturn(Optional.empty());
+
+        assertThrows(OperacionInvalidaException.class,
+                () -> servicio.obtenerPrecioCompra(ID_PROVEEDOR, ID_PRODUCTO));
+    }
+
     // ---- ayudas ----
 
     private ProveedorProductoRequest solicitud(String precioCompra) {

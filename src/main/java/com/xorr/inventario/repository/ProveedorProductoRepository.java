@@ -11,6 +11,9 @@ public interface ProveedorProductoRepository extends JpaRepository<ProveedorProd
 
     Optional<ProveedorProducto> findByIdAndIdEmpresa(Long id, Long idEmpresa);
 
+    Optional<ProveedorProducto> findByIdEmpresaAndIdProveedorAndIdProducto(
+            Long idEmpresa, Long idProveedor, Long idProducto);
+
     List<ProveedorProducto> findByIdEmpresa(Long idEmpresa);
 
     boolean existsByIdEmpresaAndIdProveedorAndIdProducto(Long idEmpresa, Long idProveedor, Long idProducto);

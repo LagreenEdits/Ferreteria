@@ -1,5 +1,6 @@
 package com.xorr.inventario.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -53,6 +54,17 @@ public class ProveedorProductoService {
     @Transactional(readOnly = true)
     public ProveedorProductoResponse obtener(Long idAsociacion) {
         return ProveedorProductoResponse.desde(buscarAsociacion(idAsociacion));
+    }
+
+    // RN-09: solo se compran productos asociados al proveedor, al precio de esa
+    // asociación.
+    @Transactional(readOnly = true)
+    public BigDecimal obtenerPrecioCompra(Long idProveedor, Long idProducto) {
+        return repositorio.findByIdEmpresaAndIdProveedorAndIdProducto(
+                contexto.getIdEmpresa(), idProveedor, idProducto)
+                .map(ProveedorProducto::getPrecioCompra)
+                .orElseThrow(() -> new OperacionInvalidaException(
+                        "El producto " + idProducto + " no está asociado al proveedor " + idProveedor));
     }
 
     @Transactional
