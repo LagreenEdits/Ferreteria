@@ -46,7 +46,7 @@ Es un proyecto académico del curso de **Calidad de Software** (IDEAD, Universid
 | **Pantallas web (frontend)** | 🔜 Pendiente | Páginas HTML + JavaScript |
 | **Reportes, PDF, clientes** | 🔜 Fase 2 | |
 
-**Pruebas automáticas:** 56 pruebas, todas en verde (`BUILD SUCCESS`). Las pruebas del servicio de Ventas (`FacturaServiceTest`) todavía no existen.
+**Pruebas automáticas:** 67 pruebas, todas en verde (`BUILD SUCCESS`).
 
 **Base de datos:** H2 en memoria. Es una base de datos temporal que **se borra cada vez que apagas la aplicación**. MySQL ya está incluido como dependencia, pero todavía no está configurado.
 
@@ -171,7 +171,7 @@ mvn test
 La primera vez tarda más porque Maven descarga las librerías (necesitas internet). Al final debes ver:
 
 ```
-Tests run: 56, Failures: 0, Errors: 0, Skipped: 0
+Tests run: 67, Failures: 0, Errors: 0, Skipped: 0
 BUILD SUCCESS
 ```
 
@@ -391,6 +391,8 @@ Xorr/
         ├── compras/service/
         │   ├── OrdenCompraServiceTest.java           ← 14 pruebas
         │   └── MovimientosCompraServiceTest.java     ← 4 pruebas
+        ├── ventas/service/
+        │   └── FacturaServiceTest.java               ← 11 pruebas
         └── inventario/service/
             ├── ProductoServiceTest.java              ← 19 pruebas
             ├── ProveedorServiceTest.java             ← 8 pruebas
@@ -502,11 +504,11 @@ Reglas de convivencia entre módulos:
 
 ## 11. Reglas de negocio
 
-Las reglas viven en los **servicios**. Las de Compras e Inventario están probadas con pruebas automáticas; las de Ventas (RN-01 con facturas, RN-03, RN-06, RN-10) esperan a `FacturaServiceTest`.
+Las reglas viven en los **servicios** y están probadas con pruebas automáticas.
 
 | Código | Regla | Estado |
 |---|---|---|
-| RN-01 | No se vende sin stock suficiente (se valida solo en `decrementarStock`) | ✅ (`POST /api/facturas` la usa) |
+| RN-01 | No se vende sin stock suficiente (se valida solo en `decrementarStock`) | ✅ |
 | RN-02 | Al recibir una orden de compra, sube el stock de sus productos | ✅ |
 | RN-03 | Subtotales y totales los calcula el servidor, nunca el cliente | ✅ en compras y ventas |
 | RN-04 | "Stock bajo" = `stock < stockMinimo` (estricto) | ✅ |
@@ -516,7 +518,7 @@ Las reglas viven en los **servicios**. Las de Compras e Inventario están probad
 | RN-08 | Una orden solo se recibe o se cancela estando `PENDIENTE`; la recepción no se revierte | ✅ |
 | RN-09 | En una orden solo van productos asociados al proveedor, al precio de esa asociación | ✅ |
 | RN-10 | En una factura el precio sale de `Producto.precioVenta` | ✅ |
-| RN-11 | No hay anulación ni borrado de facturas en el MVP | ✅ (no existen `PUT` ni `DELETE`) |
+| RN-11 | No hay anulación ni borrado de facturas en el MVP | ✅ (no existen `PUT` ni `DELETE`; se comprueba en Swagger) |
 | RN-12 | No se elimina un producto o proveedor con movimientos | ✅ órdenes de compra y facturas |
 | RN-13 | No puede haber dos asociaciones con el mismo proveedor y producto | ✅ |
 | RN-14 | Al eliminar un producto o proveedor se eliminan sus asociaciones | ✅ |
@@ -538,7 +540,8 @@ Estas son **pruebas unitarias de los servicios**: usan **JUnit 5** (para escribi
 | `ProductoServiceTest` | 19 | Subir y bajar stock, cantidades inválidas, stock bajo, eliminar, multi-tenant |
 | `ProveedorServiceTest` | 8 | CRUD, eliminar con y sin órdenes, multi-tenant |
 | `ProveedorProductoServiceTest` | 11 | Asociaciones, duplicados, precio de compra |
-| **Total** | **56** | |
+| `FacturaServiceTest` | 11 | Crear facturas, precios y totales, descuento de stock, atomicidad, multi-tenant |
+| **Total** | **67** | |
 
 ### Comandos útiles
 
@@ -599,12 +602,12 @@ Cuando falla la validación de varios campos a la vez, el mensaje los junta: `no
 | Fase | Contenido | Estado |
 |---|---|---|
 | **Fase 0** | Inventario, Compras y Ventas en el backend, sin login | ✅ Hecho |
-| **Fase 0 (resto)** | Pruebas de Ventas (`FacturaServiceTest`), colección de Postman, medición de complejidad y cobertura de pruebas (JaCoCo) | 🔜 Siguiente |
+| **Fase 0 (resto)** | Colección de Postman, medición de complejidad y cobertura de pruebas (JaCoCo) | 🔜 Siguiente |
 | **Fase 1 · MVP** | Registro y login con JWT, roles ADMIN y EMPLEADO, empresa; páginas HTML + JavaScript | Pendiente |
 | **Fase 2** | Reportes, PDF de facturas y órdenes, clientes, logo, pruebas de integración y refactor de inversión de dependencias | Futuro |
 | **Fase 3** | Permisos por rol en la interfaz, HTTPS, instalador, despliegue en la nube, modo sin conexión, React, app móvil | Futuro |
 
-**Limitaciones conocidas hoy:** no hay login ni roles; todo opera como empresa `1`, usuario `1`; la base de datos es temporal; las facturas todavía no tienen pruebas automáticas.
+**Limitaciones conocidas hoy:** no hay login ni roles; todo opera como empresa `1`, usuario `1`; la base de datos es temporal; las pruebas no usan base de datos real (consultas, validaciones y rollback se comprueban a mano).
 
 ---
 
