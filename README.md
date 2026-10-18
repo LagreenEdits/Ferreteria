@@ -1,6 +1,6 @@
 # Xorr · Sistema Gestor de Ferreterías
 
-Xorr es una aplicación para que las **microferreterías del Tolima** controlen su **inventario**, sus **proveedores** y sus **órdenes de compra** (y, próximamente, las **facturas de venta**). Está pensada para que varias ferreterías usen el mismo sistema sin ver los datos de las demás.
+Xorr es una aplicación para que las **microferreterías del Tolima** controlen su **inventario**, sus **proveedores** y sus **órdenes de compra** y sus **facturas de venta**. Está pensada para que varias ferreterías usen el mismo sistema sin ver los datos de las demás.
 
 Es un proyecto académico del curso de **Calidad de Software** (IDEAD, Universidad del Tolima), construido por un equipo de tres desarrolladores. Por eso se construye **por fases, de forma simple y con pruebas**: primero lo básico funcionando, después lo demás.
 
@@ -36,17 +36,17 @@ Es un proyecto académico del curso de **Calidad de Software** (IDEAD, Universid
 
 | Módulo | Estado | Qué incluye |
 |---|---|---|
-| **Inventario · Productos** | ✅ Listo | Crear, listar, ver, actualizar y eliminar productos; listar los de **stock bajo**; subir y bajar stock con validaciones |
+| **Inventario · Productos** | ✅ Listo | Crear, listar, ver, actualizar y eliminar productos; listar los de **stock bajo**. Subir y bajar stock son métodos internos que usan Compras y Ventas (no tienen endpoint propio) |
 | **Inventario · Proveedores** | ✅ Listo | Crear, listar, ver, actualizar y eliminar proveedores |
 | **Inventario · Proveedor-Producto** | ✅ Listo | Asociar un producto a un proveedor con su **precio de compra** |
 | **Compras** | ✅ Listo | Crear una orden de compra con varias líneas, **recibirla** (sube el stock), **cancelarla**, consultarla y listarla |
-| **Regla "no borrar con movimientos"** | ✅ Listo | No deja eliminar un producto o proveedor que ya tiene órdenes de compra |
-| **Ventas (facturas)** | 🔜 Siguiente | Vender descontando stock |
+| **Regla "no borrar con movimientos"** | ✅ Listo | No deja eliminar un producto con órdenes de compra o facturas, ni un proveedor con órdenes de compra |
+| **Ventas (facturas)** | ✅ Listo | Crear una factura con varias líneas (descuenta el stock), consultarla y listarla. Las facturas no se anulan ni se borran |
 | **Seguridad (login y roles)** | 🔜 Pendiente | Hoy **no hay login**: todo se hace como la empresa 1 y el usuario 1 |
 | **Pantallas web (frontend)** | 🔜 Pendiente | Páginas HTML + JavaScript |
 | **Reportes, PDF, clientes** | 🔜 Fase 2 | |
 
-**Pruebas automáticas:** 55 pruebas, todas en verde (`BUILD SUCCESS`).
+**Pruebas automáticas:** 56 pruebas, todas en verde (`BUILD SUCCESS`). Las pruebas del servicio de Ventas (`FacturaServiceTest`) todavía no existen.
 
 **Base de datos:** H2 en memoria. Es una base de datos temporal que **se borra cada vez que apagas la aplicación**. MySQL ya está incluido como dependencia, pero todavía no está configurado.
 
@@ -171,7 +171,7 @@ mvn test
 La primera vez tarda más porque Maven descarga las librerías (necesitas internet). Al final debes ver:
 
 ```
-Tests run: 55, Failures: 0, Errors: 0, Skipped: 0
+Tests run: 56, Failures: 0, Errors: 0, Skipped: 0
 BUILD SUCCESS
 ```
 
@@ -284,6 +284,27 @@ La orden pasa a `RECIBIDA`. Comprueba con `GET /api/productos/1` que el stock ah
 | `GET /api/productos/999` | `404` · producto no encontrado |
 | Crear una orden con `"cantidad": 0` | `400` · `detalles[0].cantidad: La cantidad debe ser mayor que cero` |
 
+**Paso 8 · Vender (crear una factura)** → `POST /api/facturas`
+
+```json
+{
+  "detalles": [
+    { "idProducto": 1, "cantidad": 3 }
+  ]
+}
+```
+Respuesta: `201`. Fíjate: **no envías precios**. El servidor toma el precio de `Producto.precioVenta` (15000), calcula el subtotal y el total (45000) y descuenta el stock. Comprueba con `GET /api/productos/1` que el stock bajó de `12` a `9`.
+
+**Paso 9 · Probar las protecciones de Ventas**
+
+| Qué haces | Qué debe pasar |
+|---|---|
+| Crear una factura con `"cantidad": 100` (más que el stock) | `409` · `Stock insuficiente para 'Martillo': disponible 9, solicitado 100`, y no se guarda nada |
+| Crear una factura con `"cantidad": 0` | `400` · `detalles[0].cantidad: ...` |
+| Crear una factura con `"detalles": []` | `400` · la lista de detalles no puede estar vacía |
+| `DELETE /api/productos/1` | `400` · `No se puede eliminar el producto 'Martillo' porque tiene órdenes de compra` (y si no tuviera órdenes, `... porque tiene facturas`) |
+| `PUT` o `DELETE` sobre `/api/facturas/1` | `405` · las facturas no se anulan ni se borran (RN-11) |
+
 ---
 
 ## 8. Estructura de archivos y rutas
@@ -351,19 +372,34 @@ Xorr/
     │               ├── OrdenCompraRequest.java / OrdenCompraResponse.java
     │               └── DetalleOrdenCompraRequest.java / DetalleOrdenCompraResponse.java
     │
+    │       └── ventas/                       ← Facturas de venta
+    │           ├── controller/
+    │           │   └── FacturaController.java
+    │           ├── service/
+    │           │   ├── FacturaService.java             ← Crear (descuenta stock), listar, consultar
+    │           │   └── MovimientosVentaService.java    ← Consulta de solo lectura que usa Inventario (RN-12)
+    │           ├── repository/
+    │           │   └── FacturaRepository.java
+    │           ├── entity/
+    │           │   ├── Factura.java
+    │           │   └── DetalleFactura.java
+    │           └── dto/
+    │               ├── FacturaRequest.java / FacturaResponse.java
+    │               └── DetalleFacturaRequest.java / DetalleFacturaResponse.java
+    │
     └── test/java/com/xorr/                   ← Pruebas automáticas (misma estructura de paquetes)
         ├── compras/service/
         │   ├── OrdenCompraServiceTest.java           ← 14 pruebas
         │   └── MovimientosCompraServiceTest.java     ← 4 pruebas
         └── inventario/service/
-            ├── ProductoServiceTest.java              ← 18 pruebas
+            ├── ProductoServiceTest.java              ← 19 pruebas
             ├── ProveedorServiceTest.java             ← 8 pruebas
             └── ProveedorProductoServiceTest.java     ← 11 pruebas
 ```
 
 **Carpetas que aparecen al compilar y que no se suben a GitHub:** `target/` (el código compilado y los reportes de pruebas). Si la borras, Maven la vuelve a crear.
 
-**Cómo ubicarte rápido:** cada módulo (`inventario`, `compras`) tiene las mismas cuatro/cinco carpetas: `controller`, `service`, `repository`, `entity`, `dto`. Si buscas "qué pasa cuando creo un producto", empieza en `inventario/controller/ProductoController.java` y sigue hacia `service`.
+**Cómo ubicarte rápido:** cada módulo (`inventario`, `compras`, `ventas`) tiene las mismas cuatro/cinco carpetas: `controller`, `service`, `repository`, `entity`, `dto`. Si buscas "qué pasa cuando creo un producto", empieza en `inventario/controller/ProductoController.java` y sigue hacia `service`.
 
 ---
 
@@ -420,6 +456,16 @@ Cuerpo: `idProveedor` (obligatorio), `idProducto` (obligatorio), `precioCompra` 
 
 Cuerpo de `POST`: `idProveedor` (obligatorio) y `detalles` (lista con al menos una línea). Cada línea: `idProducto` (obligatorio) y `cantidad` (obligatoria, mínimo 1).
 
+### Facturas · `/api/facturas`
+
+| Método | Ruta | Qué hace | Respuesta |
+|---|---|---|---|
+| `POST` | `/api/facturas` | Crea una factura y descuenta el stock | `201` / `400` / `404` / `409` |
+| `GET` | `/api/facturas` | Lista las facturas | `200` |
+| `GET` | `/api/facturas/{id}` | Ve una factura con sus líneas | `200` / `404` |
+
+Cuerpo de `POST`: `detalles` (lista con al menos una línea). Cada línea: `idProducto` (obligatorio) y `cantidad` (obligatoria, mínimo 1). No hay `PUT` ni `DELETE`: las facturas no se anulan ni se borran (RN-11).
+
 ---
 
 ## 10. Cómo está organizado el código
@@ -456,22 +502,22 @@ Reglas de convivencia entre módulos:
 
 ## 11. Reglas de negocio
 
-Las reglas viven en los **servicios** y están probadas con pruebas automáticas.
+Las reglas viven en los **servicios**. Las de Compras e Inventario están probadas con pruebas automáticas; las de Ventas (RN-01 con facturas, RN-03, RN-06, RN-10) esperan a `FacturaServiceTest`.
 
 | Código | Regla | Estado |
 |---|---|---|
-| RN-01 | No se vende sin stock suficiente (se valida solo en `decrementarStock`) | ✅ (aún sin endpoint de ventas) |
+| RN-01 | No se vende sin stock suficiente (se valida solo en `decrementarStock`) | ✅ (`POST /api/facturas` la usa) |
 | RN-02 | Al recibir una orden de compra, sube el stock de sus productos | ✅ |
-| RN-03 | Subtotales y totales los calcula el servidor, nunca el cliente | ✅ en compras |
+| RN-03 | Subtotales y totales los calcula el servidor, nunca el cliente | ✅ en compras y ventas |
 | RN-04 | "Stock bajo" = `stock < stockMinimo` (estricto) | ✅ |
 | RN-05 | Multi-tenant: un recurso de otra empresa se trata como "no encontrado" | ✅ |
-| RN-06 | Recibir una orden es atómico: si falla una línea, no se guarda nada | ✅ |
+| RN-06 | Recibir una orden o crear una factura es atómico: si falla una línea, no se guarda nada | ✅ |
 | RN-07 | Cantidades mayores que 0; precios y stock nunca negativos | ✅ |
 | RN-08 | Una orden solo se recibe o se cancela estando `PENDIENTE`; la recepción no se revierte | ✅ |
 | RN-09 | En una orden solo van productos asociados al proveedor, al precio de esa asociación | ✅ |
-| RN-10 | En una factura el precio sale de `Producto.precioVenta` | 🔜 Ventas |
-| RN-11 | No hay anulación ni borrado de facturas en el MVP | 🔜 Ventas |
-| RN-12 | No se elimina un producto o proveedor con movimientos | ✅ órdenes de compra · 🔜 facturas |
+| RN-10 | En una factura el precio sale de `Producto.precioVenta` | ✅ |
+| RN-11 | No hay anulación ni borrado de facturas en el MVP | ✅ (no existen `PUT` ni `DELETE`) |
+| RN-12 | No se elimina un producto o proveedor con movimientos | ✅ órdenes de compra y facturas |
 | RN-13 | No puede haber dos asociaciones con el mismo proveedor y producto | ✅ |
 | RN-14 | Al eliminar un producto o proveedor se eliminan sus asociaciones | ✅ |
 
@@ -489,10 +535,10 @@ Estas son **pruebas unitarias de los servicios**: usan **JUnit 5** (para escribi
 |---|---|---|
 | `OrdenCompraServiceTest` | 14 | Crear, recibir, cancelar, consultar; precios y totales; estados; multi-tenant |
 | `MovimientosCompraServiceTest` | 4 | Consulta de órdenes por producto y por proveedor |
-| `ProductoServiceTest` | 18 | Subir y bajar stock, cantidades inválidas, stock bajo, eliminar, multi-tenant |
+| `ProductoServiceTest` | 19 | Subir y bajar stock, cantidades inválidas, stock bajo, eliminar, multi-tenant |
 | `ProveedorServiceTest` | 8 | CRUD, eliminar con y sin órdenes, multi-tenant |
 | `ProveedorProductoServiceTest` | 11 | Asociaciones, duplicados, precio de compra |
-| **Total** | **55** | |
+| **Total** | **56** | |
 
 ### Comandos útiles
 
@@ -552,13 +598,13 @@ Cuando falla la validación de varios campos a la vez, el mensaje los junta: `no
 
 | Fase | Contenido | Estado |
 |---|---|---|
-| **Fase 0** | Inventario y Compras en el backend, sin login | ✅ Hecho |
-| **Fase 0 (resto)** | **Ventas (facturas)**, colección de Postman, medición de complejidad y cobertura de pruebas (JaCoCo) | 🔜 Siguiente |
+| **Fase 0** | Inventario, Compras y Ventas en el backend, sin login | ✅ Hecho |
+| **Fase 0 (resto)** | Pruebas de Ventas (`FacturaServiceTest`), colección de Postman, medición de complejidad y cobertura de pruebas (JaCoCo) | 🔜 Siguiente |
 | **Fase 1 · MVP** | Registro y login con JWT, roles ADMIN y EMPLEADO, empresa; páginas HTML + JavaScript | Pendiente |
 | **Fase 2** | Reportes, PDF de facturas y órdenes, clientes, logo, pruebas de integración y refactor de inversión de dependencias | Futuro |
 | **Fase 3** | Permisos por rol en la interfaz, HTTPS, instalador, despliegue en la nube, modo sin conexión, React, app móvil | Futuro |
 
-**Limitaciones conocidas hoy:** no hay login ni roles; todo opera como empresa `1`, usuario `1`; la base de datos es temporal; todavía no existe el módulo de ventas.
+**Limitaciones conocidas hoy:** no hay login ni roles; todo opera como empresa `1`, usuario `1`; la base de datos es temporal; las facturas todavía no tienen pruebas automáticas.
 
 ---
 
