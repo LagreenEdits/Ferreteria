@@ -44,7 +44,7 @@ Es un proyecto académico del curso de **Calidad de Software** (IDEAD, Universid
 | **Ventas (facturas)** | ✅ Listo | Crear una factura con varias líneas (descuenta el stock), consultarla y listarla. Las facturas no se anulan ni se borran |
 | **Seguridad · Registro y login** | ✅ Listo | Registrar un administrador (crea su empresa) e iniciar sesión para recibir un **token JWT**. Las contraseñas se guardan con BCrypt, nunca en claro |
 | **Seguridad · Token, roles y empleados** | ✅ Listo | El token se exige en las rutas protegidas (sin token: `401`; rol sin permiso: `403`). El ADMIN puede todo; el EMPLEADO solo consulta productos y vende. El ADMIN da de alta empleados y los lista. Cada petición opera con la empresa y el usuario del token |
-| **Pantallas web (frontend)** | 🟡 Funcional, con prueba manual pendiente | Una sola página (`index.html`). Para todos los roles: registrar la ferretería, iniciar y cerrar sesión, **Inicio** (ventas de hoy, productos, stock bajo y últimas facturas), productos (solo el ADMIN crea, edita y elimina; el stock bajo se marca en rojo), vista de stock bajo, **Vender** con varias líneas y total, y **Facturas** con detalle. Solo para el ADMIN: **Proveedores**, **Asociaciones** proveedor-producto, **Compras** (crear, recibir y cancelar órdenes) y **Empleados**. Los formularios validan en el navegador las mismas reglas que el backend (el servidor sigue validando). Pendiente: recorrer toda la interfaz a mano en un navegador (ver abajo) |
+| **Pantallas web (frontend)** | ✅ Listo | Una sola página (`index.html`). Para todos los roles: registrar la ferretería, iniciar y cerrar sesión, **Inicio** (ventas de hoy, productos, stock bajo y últimas facturas), productos (solo el ADMIN crea, edita y elimina; el stock bajo se marca en rojo), vista de stock bajo, **Vender** con varias líneas y total, y **Facturas** con detalle. Solo para el ADMIN: **Proveedores**, **Asociaciones** proveedor-producto, **Compras** (crear, recibir y cancelar órdenes) y **Empleados**. Los formularios validan en el navegador las mismas reglas que el backend (el servidor sigue validando). Probado a mano el 19 de octubre de 2026 (ver abajo) |
 | **Facturas y órdenes en PDF** | 🟡 Hecho en el navegador | Botón **Descargar factura en PDF** (tras vender, en Inicio y en Facturas) y botón **PDF** en cada orden de compra. El PDF lo arma la propia página, sin librerías ni endpoint nuevo en el servidor |
 | **Reportes y clientes** | 🔜 Fase 2 | |
 
@@ -52,7 +52,7 @@ Es un proyecto académico del curso de **Calidad de Software** (IDEAD, Universid
 
 **Cobertura y complejidad (JaCoCo, releída el 19 de octubre de 2026 tras correr las 209 pruebas, ya con el refactor y la regla RN-15):** 95 % de las instrucciones (119 de 2.683 sin cubrir) y 96 % de las ramas (1 de 30); en los servicios, 98 % (inventario), 98 % (compras) y 100 % (ventas). La complejidad máxima por método, V(G), es **3** (medida con Checkstyle).
 
-**Verificación del frontend (lo que sí y lo que no se ha comprobado):** el JavaScript compila sin errores y el generador de PDF produce archivos válidos (revisados con `qpdf`, `pdftotext` y a simple vista). El resto de la interfaz **aún no se ha recorrido en un navegador contra el servidor**: esa prueba manual sigue pendiente. Las pruebas automáticas y Postman cubren el backend, no la página.
+**Verificación del frontend:** el JavaScript compila sin errores y el generador de PDF produce archivos válidos (revisados con `qpdf`, `pdftotext` y a simple vista). Además, el equipo recorrió la interfaz a mano el 19 de octubre de 2026: registrar la ferretería, crear un producto, vender y descargar el PDF, provocar el `409` por stock insuficiente, crear un empleado y entrar con él, y revisar Facturas y una orden de compra con su PDF; todo funcionó correctamente. Las pruebas automáticas y Postman cubren el backend; la página se verifica a mano.
 
 **Colección de Postman:** 44 peticiones con 74 comprobaciones automáticas, todas pasadas el 19 de octubre de 2026 (ver la [sección 7](#7-probar-la-api-paso-a-paso)).
 
@@ -364,7 +364,7 @@ Respuesta: `201` con `id`, `nombre`, `correo` y `rol` (`ADMIN`). Nunca devuelve 
   "password": "clave12345"
 }
 ```
-Respuesta: `200` con un `token` (un texto largo) y los datos del usuario. Ese token se envía en cada petición, en la cabecera `Authorization: Bearer <token>`. En Swagger, pulsa **Authorize** y pega solo el texto del token.
+Respuesta: `200` con un `token` (un texto largo) y los datos del usuario. Ese token se envía en cada petición, en la cabecera `Authorization: Bearer <token>`. En Swagger, pulsa **Authorize** y pega solo el texto del token. Con el token puesto `GET /api/productos` responde `200`, y tras pulsar **Logout** responde `401` (comprobado a mano el 19 de octubre de 2026).
 
 | Qué haces | Qué debe pasar |
 |---|---|
@@ -857,11 +857,11 @@ Cuando falla la validación de varios campos a la vez, el mensaje los junta: `no
 |---|---|---|
 | **Fase 0** | Inventario, Compras y Ventas en el backend, sin login | ✅ Hecho |
 | **Fase 0 (resto)** | Colección de Postman, medición de complejidad y cobertura de pruebas (JaCoCo) | ✅ Hecho |
-| **Fase 1 · MVP** | Registro y login con JWT, roles ADMIN y EMPLEADO, empresa; páginas HTML + JavaScript | 🟡 En curso: el backend de Seguridad está hecho (registro, login, token exigido, roles y alta de empleados); las pruebas de integración de usuarios y la medición de cobertura ya están hechas; el frontend ya cubre todos los módulos y descarga PDF, pero falta recorrerlo a mano en un navegador; sigue decidir la duplicación de `normalizar` |
+| **Fase 1 · MVP** | Registro y login con JWT, roles ADMIN y EMPLEADO, empresa; páginas HTML + JavaScript | 🟡 En curso: el backend de Seguridad está hecho (registro, login, token exigido, roles y alta de empleados); las pruebas de integración de usuarios y la medición de cobertura ya están hechas; el frontend ya cubre todos los módulos, descarga PDF y fue probado a mano; sigue decidir la duplicación de `normalizar` |
 | **Fase 2** | Reportes, clientes, logo, endpoint `GET /api/empresa` para el nombre de la ferretería (hoy vive en el navegador), RN-15 en órdenes de compra, más pruebas de integración (el refactor de inversión de dependencias ya se hizo el 19-10-2026) | Futuro |
 | **Fase 3** | Permisos por rol en la interfaz, HTTPS, instalador, despliegue en la nube, modo sin conexión, React, app móvil | Futuro |
 
-**Limitaciones conocidas hoy:** el token se exige y los datos se filtran por la empresa del token; no hay edición ni baja de empleados; el frontend no se ha probado a mano de punta a punta y la sesión dura mientras la pestaña esté abierta; el nombre de la ferretería solo existe en el navegador donde se registró; los PDF salen de la página y no quedan guardados en el servidor; Swagger y la consola H2 están abiertos sin token (hay que cerrarlos con un perfil de producción antes de un despliegue real); el secreto del token de desarrollo está en el repositorio; la base de datos es temporal; las pruebas unitarias no usan base de datos real (las consultas, las validaciones y el rollback se cubren con clases de integración; el resto de la integración queda para la Fase 2).
+**Limitaciones conocidas hoy:** el token se exige y los datos se filtran por la empresa del token; no hay edición ni baja de empleados; la sesión del frontend dura mientras la pestaña esté abierta; el nombre de la ferretería solo existe en el navegador donde se registró; los PDF salen de la página y no quedan guardados en el servidor; Swagger y la consola H2 están abiertos sin token (hay que cerrarlos con un perfil de producción antes de un despliegue real); el secreto del token de desarrollo está en el repositorio; la base de datos es temporal; las pruebas unitarias no usan base de datos real (las consultas, las validaciones y el rollback se cubren con clases de integración; el resto de la integración queda para la Fase 2).
 
 ---
 
