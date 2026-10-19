@@ -32,7 +32,7 @@ Es un proyecto académico del curso de **Calidad de Software** (IDEAD, Universid
 
 ## 1. Estado actual del proyecto
 
-**Fase actual: Fase 0 (versión mínima).** Solo existe el **backend** (la parte que guarda datos y aplica las reglas). **No hay pantallas todavía**: se prueba con Swagger, una página que genera el propio proyecto.
+**Fase actual: Fase 0 (versión mínima), completada.** Solo existe el **backend** (la parte que guarda datos y aplica las reglas). **No hay pantallas todavía**: se prueba con Swagger (una página que genera el propio proyecto) o con la colección de Postman. Sigue la Fase 1, empezando por la Seguridad (login y roles).
 
 | Módulo | Estado | Qué incluye |
 |---|---|---|
@@ -46,7 +46,11 @@ Es un proyecto académico del curso de **Calidad de Software** (IDEAD, Universid
 | **Pantallas web (frontend)** | 🔜 Pendiente | Páginas HTML + JavaScript |
 | **Reportes, PDF, clientes** | 🔜 Fase 2 | |
 
-**Pruebas automáticas:** 67 pruebas, todas en verde (`BUILD SUCCESS`).
+**Pruebas automáticas:** 75 pruebas, todas en verde (`BUILD SUCCESS`).
+
+**Cobertura y complejidad (JaCoCo):** 86 % de las instrucciones y 100 % de las ramas cubiertas; en los servicios, 96 % (inventario), 98 % (compras) y 100 % (ventas). La complejidad máxima por método (V(G)) es 2.
+
+**Colección de Postman:** 24 peticiones con 34 comprobaciones automáticas, todas en verde (ver la [sección 7](#7-probar-la-api-paso-a-paso)).
 
 **Base de datos:** H2 en memoria. Es una base de datos temporal que **se borra cada vez que apagas la aplicación**. MySQL ya está incluido como dependencia, pero todavía no está configurado.
 
@@ -116,6 +120,7 @@ Cuando llega mercancía, el dueño marca la orden como **RECIBIDA** y el stock s
 | **Bean Validation** | (incluido) | Valida los datos de entrada (campos obligatorios, números no negativos...) |
 | **springdoc-openapi** | 2.6.0 | Genera **Swagger**, la página para probar la API |
 | **JUnit 5 + Mockito** | (incluido) | Pruebas automáticas |
+| **JaCoCo** | 0.8.15 | Mide qué parte del código ejecutan las pruebas (cobertura) y su complejidad |
 
 > **Dato técnico:** el proyecto compila para Java 17, pero se ha probado con **JDK 25**. Para que Mockito funcione en JDK 25, el `pom.xml` fuerza la versión `1.17.7` de Byte Buddy (propiedad `byte-buddy.version`). No la quites.
 
@@ -129,7 +134,7 @@ Cuando llega mercancía, el dueño marca la orden como **RECIBIDA** y el stock s
 | **Maven 3.9 o superior** | Construir y probar | `mvn -v` |
 | **Git** | Descargar el código y subir cambios | `git --version` |
 | Un editor (recomendado: **VS Code** con el *Extension Pack for Java*, o **IntelliJ IDEA**) | Leer y editar el código | — |
-| **Postman** (opcional) | Probar la API más cómodo que con Swagger | — |
+| **Postman** (opcional) | Probar la API más cómodo que con Swagger y ejecutar la colección de pruebas | — |
 
 Abre una terminal (en Windows: `cmd`, PowerShell o la terminal de VS Code) y escribe los tres comandos de la columna derecha. Si alguno dice que "no se reconoce", todavía no está instalado o no está en el `PATH` (mira [Problemas frecuentes](#14-problemas-frecuentes)).
 
@@ -171,9 +176,11 @@ mvn test
 La primera vez tarda más porque Maven descarga las librerías (necesitas internet). Al final debes ver:
 
 ```
-Tests run: 67, Failures: 0, Errors: 0, Skipped: 0
+Tests run: 75, Failures: 0, Errors: 0, Skipped: 0
 BUILD SUCCESS
 ```
+
+`mvn test` también genera el **reporte de cobertura de JaCoCo**: ábrelo en `target/site/jacoco/index.html`.
 
 Verás varios mensajes `WARNING` sobre Java, `Unsafe` o un agente de Byte Buddy. **Son inofensivos**: los producen las versiones recientes de Java con Maven y Mockito, no tu código.
 
@@ -305,6 +312,15 @@ Respuesta: `201`. Fíjate: **no envías precios**. El servidor toma el precio de
 | `DELETE /api/productos/1` | `400` · `No se puede eliminar el producto 'Martillo' porque tiene órdenes de compra` (y si no tuviera órdenes, `... porque tiene facturas`) |
 | `PUT` o `DELETE` sobre `/api/facturas/1` | `405` · las facturas no se anulan ni se borran (RN-11) |
 
+**Paso 10 · Hacer el mismo recorrido con Postman**
+
+La colección `postman/Xorr.postman_collection.json` (24 peticiones, con la variable `baseUrl` = `http://localhost:8081`) repite este recorrido de forma automática. Impórtala en Postman y ejecútala con el **Collection Runner**, en el orden en que aparecen las peticiones. Cada corrida crea datos nuevos (la base es en memoria) y no necesita login.
+
+- **Carpeta 1 · Flujo principal (11 pasos):** crear producto y proveedor, asociarlos, crear y recibir una orden, vender, comprobar el stock, el stock bajo y las facturas.
+- **Carpeta 2 · Reglas y protecciones (13 casos):** los errores `400`, `404`, `405` y `409` de las tablas anteriores.
+
+Resultado esperado: **34 comprobaciones, 34 pasadas, 0 fallos**. Cuando llegue el login, la colección deberá guardar el token y enviarlo en `Authorization: Bearer`.
+
 ---
 
 ## 8. Estructura de archivos y rutas
@@ -313,9 +329,11 @@ Todas las rutas son relativas a la raíz del proyecto (donde está `pom.xml`).
 
 ```
 Xorr/
-├── pom.xml                          ← Configuración de Maven: dependencias y versiones
+├── pom.xml                          ← Configuración de Maven: dependencias, versiones y JaCoCo
 ├── .gitignore                       ← Archivos que Git no sube (target/, .idea/, .vscode/, .env...)
 ├── README.md                        ← Este archivo
+├── postman/
+│   └── Xorr.postman_collection.json ← Colección de Postman (24 peticiones, 34 comprobaciones)
 ├── .github/modernize/               ← Lo generó una herramienta de VS Code (actualización de Java); no es parte del proyecto
 │
 └── src/
@@ -392,14 +410,16 @@ Xorr/
         │   ├── OrdenCompraServiceTest.java           ← 14 pruebas
         │   └── MovimientosCompraServiceTest.java     ← 4 pruebas
         ├── ventas/service/
-        │   └── FacturaServiceTest.java               ← 11 pruebas
+        │   ├── FacturaServiceTest.java               ← 11 pruebas
+        │   └── MovimientosVentaServiceTest.java      ← 2 pruebas
         └── inventario/service/
             ├── ProductoServiceTest.java              ← 19 pruebas
+            ├── ProductoServiceCrudTest.java          ← 6 pruebas
             ├── ProveedorServiceTest.java             ← 8 pruebas
             └── ProveedorProductoServiceTest.java     ← 11 pruebas
 ```
 
-**Carpetas que aparecen al compilar y que no se suben a GitHub:** `target/` (el código compilado y los reportes de pruebas). Si la borras, Maven la vuelve a crear.
+**Carpetas que aparecen al compilar y que no se suben a GitHub:** `target/` (el código compilado, los reportes de pruebas y el de cobertura en `target/site/jacoco/`). Si la borras, Maven la vuelve a crear.
 
 **Cómo ubicarte rápido:** cada módulo (`inventario`, `compras`, `ventas`) tiene las mismas cuatro/cinco carpetas: `controller`, `service`, `repository`, `entity`, `dto`. Si buscas "qué pasa cuando creo un producto", empieza en `inventario/controller/ProductoController.java` y sigue hacia `service`.
 
@@ -486,7 +506,7 @@ Reglas de convivencia entre módulos:
 
 - La API **siempre** usa DTO, **nunca** entidades.
 - Un servicio usa **solo los repositorios de su módulo**. Si necesita datos de otro módulo, llama al **servicio** de ese módulo (por ejemplo, `OrdenCompraService` llama a `ProductoService`, no a `ProductoRepository`).
-- Dependencias permitidas: **Compras → Inventario**, y **Inventario → Compras** solo a través de `MovimientosCompraService` (consulta de lectura para impedir borrar productos o proveedores con órdenes). Esta última es una excepción justificada que se corregirá en la Fase 2.
+- Dependencias permitidas: **Compras → Inventario** y **Ventas → Inventario**; e **Inventario → Compras** e **Inventario → Ventas** solo a través de `MovimientosCompraService` y `MovimientosVentaService` (consultas de lectura para impedir borrar productos o proveedores con órdenes o facturas). Estas dos últimas son excepciones justificadas que se corregirán en la Fase 2.
 
 ### El "contexto actual"
 
@@ -518,7 +538,7 @@ Las reglas viven en los **servicios** y están probadas con pruebas automáticas
 | RN-08 | Una orden solo se recibe o se cancela estando `PENDIENTE`; la recepción no se revierte | ✅ |
 | RN-09 | En una orden solo van productos asociados al proveedor, al precio de esa asociación | ✅ |
 | RN-10 | En una factura el precio sale de `Producto.precioVenta` | ✅ |
-| RN-11 | No hay anulación ni borrado de facturas en el MVP | ✅ (no existen `PUT` ni `DELETE`; se comprueba en Swagger) |
+| RN-11 | No hay anulación ni borrado de facturas en el MVP | ✅ (no existen `PUT` ni `DELETE`; la colección de Postman confirma el `405`) |
 | RN-12 | No se elimina un producto o proveedor con movimientos | ✅ órdenes de compra y facturas |
 | RN-13 | No puede haber dos asociaciones con el mismo proveedor y producto | ✅ |
 | RN-14 | Al eliminar un producto o proveedor se eliminan sus asociaciones | ✅ |
@@ -537,11 +557,26 @@ Estas son **pruebas unitarias de los servicios**: usan **JUnit 5** (para escribi
 |---|---|---|
 | `OrdenCompraServiceTest` | 14 | Crear, recibir, cancelar, consultar; precios y totales; estados; multi-tenant |
 | `MovimientosCompraServiceTest` | 4 | Consulta de órdenes por producto y por proveedor |
-| `ProductoServiceTest` | 19 | Subir y bajar stock, cantidades inválidas, stock bajo, eliminar, multi-tenant |
+| `ProductoServiceTest` | 19 | Subir y bajar stock, cantidades inválidas, stock bajo, eliminar (con órdenes y con facturas), multi-tenant |
+| `ProductoServiceCrudTest` | 6 | Crear, listar, obtener y actualizar; un producto de otra empresa se trata como no encontrado |
 | `ProveedorServiceTest` | 8 | CRUD, eliminar con y sin órdenes, multi-tenant |
 | `ProveedorProductoServiceTest` | 11 | Asociaciones, duplicados, precio de compra |
 | `FacturaServiceTest` | 11 | Crear facturas, precios y totales, descuento de stock, atomicidad, multi-tenant |
-| **Total** | **67** | |
+| `MovimientosVentaServiceTest` | 2 | Consulta de facturas por producto |
+| **Total** | **75** | |
+
+### Cobertura y complejidad (JaCoCo)
+
+**Cobertura** es el porcentaje del código que las pruebas ejecutan. **JaCoCo** la mide cada vez que corres `mvn test` y deja el reporte en `target/site/jacoco/index.html`.
+
+| Medida | Resultado |
+|---|---|
+| Instrucciones cubiertas (total) | 86 % |
+| Ramas cubiertas | 100 % |
+| Servicios de inventario / compras / ventas | 96 % / 98 % / 100 % |
+| Complejidad máxima por método, V(G) (meta: 10 o menos) | 2 |
+
+Los controladores y `common` no tienen pruebas unitarias a propósito, por eso bajan el total.
 
 ### Comandos útiles
 
@@ -553,9 +588,9 @@ mvn test -Dtest=OrdenCompraServiceTest#cancelar_ordenPendiente_quedaCanceladaSin
 
 Los reportes detallados quedan en `target/surefire-reports/`.
 
-### Lo que las pruebas **no** cubren (y se comprueba a mano en Swagger)
+### Lo que las pruebas unitarias **no** cubren (y se comprueba en Swagger o con Postman)
 
-Como no usan base de datos real, no ejecutan: las consultas de los repositorios (por ejemplo, el `<` estricto del stock bajo), la validación de los DTO (campos obligatorios, números negativos) ni el "deshacer" (rollback) de las transacciones. Por eso el recorrido de la [sección 7](#7-probar-la-api-paso-a-paso) es parte de las comprobaciones del proyecto.
+Como no usan base de datos real, no ejecutan: las consultas de los repositorios (por ejemplo, el `<` estricto del stock bajo), la validación de los DTO (campos obligatorios, números negativos) ni el "deshacer" (rollback) de las transacciones. Por eso el recorrido de la [sección 7](#7-probar-la-api-paso-a-paso) y la colección de Postman, que sí usan la aplicación real, son parte de las comprobaciones del proyecto.
 
 ### Si escribes pruebas con Mockito
 
@@ -602,12 +637,12 @@ Cuando falla la validación de varios campos a la vez, el mensaje los junta: `no
 | Fase | Contenido | Estado |
 |---|---|---|
 | **Fase 0** | Inventario, Compras y Ventas en el backend, sin login | ✅ Hecho |
-| **Fase 0 (resto)** | Colección de Postman, medición de complejidad y cobertura de pruebas (JaCoCo) | 🔜 Siguiente |
-| **Fase 1 · MVP** | Registro y login con JWT, roles ADMIN y EMPLEADO, empresa; páginas HTML + JavaScript | Pendiente |
+| **Fase 0 (resto)** | Colección de Postman, medición de complejidad y cobertura de pruebas (JaCoCo) | ✅ Hecho |
+| **Fase 1 · MVP** | Registro y login con JWT, roles ADMIN y EMPLEADO, empresa; páginas HTML + JavaScript | 🔜 Siguiente (empieza por Seguridad) |
 | **Fase 2** | Reportes, PDF de facturas y órdenes, clientes, logo, pruebas de integración y refactor de inversión de dependencias | Futuro |
 | **Fase 3** | Permisos por rol en la interfaz, HTTPS, instalador, despliegue en la nube, modo sin conexión, React, app móvil | Futuro |
 
-**Limitaciones conocidas hoy:** no hay login ni roles; todo opera como empresa `1`, usuario `1`; la base de datos es temporal; las pruebas no usan base de datos real (consultas, validaciones y rollback se comprueban a mano).
+**Limitaciones conocidas hoy:** no hay login ni roles; todo opera como empresa `1`, usuario `1`; la base de datos es temporal; las pruebas unitarias no usan base de datos real (consultas, validaciones y rollback se comprueban a mano en Swagger o con Postman).
 
 ---
 
@@ -658,6 +693,8 @@ Reglas de oro: no mezcles lógica de negocio en los controladores, no uses entid
 | **JPA** | Tecnología de Java para guardar objetos en la base sin escribir SQL a mano |
 | **Swagger** | Página generada por el proyecto para probar la API desde el navegador |
 | **Postman** | Programa para enviar peticiones a una API |
+| **Cobertura (JaCoCo)** | Porcentaje del código que ejecutan las pruebas; JaCoCo es la herramienta que lo mide |
+| **V(G) (complejidad ciclomática)** | Número de caminos de decisión de un método; entre más bajo, más fácil de entender y probar |
 | **Prueba unitaria** | Código que comprueba que una pieza pequeña funciona bien |
 | **Mock (Mockito)** | Un "doble" de una clase, usado en pruebas para no depender de la base de datos |
 | **JUnit** | Librería para escribir pruebas en Java |
