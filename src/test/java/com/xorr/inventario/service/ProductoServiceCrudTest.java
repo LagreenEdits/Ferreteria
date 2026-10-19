@@ -18,6 +18,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.xorr.SesionDePrueba;
 import com.xorr.common.ContextoActual;
 import com.xorr.common.RecursoNoEncontradoException;
 import com.xorr.compras.service.MovimientosCompraService;
@@ -31,7 +32,7 @@ import com.xorr.ventas.service.MovimientosVentaService;
 // Cubre crear, listar, obtener y actualizar. El filtro real por empresa vive en las
 // consultas del repositorio (Mockito no las ejecuta): aquí se comprueba que el
 // servicio las llama con la empresa actual.
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({ MockitoExtension.class, SesionDePrueba.class })
 class ProductoServiceCrudTest {
 
     private static final Long ID_EMPRESA = 1L;

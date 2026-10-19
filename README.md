@@ -32,7 +32,7 @@ Es un proyecto académico del curso de **Calidad de Software** (IDEAD, Universid
 
 ## 1. Estado actual del proyecto
 
-**Fase actual: Fase 1 (MVP), en curso.** La Fase 0 (versión mínima) está completada y la Fase 1 empezó por la **Seguridad**: ya se puede **registrar un administrador** (que crea su empresa) e **iniciar sesión** para recibir un token JWT. Todavía **ningún endpoint exige ese token**; eso llega con el siguiente subpaso. Solo existe el **backend** (la parte que guarda datos y aplica las reglas). **No hay pantallas todavía**: se prueba con Swagger (una página que genera el propio proyecto) o con la colección de Postman.
+**Fase actual: Fase 1 (MVP), en curso.** La Fase 0 (versión mínima) está completada y la Fase 1 empezó por la **Seguridad**: ya se puede **registrar un administrador** (que crea su empresa), **iniciar sesión** para recibir un token JWT y **dar de alta empleados**. **El token ya se exige** en todas las rutas (salvo el registro, el login, Swagger y la consola H2) y cada petición trabaja con la empresa y el usuario del token. Solo existe el **backend** (la parte que guarda datos y aplica las reglas). **No hay pantallas todavía**: se prueba con Swagger (una página que genera el propio proyecto) o con la colección de Postman.
 
 | Módulo | Estado | Qué incluye |
 |---|---|---|
@@ -43,15 +43,15 @@ Es un proyecto académico del curso de **Calidad de Software** (IDEAD, Universid
 | **Regla "no borrar con movimientos"** | ✅ Listo | No deja eliminar un producto con órdenes de compra o facturas, ni un proveedor con órdenes de compra |
 | **Ventas (facturas)** | ✅ Listo | Crear una factura con varias líneas (descuenta el stock), consultarla y listarla. Las facturas no se anulan ni se borran |
 | **Seguridad · Registro y login** | ✅ Listo | Registrar un administrador (crea su empresa) e iniciar sesión para recibir un **token JWT**. Las contraseñas se guardan con BCrypt, nunca en claro |
-| **Seguridad · Token y roles** | 🔜 Siguiente | Exigir el token, permisos por rol (ADMIN y EMPLEADO) y alta de empleados. Hoy el token **no se exige**: todo se hace como la empresa 1 y el usuario 1 |
+| **Seguridad · Token, roles y empleados** | ✅ Listo | El token se exige en las rutas protegidas (sin token: `401`; rol sin permiso: `403`). El ADMIN puede todo; el EMPLEADO solo consulta productos y vende. El ADMIN da de alta empleados y los lista. Cada petición opera con la empresa y el usuario del token |
 | **Pantallas web (frontend)** | 🔜 Pendiente | Páginas HTML + JavaScript |
 | **Reportes, PDF, clientes** | 🔜 Fase 2 | |
 
-**Pruebas automáticas:** 137 pruebas, todas en verde (`BUILD SUCCESS`): 104 de la Fase 0 y 33 de Seguridad.
+**Pruebas automáticas:** 189 pruebas, todas en verde (`BUILD SUCCESS`): 104 de la Fase 0 y 85 de Seguridad.
 
 **Cobertura y complejidad (JaCoCo, medida con las 104 pruebas de la Fase 0; sin remedir con las de Seguridad):** 88 % de las instrucciones y 100 % de las ramas cubiertas; en los servicios, 96 % (inventario), 98 % (compras) y 100 % (ventas). La complejidad máxima por método (V(G)) es 2.
 
-**Colección de Postman:** 31 peticiones con 47 comprobaciones automáticas, todas pasadas el 18 de octubre de 2026 (ver la [sección 7](#7-probar-la-api-paso-a-paso)).
+**Colección de Postman:** 44 peticiones con 74 comprobaciones automáticas, todas pasadas el 19 de octubre de 2026 (ver la [sección 7](#7-probar-la-api-paso-a-paso)).
 
 **Base de datos:** H2 en memoria. Es una base de datos temporal que **se borra cada vez que apagas la aplicación**: también desaparecen los usuarios registrados, así que después de reiniciar hay que registrar al administrador otra vez. MySQL ya está incluido como dependencia, pero todavía no está configurado.
 
@@ -98,7 +98,7 @@ Tú (Swagger, Postman o una página web)
 
 Cuando llega mercancía, el dueño marca la orden como **RECIBIDA** y el stock sube:
 
-1. Haces `PUT /api/ordenes-compra/1/recibir`.
+1. Haces `PUT /api/ordenes-compra/1/recibir`, enviando tu token en la cabecera `Authorization`.
 2. `OrdenCompraController` recibe la petición y llama a `OrdenCompraService.recibir(1)`.
 3. El servicio busca la orden **de tu empresa** (si es de otra empresa, responde "no encontrada").
 4. Comprueba que la orden esté `PENDIENTE` (una orden ya recibida o cancelada no se puede volver a recibir).
@@ -119,8 +119,8 @@ Cuando llega mercancía, el dueño marca la orden como **RECIBIDA** y el stock s
 | **H2** | (incluido) | Base de datos en memoria para desarrollo |
 | **MySQL Connector** | (incluido) | Para usar MySQL más adelante (aún sin configurar) |
 | **Bean Validation** | (incluido) | Valida los datos de entrada (campos obligatorios, números negativos...) |
-| **Spring Security Crypto** | (versión de Spring Boot) | Solo la parte de **BCrypt**, para guardar contraseñas cifradas. Todavía no se usa el filtro de seguridad completo |
-| **jjwt** | 0.12.6 | Crea y lee los **tokens JWT** del login |
+| **Spring Security** | (versión de Spring Boot) | Exige el token en cada petición, aplica los permisos por rol y trae **BCrypt**, que se usa para guardar las contraseñas cifradas |
+| **jjwt** | 0.12.6 | Crea y lee los **tokens JWT**: los entrega el login y el filtro de seguridad los lee en cada petición |
 | **springdoc-openapi** | 2.6.0 | Genera **Swagger**, la página para probar la API |
 | **JUnit 5 + Mockito** | (incluido) | Pruebas automáticas |
 | **JaCoCo** | 0.8.15 | Mide qué parte del código ejecutan las pruebas (cobertura) y su complejidad |
@@ -179,7 +179,7 @@ mvn test
 La primera vez tarda más porque Maven descarga las librerías (necesitas internet). Al final debes ver:
 
 ```
-Tests run: 137, Failures: 0, Errors: 0, Skipped: 0
+Tests run: 189, Failures: 0, Errors: 0, Skipped: 0
 BUILD SUCCESS
 ```
 
@@ -241,6 +241,8 @@ xorr.jwt.expiracion-minutos=480
 ## 7. Probar la API paso a paso
 
 Con la aplicación arrancada, abre **Swagger** (http://localhost:8081/swagger-ui.html). Verás un grupo de endpoints por cada controlador. Para probar uno: ábrelo, pulsa **Try it out**, escribe el cuerpo (si lo pide) y pulsa **Execute**.
+
+> **Antes de empezar:** casi todas las rutas exigen un token. Haz primero el **Paso 11** (registrar un administrador e iniciar sesión), pulsa **Authorize** en Swagger y pega solo el texto del token (sin la palabra `Bearer`). Si no lo haces, las peticiones responderán `401`.
 
 Este recorrido sirve para entender todo el sistema. Hazlo **en orden** y con la base recién arrancada (los números `id` empiezan en 1).
 
@@ -330,12 +332,14 @@ Respuesta: `201`. Fíjate: **no envías precios**. El servidor toma el precio de
 
 **Paso 10 · Hacer el mismo recorrido con Postman**
 
-La colección `postman/Xorr.postman_collection.json` (31 peticiones, con la variable `baseUrl` = `http://localhost:8081`) repite este recorrido de forma automática. Impórtala en Postman y ejecútala con el **Collection Runner**, en el orden en que aparecen las peticiones. Cada corrida crea datos nuevos (la base es en memoria) y no necesita login.
+La colección `postman/Xorr.postman_collection.json` (44 peticiones, con la variable `baseUrl` = `http://localhost:8081`) repite este recorrido de forma automática. Impórtala en Postman y ejecútala con el **Collection Runner**, en el orden en que aparecen las peticiones. Cada corrida crea datos nuevos (la base es en memoria) y registra su propio administrador y su propio empleado, así que no necesitas iniciar sesión a mano.
 
+- **Carpeta 0 · Autenticación (3 pasos):** registra un administrador con una empresa nueva, inicia sesión y guarda el token (las demás carpetas lo envían solas), y comprueba que sin token se responde `401`.
 - **Carpeta 1 · Flujo principal (11 pasos):** crear producto y proveedor, asociarlos, crear y recibir una orden, vender, comprobar el stock, el stock bajo y las facturas.
 - **Carpeta 2 · Reglas y protecciones (20 casos):** los errores `400`, `404`, `405` y `409` de las tablas anteriores, el límite del stock bajo (un producto con stock igual al mínimo no aparece) y los valores negativos (stock, precios y cantidades).
+- **Carpeta 3 · Usuarios y roles (10 pasos):** el administrador crea un empleado y lista los usuarios de su empresa; el empleado inicia sesión y se comprueba que recibe `403` en `/api/usuarios` y al crear productos, pero puede ver productos y vender.
 
-Resultado esperado: **47 comprobaciones pasadas, 0 fallos**. La colección todavía no usa login (el token aún no se exige); cuando se exija, deberá guardar el token y enviarlo en `Authorization: Bearer`.
+Resultado esperado: **74 comprobaciones pasadas, 0 fallos**. La colección guarda el token del administrador (`token`) y el del empleado (`tokenEmpleado`) y los envía en `Authorization: Bearer`.
 
 **Paso 11 · Registrar un administrador e iniciar sesión** → `POST /api/auth/registro-admin`
 
@@ -355,7 +359,7 @@ Respuesta: `201` con `id`, `nombre`, `correo` y `rol` (`ADMIN`). Nunca devuelve 
   "password": "clave12345"
 }
 ```
-Respuesta: `200` con un `token` (un texto largo) y los datos del usuario. Ese token se enviará más adelante en la cabecera `Authorization: Bearer <token>`.
+Respuesta: `200` con un `token` (un texto largo) y los datos del usuario. Ese token se envía en cada petición, en la cabecera `Authorization: Bearer <token>`. En Swagger, pulsa **Authorize** y pega solo el texto del token.
 
 | Qué haces | Qué debe pasar |
 |---|---|
@@ -366,6 +370,29 @@ Respuesta: `200` con un `token` (un texto largo) y los datos del usuario. Ese to
 | Iniciar sesión con un correo que no existe | `401` · el mismo mensaje (así no se revela qué correos existen) |
 
 Para ver qué lleva el token puedes pegarlo en [jwt.io](https://jwt.io): verás `idUsuario`, `idEmpresa` y `rol`.
+
+**Paso 12 · Crear un empleado y probar los permisos** → `POST /api/usuarios` (con el token del administrador)
+
+```json
+{
+  "nombre": "Luis Gómez",
+  "correo": "luis@correo.com",
+  "password": "clave12345"
+}
+```
+Respuesta: `201` con `id`, `nombre`, `correo` y `rol` (`EMPLEADO`). No envías ni el rol ni la empresa: el rol siempre es `EMPLEADO` y la empresa es la del administrador. `GET /api/usuarios` lista los usuarios de tu empresa. Después inicia sesión con el correo del empleado (`POST /api/auth/login`), pulsa **Authorize** con **su** token y prueba:
+
+| Qué haces con el token del empleado | Qué debe pasar |
+|---|---|
+| `GET /api/productos` | `200` (puede consultar) |
+| `POST /api/facturas` | `201` (puede vender) |
+| `POST /api/productos` | `403` · `No tienes permiso para esta operación` |
+| `GET /api/usuarios` o `POST /api/usuarios` | `403` · el mismo mensaje |
+| `GET /api/proveedores` o `GET /api/ordenes-compra` | `403` |
+| Cualquier petición sin token | `401` · `Debes iniciar sesión con un token válido` |
+
+Con el token del administrador: crear otro empleado con el mismo correo (aunque cambies mayúsculas) da `400` · `Ya existe un usuario con el correo luis@correo.com`, y una contraseña de menos de 8 caracteres da `400` · `password: La contraseña debe tener entre 8 y 72 caracteres`.
+
 
 ---
 
@@ -379,7 +406,7 @@ Xorr/
 ├── .gitignore                       ← Archivos que Git no sube (target/, .idea/, .vscode/, .env...)
 ├── README.md                        ← Este archivo
 ├── postman/
-│   └── Xorr.postman_collection.json ← Colección de Postman (31 peticiones, 47 comprobaciones)
+│   └── Xorr.postman_collection.json ← Colección de Postman (44 peticiones, 74 comprobaciones)
 ├── .github/modernize/               ← Lo generó una herramienta de VS Code (actualización de Java); no es parte del proyecto
 │
 └── src/
@@ -392,7 +419,7 @@ Xorr/
     │       ├── XorrApplication.java          ← Punto de entrada: aquí arranca todo
     │       │
     │       ├── common/                       ← Piezas compartidas por todos los módulos
-    │       │   ├── ContextoActual.java            ← Da el idEmpresa y el idUsuario (hoy fijos en 1)
+    │       │   ├── ContextoActual.java            ← Da el idEmpresa y el idUsuario que vienen en el token
     │       │   ├── GlobalExceptionHandler.java    ← Convierte los errores en respuestas JSON
     │       │   ├── RecursoNoEncontradoException.java   ← Error 404
     │       │   ├── OperacionInvalidaException.java     ← Error 400
@@ -460,37 +487,51 @@ Xorr/
     │           └── service/
     │               └── EmpresaService.java             ← Crea la empresa y devuelve su id
     │
-    │       └── seguridad/                    ← Registro y login
+    │       └── seguridad/                    ← Registro, login, token y empleados
     │           ├── controller/
-    │           │   └── AuthController.java             ← /api/auth/registro-admin y /api/auth/login
+    │           │   ├── AuthController.java             ← /api/auth/registro-admin y /api/auth/login
+    │           │   └── UsuarioController.java          ← /api/usuarios (solo ADMIN: crear y listar empleados)
     │           ├── service/
     │           │   ├── AuthService.java                ← Registrar al administrador e iniciar sesión
     │           │   ├── JwtService.java                 ← Crea y lee los tokens
-    │           │   └── DatosToken.java                 ← Lo que viaja dentro del token (usuario, empresa, rol)
+    │           │   ├── DatosToken.java                 ← Lo que viaja dentro del token (usuario, empresa, rol)
+    │           │   └── UsuarioService.java             ← Alta y listado de empleados (solo ADMIN)
     │           ├── repository/
     │           │   └── UsuarioRepository.java
     │           ├── entity/
     │           │   ├── Usuario.java
     │           │   └── Rol.java                        ← ADMIN, EMPLEADO
     │           ├── config/
-    │           │   └── PasswordConfig.java             ← Cifrado BCrypt de contraseñas
+    │           │   ├── PasswordConfig.java             ← Cifrado BCrypt de contraseñas
+    │           │   ├── JwtAuthenticationFilter.java     ← Lee el token de cada petición y deja la sesión
+    │           │   ├── SecurityConfig.java              ← Qué rol puede llamar a qué ruta
+    │           │   ├── ManejadorErroresSeguridad.java   ← Respuestas JSON de 401 y 403
+    │           │   └── OpenApiConfig.java               ← Botón Authorize de Swagger
     │           └── dto/
     │               ├── RegistroAdminRequest.java / UsuarioResponse.java
-    │               └── LoginRequest.java / LoginResponse.java
+    │               ├── LoginRequest.java / LoginResponse.java
+    │               └── CrearEmpleadoRequest.java
     │
     └── test/java/com/xorr/                   ← Pruebas automáticas (misma estructura de paquetes)
         ├── RollbackIntegracionTest.java              ← 3 pruebas de integración (rollback real, RN-06)
+        ├── SesionDePrueba.java                       ← Abre una sesión simulada (empresa 1, usuario 1, ADMIN) en las pruebas unitarias
         ├── common/
-        │   └── ValidacionDtoTest.java                ← 22 pruebas (validación de los DTO, RN-07)
+        │   ├── ValidacionDtoTest.java                ← 22 pruebas (validación de los DTO, RN-07)
+        │   └── ContextoActualTest.java               ← 3 pruebas (empresa y usuario del token: con sesión, sin sesión y principal ajeno)
         ├── negocio/service/
         │   └── EmpresaServiceTest.java               ← 1 prueba
         ├── seguridad/
         │   ├── service/
         │   │   ├── AuthServiceTest.java              ← 11 pruebas (registro y login)
-        │   │   └── JwtServiceTest.java               ← 8 pruebas (crear y leer tokens)
-        │   └── dto/
-        │       ├── ValidacionRegistroAdminTest.java  ← 9 pruebas
-        │       └── ValidacionLoginTest.java          ← 4 pruebas
+        │   │   ├── JwtServiceTest.java               ← 8 pruebas (crear y leer tokens)
+        │   │   └── UsuarioServiceTest.java           ← 6 pruebas (alta y listado de empleados)
+        │   ├── dto/
+        │   │   ├── ValidacionRegistroAdminTest.java  ← 9 pruebas
+        │   │   ├── ValidacionLoginTest.java          ← 4 pruebas
+        │   │   └── ValidacionCrearEmpleadoRequestTest.java ← 12 pruebas
+        │   ├── SeguridadIntegracionTest.java         ← 26 pruebas con la aplicación real en un puerto (401, 403, rutas abiertas, 405)
+        │   ├── AislamientoEmpresasIntegracionTest.java ← 5 pruebas con dos empresas reales (RN-05)
+        │   └── ClienteHttp.java                      ← Apoyo (no es una prueba): cliente HTTP real de Java para las pruebas de integración
         ├── compras/service/
         │   ├── OrdenCompraServiceTest.java           ← 14 pruebas
         │   └── MovimientosCompraServiceTest.java     ← 4 pruebas
@@ -514,7 +555,17 @@ Xorr/
 
 ## 9. Endpoints disponibles
 
-Prefijo de todas las rutas: `http://localhost:8081`. Hoy **cualquiera** puede llamarlas: el login existe, pero el token todavía no se exige.
+Prefijo de todas las rutas: `http://localhost:8081`. Todas exigen el token en la cabecera `Authorization: Bearer <token>`, salvo el registro y el login (y Swagger y la consola H2, solo para desarrollo). El rol del token decide quién puede usar cada ruta:
+
+| Rutas | ADMIN | EMPLEADO |
+|---|---|---|
+| `POST /api/auth/registro-admin` y `POST /api/auth/login` | público | público |
+| `GET /api/productos/**` (ver y stock bajo) | ✅ | ✅ |
+| `POST`, `PUT` y `DELETE /api/productos/**` | ✅ | `403` |
+| `/api/facturas/**` | ✅ | ✅ |
+| `/api/proveedores/**`, `/api/proveedor-productos/**`, `/api/ordenes-compra/**` y `/api/usuarios/**` | ✅ | `403` |
+
+Sin token, cualquier ruta protegida responde `401`; con un rol sin permiso, `403`. Cualquier otra ruta se deniega.
 
 ### Autenticación · `/api/auth`
 
@@ -526,6 +577,15 @@ Prefijo de todas las rutas: `http://localhost:8081`. Hoy **cualquiera** puede ll
 Cuerpo de `registro-admin`: `nombreEmpresa`, `nombre`, `correo` (con formato de correo) y `password` (de 8 a 72 caracteres), todos obligatorios. Responde con `id`, `nombre`, `correo` y `rol`.
 
 Cuerpo de `login`: `correo` y `password`, obligatorios. Responde con `token` y `usuario` (`id`, `nombre`, `correo`, `rol`). El correo no distingue mayúsculas de minúsculas.
+
+### Usuarios · `/api/usuarios` (solo ADMIN)
+
+| Método | Ruta | Qué hace | Respuesta |
+|---|---|---|---|
+| `POST` | `/api/usuarios` | Crea un empleado en tu empresa | `201` / `400` / `403` |
+| `GET` | `/api/usuarios` | Lista los usuarios de tu empresa | `200` / `403` |
+
+Cuerpo de `POST`: `nombre`, `correo` (con formato de correo) y `password` (de 8 a 72 caracteres), todos obligatorios. El rol siempre es `EMPLEADO` y la empresa es la del token: no se envían. Responde con `id`, `nombre`, `correo` y `rol`, nunca con la contraseña. Un correo ya registrado (en cualquier empresa) responde `400`.
 
 ### Productos · `/api/productos`
 
@@ -604,11 +664,11 @@ Reglas de convivencia entre módulos:
 
 - La API **siempre** usa DTO, **nunca** entidades.
 - Un servicio usa **solo los repositorios de su módulo**. Si necesita datos de otro módulo, llama al **servicio** de ese módulo (por ejemplo, `OrdenCompraService` llama a `ProductoService`, no a `ProductoRepository`).
-- Dependencias permitidas: **Seguridad → Negocio** (crear la empresa al registrar al administrador), **Compras → Inventario** y **Ventas → Inventario**; e **Inventario → Compras** e **Inventario → Ventas** solo a través de `MovimientosCompraService` y `MovimientosVentaService` (consultas de lectura para impedir borrar productos o proveedores con órdenes o facturas). Estas dos últimas son excepciones justificadas que se corregirán en la Fase 2.
+- Dependencias permitidas: **Seguridad → Negocio** (crear la empresa al registrar al administrador), **Compras → Inventario** y **Ventas → Inventario**; e **Inventario → Compras** e **Inventario → Ventas** solo a través de `MovimientosCompraService` y `MovimientosVentaService` (consultas de lectura para impedir borrar productos o proveedores con órdenes o facturas). Estas dos últimas son excepciones justificadas que se corregirán en la Fase 2. Hay otra: **common → seguridad**, porque `ContextoActual` importa `DatosToken` para leer el token; también se corrige en la Fase 2.
 
 ### El "contexto actual"
 
-`ContextoActual` es **la única clase** que dice a qué empresa y a qué usuario pertenece cada petición. Hoy devuelve siempre `1` y `1`. El registro y el login ya existen, pero el token todavía no se lee: cuando se agregue el filtro JWT, solo cambiará esa clase y el resto del código seguirá igual. Por eso **ningún servicio recibe el `idEmpresa` desde fuera**: así un usuario nunca puede pedir datos de otra empresa.
+`ContextoActual` es **la única clase** que dice a qué empresa y a qué usuario pertenece cada petición. Lee el `idEmpresa` y el `idUsuario` del token de la petición (el filtro JWT los deja en la sesión de Spring Security). Si se llama sin sesión lanza un error de programación, porque el filtro ya rechaza las peticiones sin token. Por eso **ningún servicio recibe el `idEmpresa` desde fuera**: así un usuario nunca puede pedir datos de otra empresa.
 
 ### Estilo de código que sigue el proyecto
 
@@ -630,7 +690,7 @@ Las reglas viven en los **servicios** y están probadas con pruebas automáticas
 | RN-02 | Al recibir una orden de compra, sube el stock de sus productos | ✅ |
 | RN-03 | Subtotales y totales los calcula el servidor, nunca el cliente | ✅ en compras y ventas |
 | RN-04 | "Stock bajo" = `stock < stockMinimo` (estricto) | ✅ |
-| RN-05 | Multi-tenant: un recurso de otra empresa se trata como "no encontrado" | ✅ |
+| RN-05 | Multi-tenant: un recurso de otra empresa se trata como "no encontrado"; la empresa sale del token | ✅ (probado con dos empresas reales) |
 | RN-06 | Recibir una orden o crear una factura es atómico: si falla una línea, no se guarda nada | ✅ |
 | RN-07 | Cantidades mayores que 0; precios y stock nunca negativos | ✅ |
 | RN-08 | Una orden solo se recibe o se cancela estando `PENDIENTE`; la recepción no se revierte | ✅ |
@@ -669,7 +729,12 @@ Estas son **pruebas unitarias de los servicios**: usan **JUnit 5** (para escribi
 | `EmpresaServiceTest` | 1 | Crear una empresa y devolver su id |
 | `ValidacionRegistroAdminTest` | 9 | Validación del registro: nombres vacíos, correo mal escrito, contraseña corta, larga o nula |
 | `ValidacionLoginTest` | 4 | Validación del login: correo y contraseña obligatorios |
-| **Total** | **137** | |
+| `ContextoActualTest` | 3 | Leer empresa y usuario del token: con sesión, sin sesión y con un principal ajeno al token |
+| `SeguridadIntegracionTest` | 26 | Con la aplicación real en un puerto: `401` sin token o con token inválido, `403` por rol, rutas abiertas y el `405` de las facturas |
+| `AislamientoEmpresasIntegracionTest` | 5 | Dos empresas reales: la otra empresa recibe `404` al ver, listar, eliminar o vender el producto ajeno (RN-05) |
+| `UsuarioServiceTest` | 6 | Alta de empleados (rol `EMPLEADO`, empresa del token, hash BCrypt, correo en minúsculas, correo repetido sin guardar) y listado por empresa |
+| `ValidacionCrearEmpleadoRequestTest` | 12 | Validación del alta de empleados: nombre y correo obligatorios, correo mal escrito, contraseña nula, corta o larga |
+| **Total** | **189** | |
 
 ### Cobertura y complejidad (JaCoCo)
 
@@ -702,6 +767,8 @@ Como no usan base de datos real, no ejecutan: las consultas de los repositorios 
 
 Mockito es estricto: si el código llama a un método simulado con argumentos distintos a los que declaraste, la prueba falla con `PotentialStubbingProblem`. Declara el comportamiento de **cada** llamada que tu código va a hacer.
 
+Si tu prueba usa `ContextoActual` real, añade `SesionDePrueba.class` al `@ExtendWith`: abre una sesión simulada (empresa 1, usuario 1, ADMIN). Sin ella la prueba falla con `No hay una sesión autenticada`.
+
 ---
 
 ## 13. Formato de los errores
@@ -716,7 +783,8 @@ Todos los errores devuelven JSON con un solo campo `mensaje`:
 |---|---|---|
 | `400` Bad Request | Datos inválidos o regla de negocio incumplida | `La cantidad debe ser mayor que cero` |
 | `404` Not Found | El recurso no existe **o es de otra empresa** | `Orden de compra no encontrada: 5` |
-| `401` Unauthorized | Correo o contraseña incorrectos al iniciar sesión | `Correo o contraseña incorrectos` |
+| `401` Unauthorized | Correo o contraseña incorrectos al iniciar sesión, o petición sin token válido (falta, vencido o alterado) | `Correo o contraseña incorrectos` o `Debes iniciar sesión con un token válido` |
+| `403` Forbidden | Tienes sesión, pero tu rol no puede usar esa ruta | `No tienes permiso para esta operación` |
 | `409` Conflict | Stock insuficiente | `Stock insuficiente para 'Martillo': disponible 2, solicitado 5` |
 
 Cuando falla la validación de varios campos a la vez, el mensaje los junta: `nombre: El nombre es obligatorio; stock: El stock no puede ser negativo`.
@@ -738,6 +806,9 @@ Cuando falla la validación de varios campos a la vez, el mensaje los junta: `no
 | Falló la descarga de dependencias | Sin internet o red bloqueada | Reintenta con conexión; Maven guarda lo descargado en `~/.m2` |
 | La aplicación no arranca y dice `xorr.jwt.secret debe tener al menos 32 caracteres` | El secreto del token es muy corto o falta | Revisa `xorr.jwt.secret` en `application-dev.properties` (sección 6.5) |
 | El login responde `401` aunque el correo es correcto | La contraseña no coincide, o reiniciaste la aplicación y la base en memoria borró al administrador | Registra al administrador otra vez con `POST /api/auth/registro-admin` |
+| Todas las peticiones responden `401` | Falta el token, está vencido o está mal escrito | Inicia sesión otra vez y envía `Authorization: Bearer <token>`. En Swagger, pulsa **Authorize** y pega solo el token, sin la palabra `Bearer` |
+| Recibo `403` aunque inicié sesión | Tu rol no tiene permiso para esa ruta (por ejemplo, un EMPLEADO intentando crear un producto) | Usa el token de un ADMIN o revisa la tabla de permisos de la [sección 9](#9-endpoints-disponibles) |
+| Una prueba nueva falla con `IllegalStateException: No hay una sesión autenticada` | La prueba usa `ContextoActual` real y no tiene sesión | Añade `SesionDePrueba.class` al `@ExtendWith` de la prueba |
 
 ---
 
@@ -747,11 +818,11 @@ Cuando falla la validación de varios campos a la vez, el mensaje los junta: `no
 |---|---|---|
 | **Fase 0** | Inventario, Compras y Ventas en el backend, sin login | ✅ Hecho |
 | **Fase 0 (resto)** | Colección de Postman, medición de complejidad y cobertura de pruebas (JaCoCo) | ✅ Hecho |
-| **Fase 1 · MVP** | Registro y login con JWT, roles ADMIN y EMPLEADO, empresa; páginas HTML + JavaScript | 🟡 En curso: registro del administrador y login con JWT hechos; siguen exigir el token y los roles, el alta de empleados, la colección de Postman con login y las páginas |
+| **Fase 1 · MVP** | Registro y login con JWT, roles ADMIN y EMPLEADO, empresa; páginas HTML + JavaScript | 🟡 En curso: el backend de Seguridad está hecho (registro, login, token exigido, roles y alta de empleados); siguen cerrar Seguridad con más pruebas de integración y medir la cobertura, y después las páginas |
 | **Fase 2** | Reportes, PDF de facturas y órdenes, clientes, logo, más pruebas de integración y refactor de inversión de dependencias | Futuro |
 | **Fase 3** | Permisos por rol en la interfaz, HTTPS, instalador, despliegue en la nube, modo sin conexión, React, app móvil | Futuro |
 
-**Limitaciones conocidas hoy:** existen el registro y el login, pero el token no se exige y todavía no hay permisos por rol; todo opera como empresa `1`, usuario `1` (la empresa que crea el registro aún no se usa para filtrar datos); la base de datos es temporal; las pruebas unitarias no usan base de datos real (las consultas, las validaciones y el rollback se cubren con tres clases de integración; el resto de la integración queda para la Fase 2).
+**Limitaciones conocidas hoy:** el token se exige y los datos se filtran por la empresa del token; no hay edición ni baja de empleados; Swagger y la consola H2 están abiertos sin token (hay que cerrarlos con un perfil de producción antes de un despliegue real); el secreto del token de desarrollo está en el repositorio; la base de datos es temporal; las pruebas unitarias no usan base de datos real (las consultas, las validaciones y el rollback se cubren con clases de integración; el resto de la integración queda para la Fase 2).
 
 ---
 
@@ -814,7 +885,7 @@ Reglas de oro: no mezcles lógica de negocio en los controladores, no uses entid
 | **Git / GitHub** | Git guarda el historial de cambios; GitHub aloja el repositorio en internet |
 | **Rama (branch)** | Una línea de trabajo separada, para no dañar la principal |
 | **Pull Request** | Una propuesta de cambios para que el equipo la revise antes de unirla |
-| **JWT (token)** | Un texto firmado que el servidor entrega al iniciar sesión y que dice quién eres (usuario, empresa y rol). Se enviará en cada petición, en la cabecera `Authorization: Bearer <token>` |
+| **JWT (token)** | Un texto firmado que el servidor entrega al iniciar sesión y que dice quién eres (usuario, empresa y rol). Se envía en cada petición, en la cabecera `Authorization: Bearer <token>` |
 | **BCrypt / hash** | Forma de guardar contraseñas: en vez de la contraseña se guarda un resultado cifrado (el *hash*) que no se puede deshacer, así que ni la base de datos revela la clave |
 | **Autenticación** | Comprobar quién eres (el login). Distinta de la **autorización**, que decide qué puedes hacer según tu rol |
 | **Rol** | El tipo de usuario: `ADMIN` (todos los permisos) o `EMPLEADO` (solo ventas y consultas) |

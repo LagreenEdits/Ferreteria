@@ -18,6 +18,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.xorr.SesionDePrueba;
 import com.xorr.common.ContextoActual;
 import com.xorr.common.OperacionInvalidaException;
 import com.xorr.common.RecursoNoEncontradoException;
@@ -26,7 +27,7 @@ import com.xorr.inventario.dto.ProveedorProductoResponse;
 import com.xorr.inventario.entity.ProveedorProducto;
 import com.xorr.inventario.repository.ProveedorProductoRepository;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({ MockitoExtension.class, SesionDePrueba.class })
 class ProveedorProductoServiceTest {
 
     private static final Long ID_EMPRESA = 1L;

@@ -22,6 +22,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.xorr.SesionDePrueba;
 import com.xorr.common.ContextoActual;
 import com.xorr.common.OperacionInvalidaException;
 import com.xorr.common.RecursoNoEncontradoException;
@@ -36,7 +37,7 @@ import com.xorr.inventario.service.ProductoService;
 import com.xorr.inventario.service.ProveedorProductoService;
 import com.xorr.inventario.service.ProveedorService;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({ MockitoExtension.class, SesionDePrueba.class })
 class OrdenCompraServiceTest {
 
     private static final Long ID_EMPRESA = 1L;

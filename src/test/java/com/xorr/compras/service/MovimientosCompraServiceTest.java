@@ -10,13 +10,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.xorr.SesionDePrueba;
 import com.xorr.common.ContextoActual;
 import com.xorr.compras.repository.OrdenCompraRepository;
 
 // Las consultas reales (JPQL y derivada) las ejecuta la base de datos; aquí solo se
 // comprueba que el servicio las usa con la empresa actual. El comportamiento real
 // se verifica a mano en Swagger.
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({ MockitoExtension.class, SesionDePrueba.class })
 class MovimientosCompraServiceTest {
 
     private static final Long ID_EMPRESA = 1L;

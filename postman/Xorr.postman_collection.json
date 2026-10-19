@@ -1,10 +1,114 @@
 {
   "info": {
-    "name": "Xorr · Fase 0 (Inventario, Compras y Ventas)",
-    "description": "Flujo principal (crear producto y proveedor, asociar, comprar, recibir, vender) y comprobación de las reglas de negocio y protecciones, incluidos el límite estricto de stock bajo (RN-04) y los valores negativos (RN-07). Ejecutar con el Collection Runner en el orden en que aparecen. Requiere la aplicación arrancada en http://localhost:8081 (perfil dev, sin login).",
+    "name": "Xorr · Fases 0 y 1 (Inventario, Compras, Ventas y Seguridad)",
+    "description": "Autenticación (registro y login con JWT), flujo principal (crear producto y proveedor, asociar, comprar, recibir, vender), reglas de negocio y protecciones (incluidos el límite estricto de stock bajo RN-04 y los valores negativos RN-07) y usuarios y roles (alta de empleados y 403 para EMPLEADO). Ejecutar con el Collection Runner en el orden en que aparecen. Requiere la aplicación arrancada en http://localhost:8081 (perfil dev). La carpeta 0 guarda el token del administrador y la carpeta 3 el del empleado.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
+    {
+      "name": "0 · Autenticación",
+      "item": [
+        {
+          "name": "0.1 Registrar administrador (empresa nueva)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('correoAdmin', 'postman' + Date.now() + '@correo.com');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Es ADMIN', () => pm.expect(j.rol).to.eql('ADMIN'));",
+                  "pm.test('No devuelve la contraseña', () => pm.expect(JSON.stringify(j)).to.not.include('password'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/registro-admin",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "registro-admin"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombreEmpresa\": \"Ferretería Postman\",\n  \"nombre\": \"Admin Postman\",\n  \"correo\": \"{{correoAdmin}}\",\n  \"password\": \"clave12345\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "0.2 Iniciar sesión (guarda el token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Devuelve un token', () => pm.expect(j.token).to.be.a('string').and.not.empty);",
+                  "pm.test('El usuario es ADMIN', () => pm.expect(j.usuario.rol).to.eql('ADMIN'));",
+                  "pm.collectionVariables.set('token', j.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"{{correoAdmin}}\",\n  \"password\": \"clave12345\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "0.3 Sin token -> 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 401', () => pm.response.to.have.status(401));",
+                  "pm.test('Pide iniciar sesión', () => pm.expect(pm.response.json().mensaje).to.include('iniciar sesión'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/productos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "productos"]
+            }
+          }
+        }
+      ]
+    },
     {
       "name": "1 · Flujo principal",
       "item": [
@@ -12,30 +116,16 @@
           "name": "1. Crear producto (stock 0)",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "url": {
               "raw": "{{baseUrl}}/api/productos",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "productos"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "productos"]
             },
             "body": {
               "mode": "raw",
               "raw": "{\n  \"nombre\": \"Martillo Postman\",\n  \"precioVenta\": 15000,\n  \"stock\": 0,\n  \"stockMinimo\": 5\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
+              "options": { "raw": { "language": "json" } }
             }
           },
           "event": [
@@ -57,30 +147,16 @@
           "name": "2. Crear proveedor",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "url": {
               "raw": "{{baseUrl}}/api/proveedores",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "proveedores"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "proveedores"]
             },
             "body": {
               "mode": "raw",
               "raw": "{\n  \"nombre\": \"Proveedor Postman\",\n  \"telefono\": \"3000000000\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
+              "options": { "raw": { "language": "json" } }
             }
           },
           "event": [
@@ -100,30 +176,16 @@
           "name": "3. Asociar producto a proveedor (precio de compra 9000)",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "url": {
               "raw": "{{baseUrl}}/api/proveedor-productos",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "proveedor-productos"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "proveedor-productos"]
             },
             "body": {
               "mode": "raw",
               "raw": "{\n  \"idProveedor\": {{proveedorId}},\n  \"idProducto\": {{productoId}},\n  \"precioCompra\": 9000\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
+              "options": { "raw": { "language": "json" } }
             }
           },
           "event": [
@@ -143,30 +205,16 @@
           "name": "4. Crear orden de compra (10 unidades)",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "url": {
               "raw": "{{baseUrl}}/api/ordenes-compra",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "ordenes-compra"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ordenes-compra"]
             },
             "body": {
               "mode": "raw",
               "raw": "{\n  \"idProveedor\": {{proveedorId}},\n  \"detalles\": [\n    { \"idProducto\": {{productoId}}, \"cantidad\": 10 }\n  ]\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
+              "options": { "raw": { "language": "json" } }
             }
           },
           "event": [
@@ -192,15 +240,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/ordenes-compra/{{ordenId}}/recibir",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "ordenes-compra",
-                "{{ordenId}}",
-                "recibir"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ordenes-compra", "{{ordenId}}", "recibir"]
             }
           },
           "event": [
@@ -223,14 +264,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/productos/{{productoId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "productos",
-                "{{productoId}}"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "productos", "{{productoId}}"]
             }
           },
           "event": [
@@ -250,30 +285,16 @@
           "name": "7. Vender 8 unidades (crear factura)",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "url": {
               "raw": "{{baseUrl}}/api/facturas",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "facturas"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "facturas"]
             },
             "body": {
               "mode": "raw",
               "raw": "{\n  \"detalles\": [\n    { \"idProducto\": {{productoId}}, \"cantidad\": 8 }\n  ]\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
+              "options": { "raw": { "language": "json" } }
             }
           },
           "event": [
@@ -298,14 +319,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/productos/{{productoId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "productos",
-                "{{productoId}}"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "productos", "{{productoId}}"]
             }
           },
           "event": [
@@ -328,14 +343,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/productos/stock-bajo",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "productos",
-                "stock-bajo"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "productos", "stock-bajo"]
             }
           },
           "event": [
@@ -359,14 +368,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/facturas/{{facturaId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "facturas",
-                "{{facturaId}}"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "facturas", "{{facturaId}}"]
             }
           },
           "event": [
@@ -388,13 +391,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/facturas",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "facturas"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "facturas"]
             }
           },
           "event": [
@@ -419,30 +417,16 @@
           "name": "Vender más de lo que hay (3 con stock 2) -> 409",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "url": {
               "raw": "{{baseUrl}}/api/facturas",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "facturas"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "facturas"]
             },
             "body": {
               "mode": "raw",
               "raw": "{\n  \"detalles\": [\n    { \"idProducto\": {{productoId}}, \"cantidad\": 3 }\n  ]\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
+              "options": { "raw": { "language": "json" } }
             }
           },
           "event": [
@@ -461,30 +445,16 @@
           "name": "Vender cantidad 0 -> 400",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "url": {
               "raw": "{{baseUrl}}/api/facturas",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "facturas"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "facturas"]
             },
             "body": {
               "mode": "raw",
               "raw": "{\n  \"detalles\": [\n    { \"idProducto\": {{productoId}}, \"cantidad\": 0 }\n  ]\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
+              "options": { "raw": { "language": "json" } }
             }
           },
           "event": [
@@ -503,30 +473,16 @@
           "name": "Vender con detalles vacíos -> 400",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "url": {
               "raw": "{{baseUrl}}/api/facturas",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "facturas"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "facturas"]
             },
             "body": {
               "mode": "raw",
               "raw": "{\n  \"detalles\": []\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
+              "options": { "raw": { "language": "json" } }
             }
           },
           "event": [
@@ -545,30 +501,16 @@
           "name": "Vender un producto que no existe -> 404",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "url": {
               "raw": "{{baseUrl}}/api/facturas",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "facturas"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "facturas"]
             },
             "body": {
               "mode": "raw",
               "raw": "{\n  \"detalles\": [\n    { \"idProducto\": 999999, \"cantidad\": 1 }\n  ]\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
+              "options": { "raw": { "language": "json" } }
             }
           },
           "event": [
@@ -590,14 +532,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/productos/{{productoId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "productos",
-                "{{productoId}}"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "productos", "{{productoId}}"]
             }
           },
           "event": [
@@ -619,14 +555,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/proveedores/{{proveedorId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "proveedores",
-                "{{proveedorId}}"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "proveedores", "{{proveedorId}}"]
             }
           },
           "event": [
@@ -645,31 +575,16 @@
           "name": "Modificar una factura (PUT) -> 405 (RN-11)",
           "request": {
             "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "url": {
               "raw": "{{baseUrl}}/api/facturas/{{facturaId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "facturas",
-                "{{facturaId}}"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "facturas", "{{facturaId}}"]
             },
             "body": {
               "mode": "raw",
               "raw": "{\n  \"detalles\": []\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
+              "options": { "raw": { "language": "json" } }
             }
           },
           "event": [
@@ -691,14 +606,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/facturas/{{facturaId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "facturas",
-                "{{facturaId}}"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "facturas", "{{facturaId}}"]
             }
           },
           "event": [
@@ -720,15 +629,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/ordenes-compra/{{ordenId}}/recibir",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "ordenes-compra",
-                "{{ordenId}}",
-                "recibir"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ordenes-compra", "{{ordenId}}", "recibir"]
             }
           },
           "event": [
@@ -750,15 +652,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/ordenes-compra/{{ordenId}}/cancelar",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "ordenes-compra",
-                "{{ordenId}}",
-                "cancelar"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ordenes-compra", "{{ordenId}}", "cancelar"]
             }
           },
           "event": [
@@ -777,30 +672,16 @@
           "name": "Orden con cantidad 0 -> 400 (RN-07)",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "url": {
               "raw": "{{baseUrl}}/api/ordenes-compra",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "ordenes-compra"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ordenes-compra"]
             },
             "body": {
               "mode": "raw",
               "raw": "{\n  \"idProveedor\": {{proveedorId}},\n  \"detalles\": [\n    { \"idProducto\": {{productoId}}, \"cantidad\": 0 }\n  ]\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
+              "options": { "raw": { "language": "json" } }
             }
           },
           "event": [
@@ -819,30 +700,16 @@
           "name": "Asociación duplicada -> 400 (RN-13)",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "url": {
               "raw": "{{baseUrl}}/api/proveedor-productos",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "proveedor-productos"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "proveedor-productos"]
             },
             "body": {
               "mode": "raw",
               "raw": "{\n  \"idProveedor\": {{proveedorId}},\n  \"idProducto\": {{productoId}},\n  \"precioCompra\": 9000\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
+              "options": { "raw": { "language": "json" } }
             }
           },
           "event": [
@@ -865,14 +732,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/productos/999999",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "productos",
-                "999999"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "productos", "999999"]
             }
           },
           "event": [
@@ -891,30 +752,16 @@
           "name": "RN-04 · Crear producto con stock = stockMínimo (5 = 5)",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "url": {
               "raw": "{{baseUrl}}/api/productos",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "productos"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "productos"]
             },
             "body": {
               "mode": "raw",
               "raw": "{\n  \"nombre\": \"Limite Postman\",\n  \"precioVenta\": 1000,\n  \"stock\": 5,\n  \"stockMinimo\": 5\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
+              "options": { "raw": { "language": "json" } }
             }
           },
           "event": [
@@ -937,14 +784,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/productos/stock-bajo",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "productos",
-                "stock-bajo"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "productos", "stock-bajo"]
             }
           },
           "event": [
@@ -965,30 +806,16 @@
           "name": "RN-07 · Producto con stock -1 -> 400",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "url": {
               "raw": "{{baseUrl}}/api/productos",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "productos"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "productos"]
             },
             "body": {
               "mode": "raw",
               "raw": "{\n  \"nombre\": \"Negativo\",\n  \"precioVenta\": 1000,\n  \"stock\": -1,\n  \"stockMinimo\": 5\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
+              "options": { "raw": { "language": "json" } }
             }
           },
           "event": [
@@ -1008,30 +835,16 @@
           "name": "RN-07 · Producto con precioVenta -1 -> 400",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "url": {
               "raw": "{{baseUrl}}/api/productos",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "productos"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "productos"]
             },
             "body": {
               "mode": "raw",
               "raw": "{\n  \"nombre\": \"Negativo\",\n  \"precioVenta\": -1,\n  \"stock\": 1,\n  \"stockMinimo\": 5\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
+              "options": { "raw": { "language": "json" } }
             }
           },
           "event": [
@@ -1051,30 +864,16 @@
           "name": "RN-07 · Asociación con precioCompra -1 -> 400",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "url": {
               "raw": "{{baseUrl}}/api/proveedor-productos",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "proveedor-productos"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "proveedor-productos"]
             },
             "body": {
               "mode": "raw",
               "raw": "{\n  \"idProveedor\": {{proveedorId}},\n  \"idProducto\": {{productoId}},\n  \"precioCompra\": -1\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
+              "options": { "raw": { "language": "json" } }
             }
           },
           "event": [
@@ -1094,30 +893,16 @@
           "name": "RN-07 · Orden con cantidad -1 -> 400",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "url": {
               "raw": "{{baseUrl}}/api/ordenes-compra",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "ordenes-compra"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ordenes-compra"]
             },
             "body": {
               "mode": "raw",
               "raw": "{\n  \"idProveedor\": {{proveedorId}},\n  \"detalles\": [\n    { \"idProducto\": {{productoId}}, \"cantidad\": -1 }\n  ]\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
+              "options": { "raw": { "language": "json" } }
             }
           },
           "event": [
@@ -1137,30 +922,16 @@
           "name": "RN-07 · Venta con cantidad -1 -> 400",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "url": {
               "raw": "{{baseUrl}}/api/facturas",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "facturas"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "facturas"]
             },
             "body": {
               "mode": "raw",
               "raw": "{\n  \"detalles\": [\n    { \"idProducto\": {{productoId}}, \"cantidad\": -1 }\n  ]\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
+              "options": { "raw": { "language": "json" } }
             }
           },
           "event": [
@@ -1177,36 +948,341 @@
           ]
         }
       ]
+    },
+    {
+      "name": "3 · Usuarios y roles (1d)",
+      "item": [
+        {
+          "name": "3.1 ADMIN crea un empleado -> 201",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('correoEmpleado', 'empleado' + Date.now() + '@correo.com');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('El rol es EMPLEADO (lo decide el servidor)', () => pm.expect(j.rol).to.eql('EMPLEADO'));",
+                  "pm.test('No devuelve contraseña ni hash', () => pm.expect(JSON.stringify(j).toLowerCase()).to.not.include('password'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuarios"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Empleado Postman\",\n  \"correo\": \"{{correoEmpleado}}\",\n  \"password\": \"clave12345\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "3.2 Crear el mismo empleado otra vez -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Mensaje de correo repetido', () => pm.expect(pm.response.json().mensaje).to.include('Ya existe'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuarios"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Empleado Postman\",\n  \"correo\": \"{{correoEmpleado}}\",\n  \"password\": \"clave12345\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "3.3 Empleado con contraseña corta -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('El mensaje nombra el campo', () => pm.expect(pm.response.json().mensaje).to.include('password'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuarios"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Corto\",\n  \"correo\": \"corto@correo.com\",\n  \"password\": \"1234567\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "3.4 ADMIN lista los usuarios de su empresa",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "const correos = pm.response.json().map(u => u.correo);",
+                  "pm.test('Aparecen el admin y el empleado', () => { pm.expect(correos).to.include(pm.collectionVariables.get('correoAdmin')); pm.expect(correos).to.include(pm.collectionVariables.get('correoEmpleado')); });",
+                  "pm.test('No expone el hash', () => pm.expect(pm.response.text()).to.not.include('passwordHash'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuarios"]
+            }
+          }
+        },
+        {
+          "name": "3.5 Login del empleado (guarda tokenEmpleado)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('El usuario es EMPLEADO', () => pm.expect(j.usuario.rol).to.eql('EMPLEADO'));",
+                  "pm.test('Devuelve un token', () => pm.expect(j.token).to.be.a('string').and.not.empty);",
+                  "pm.collectionVariables.set('tokenEmpleado', j.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"{{correoEmpleado}}\",\n  \"password\": \"clave12345\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "3.6 EMPLEADO lista usuarios -> 403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Mensaje de permiso', () => pm.expect(pm.response.json().mensaje).to.include('permiso'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{tokenEmpleado}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuarios"]
+            }
+          }
+        },
+        {
+          "name": "3.7 EMPLEADO crea un usuario -> 403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{tokenEmpleado}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuarios"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Empleado Postman\",\n  \"correo\": \"{{correoEmpleado}}\",\n  \"password\": \"clave12345\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "3.8 EMPLEADO lee productos -> 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{tokenEmpleado}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/productos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "productos"]
+            }
+          }
+        },
+        {
+          "name": "3.9 EMPLEADO crea un producto -> 403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{tokenEmpleado}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/productos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "productos"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Prohibido\",\n  \"precioVenta\": 1000,\n  \"stock\": 1,\n  \"stockMinimo\": 1\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "3.10 EMPLEADO vende (producto con stock 5) -> 201",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{tokenEmpleado}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/facturas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "facturas"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"detalles\": [\n    { \"idProducto\": {{productoLimiteId}}, \"cantidad\": 1 }\n  ]\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        }
+      ]
     }
   ],
   "variable": [
-    {
-      "key": "baseUrl",
-      "value": "http://localhost:8081"
-    },
-    {
-      "key": "productoId",
-      "value": ""
-    },
-    {
-      "key": "proveedorId",
-      "value": ""
-    },
-    {
-      "key": "asociacionId",
-      "value": ""
-    },
-    {
-      "key": "ordenId",
-      "value": ""
-    },
-    {
-      "key": "facturaId",
-      "value": ""
-    },
-    {
-      "key": "productoLimiteId",
-      "value": ""
-    }
-  ]
+    { "key": "baseUrl", "value": "http://localhost:8081" },
+    { "key": "productoId", "value": "" },
+    { "key": "proveedorId", "value": "" },
+    { "key": "asociacionId", "value": "" },
+    { "key": "ordenId", "value": "" },
+    { "key": "facturaId", "value": "" },
+    { "key": "productoLimiteId", "value": "" },
+    { "key": "token", "value": "" },
+    { "key": "correoAdmin", "value": "" },
+    { "key": "correoEmpleado", "value": "" },
+    { "key": "tokenEmpleado", "value": "" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  }
 }

@@ -12,6 +12,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.xorr.common.ContextoActual;
 import com.xorr.common.RecursoNoEncontradoException;
@@ -23,6 +25,8 @@ import com.xorr.compras.repository.OrdenCompraRepository;
 import com.xorr.compras.service.OrdenCompraService;
 import com.xorr.inventario.entity.Producto;
 import com.xorr.inventario.repository.ProductoRepository;
+import com.xorr.seguridad.entity.Rol;
+import com.xorr.seguridad.service.DatosToken;
 import com.xorr.ventas.dto.DetalleFacturaRequest;
 import com.xorr.ventas.dto.FacturaRequest;
 import com.xorr.ventas.repository.FacturaRepository;
@@ -32,6 +36,7 @@ import com.xorr.ventas.service.FacturaService;
 // transacciones, que las pruebas con Mockito no pueden probar.
 // IMPORTANTE: esta clase NO lleva @Transactional. Si la llevara, el servicio
 // se uniría a la transacción de la prueba y el rollback real no se vería.
+// Como no pasa por HTTP, simula la sesión que normalmente crea el filtro JWT.
 @SpringBootTest
 class RollbackIntegracionTest {
 
@@ -49,6 +54,18 @@ class RollbackIntegracionTest {
     private OrdenCompraRepository ordenes;
     @Autowired
     private ContextoActual contexto;
+
+    @BeforeEach
+    void iniciarSesion() {
+        DatosToken datos = new DatosToken(1L, 1L, Rol.ADMIN);
+        SecurityContextHolder.getContext()
+                .setAuthentication(new UsernamePasswordAuthenticationToken(datos, null, List.of()));
+    }
+
+    @AfterEach
+    void cerrarSesion() {
+        SecurityContextHolder.clearContext();
+    }
 
     @BeforeEach
     @AfterEach

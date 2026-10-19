@@ -25,6 +25,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.xorr.SesionDePrueba;
 import com.xorr.common.ContextoActual;
 import com.xorr.common.RecursoNoEncontradoException;
 import com.xorr.common.StockInsuficienteException;
@@ -37,7 +38,7 @@ import com.xorr.ventas.entity.DetalleFactura;
 import com.xorr.ventas.entity.Factura;
 import com.xorr.ventas.repository.FacturaRepository;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({ MockitoExtension.class, SesionDePrueba.class })
 class FacturaServiceTest {
 
     private static final long ID_EMPRESA = 1L;
