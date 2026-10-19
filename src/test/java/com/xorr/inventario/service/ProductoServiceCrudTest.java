@@ -21,13 +21,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.xorr.SesionDePrueba;
 import com.xorr.common.ContextoActual;
 import com.xorr.common.RecursoNoEncontradoException;
-import com.xorr.compras.service.MovimientosCompraService;
 import com.xorr.inventario.dto.ProductoRequest;
 import com.xorr.inventario.dto.ProductoResponse;
 import com.xorr.inventario.entity.Producto;
 import com.xorr.inventario.repository.ProductoRepository;
 import com.xorr.inventario.repository.ProveedorProductoRepository;
-import com.xorr.ventas.service.MovimientosVentaService;
 
 // Cubre crear, listar, obtener y actualizar. El filtro real por empresa vive en las
 // consultas del repositorio (Mockito no las ejecuta): aquí se comprueba que el
@@ -43,9 +41,9 @@ class ProductoServiceCrudTest {
     @Mock
     private ProveedorProductoRepository asociaciones;
     @Mock
-    private MovimientosCompraService movimientosCompra;
+    private MovimientosCompra movimientosCompra;
     @Mock
-    private MovimientosVentaService movimientosVenta;
+    private MovimientosVenta movimientosVenta;
 
     private ProductoService servicio;
 

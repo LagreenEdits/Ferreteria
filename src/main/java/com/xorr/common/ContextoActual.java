@@ -4,13 +4,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import com.xorr.seguridad.service.DatosToken;
-
 /**
  * Única fuente del idEmpresa y del idUsuario: los lee del token JWT de la
  * petición actual (RN-05). Ningún servicio los recibe desde fuera.
- * Dependencia common → seguridad justificada: esta es la única clase que lee
- * el token; se revisa en el refactor de la Fase 2.
+ * DatosToken vive en common, así que common ya no depende de seguridad.
  */
 @Component
 public class ContextoActual {

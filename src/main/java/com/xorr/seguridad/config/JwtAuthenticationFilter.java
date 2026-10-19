@@ -10,7 +10,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.xorr.seguridad.service.DatosToken;
+import com.xorr.common.DatosToken;
 import com.xorr.seguridad.service.JwtService;
 
 import jakarta.servlet.FilterChain;

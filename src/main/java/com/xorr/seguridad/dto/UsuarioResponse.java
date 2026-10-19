@@ -1,6 +1,6 @@
 package com.xorr.seguridad.dto;
 
-import com.xorr.seguridad.entity.Rol;
+import com.xorr.common.Rol;
 import com.xorr.seguridad.entity.Usuario;
 
 // Nunca incluye passwordHash ni idEmpresa.

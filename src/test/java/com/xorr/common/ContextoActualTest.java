@@ -10,8 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.xorr.seguridad.entity.Rol;
-import com.xorr.seguridad.service.DatosToken;
+import com.xorr.common.DatosToken;
+import com.xorr.common.Rol;
 
 class ContextoActualTest {
 

@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.xorr.common.ContextoActual;
 import com.xorr.common.OperacionInvalidaException;
 import com.xorr.common.RecursoNoEncontradoException;
-import com.xorr.compras.service.MovimientosCompraService;
 import com.xorr.inventario.dto.ProveedorRequest;
 import com.xorr.inventario.dto.ProveedorResponse;
 import com.xorr.inventario.entity.Proveedor;
@@ -20,12 +19,12 @@ public class ProveedorService {
 
     private final ProveedorRepository repositorio;
     private final ProveedorProductoRepository asociaciones;
-    private final MovimientosCompraService movimientosCompra;
+    private final MovimientosCompra movimientosCompra;
     private final ContextoActual contexto;
 
     public ProveedorService(ProveedorRepository repositorio,
             ProveedorProductoRepository asociaciones,
-            MovimientosCompraService movimientosCompra,
+            MovimientosCompra movimientosCompra,
             ContextoActual contexto) {
         this.repositorio = repositorio;
         this.asociaciones = asociaciones;

@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
-import com.xorr.seguridad.entity.Rol;
+import com.xorr.common.Rol;
 import com.xorr.seguridad.entity.Usuario;
 import com.xorr.seguridad.service.JwtService;
 

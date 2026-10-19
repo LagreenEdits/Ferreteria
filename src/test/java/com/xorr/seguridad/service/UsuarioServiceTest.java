@@ -23,9 +23,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.xorr.SesionDePrueba;
 import com.xorr.common.ContextoActual;
 import com.xorr.common.OperacionInvalidaException;
+import com.xorr.common.Rol;
 import com.xorr.seguridad.dto.CrearEmpleadoRequest;
 import com.xorr.seguridad.dto.UsuarioResponse;
-import com.xorr.seguridad.entity.Rol;
 import com.xorr.seguridad.entity.Usuario;
 import com.xorr.seguridad.repository.UsuarioRepository;
 

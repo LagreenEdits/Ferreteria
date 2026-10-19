@@ -9,27 +9,25 @@ import com.xorr.common.ContextoActual;
 import com.xorr.common.OperacionInvalidaException;
 import com.xorr.common.RecursoNoEncontradoException;
 import com.xorr.common.StockInsuficienteException;
-import com.xorr.compras.service.MovimientosCompraService;
 import com.xorr.inventario.dto.ProductoRequest;
 import com.xorr.inventario.dto.ProductoResponse;
 import com.xorr.inventario.entity.Producto;
 import com.xorr.inventario.repository.ProductoRepository;
 import com.xorr.inventario.repository.ProveedorProductoRepository;
-import com.xorr.ventas.service.MovimientosVentaService;
 
 @Service
 public class ProductoService {
 
     private final ProductoRepository repositorio;
     private final ProveedorProductoRepository asociaciones;
-    private final MovimientosCompraService movimientosCompra;
-    private final MovimientosVentaService movimientosVenta;
+    private final MovimientosCompra movimientosCompra;
+    private final MovimientosVenta movimientosVenta;
     private final ContextoActual contexto;
 
     public ProductoService(ProductoRepository repositorio,
             ProveedorProductoRepository asociaciones,
-            MovimientosCompraService movimientosCompra,
-            MovimientosVentaService movimientosVenta,
+            MovimientosCompra movimientosCompra,
+            MovimientosVenta movimientosVenta,
             ContextoActual contexto) {
         this.repositorio = repositorio;
         this.asociaciones = asociaciones;

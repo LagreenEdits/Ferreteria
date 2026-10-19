@@ -22,7 +22,6 @@ import com.xorr.SesionDePrueba;
 import com.xorr.common.ContextoActual;
 import com.xorr.common.OperacionInvalidaException;
 import com.xorr.common.RecursoNoEncontradoException;
-import com.xorr.compras.service.MovimientosCompraService;
 import com.xorr.inventario.dto.ProveedorRequest;
 import com.xorr.inventario.dto.ProveedorResponse;
 import com.xorr.inventario.entity.Proveedor;
@@ -42,7 +41,7 @@ class ProveedorServiceTest {
     private ProveedorProductoRepository asociaciones;
 
     @Mock
-    private MovimientosCompraService movimientosCompra;
+    private MovimientosCompra movimientosCompra;
 
     private ProveedorService servicio;
 

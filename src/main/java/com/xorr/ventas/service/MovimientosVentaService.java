@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.xorr.common.ContextoActual;
+import com.xorr.inventario.service.MovimientosVenta;
 import com.xorr.ventas.repository.FacturaRepository;
 
 /**
@@ -12,7 +13,7 @@ import com.xorr.ventas.repository.FacturaRepository;
  * ProductoService), así que no crea un ciclo entre beans.
  */
 @Service
-public class MovimientosVentaService {
+public class MovimientosVentaService implements MovimientosVenta {
 
     private final FacturaRepository facturas;
     private final ContextoActual contexto;
@@ -22,6 +23,7 @@ public class MovimientosVentaService {
         this.contexto = contexto;
     }
 
+    @Override
     @Transactional(readOnly = true)
     public boolean productoTieneFacturas(Long idProducto) {
         return facturas.existeConProducto(contexto.getIdEmpresa(), idProducto);

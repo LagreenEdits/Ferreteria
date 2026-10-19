@@ -26,12 +26,10 @@ import com.xorr.common.ContextoActual;
 import com.xorr.common.OperacionInvalidaException;
 import com.xorr.common.RecursoNoEncontradoException;
 import com.xorr.common.StockInsuficienteException;
-import com.xorr.compras.service.MovimientosCompraService;
 import com.xorr.inventario.dto.ProductoResponse;
 import com.xorr.inventario.entity.Producto;
 import com.xorr.inventario.repository.ProductoRepository;
 import com.xorr.inventario.repository.ProveedorProductoRepository;
-import com.xorr.ventas.service.MovimientosVentaService;
 
 @ExtendWith({ MockitoExtension.class, SesionDePrueba.class })
 class ProductoServiceTest {
@@ -46,10 +44,10 @@ class ProductoServiceTest {
     private ProveedorProductoRepository asociaciones;
 
     @Mock
-    private MovimientosCompraService movimientosCompra;
+    private MovimientosCompra movimientosCompra;
 
     @Mock
-    private MovimientosVentaService movimientosVenta;
+    private MovimientosVenta movimientosVenta;
 
     private ProductoService servicio;
 

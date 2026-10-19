@@ -3,7 +3,6 @@ package com.xorr.arquitectura;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;
-import com.tngtech.archunit.junit.ArchIgnore;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
 
@@ -44,12 +43,10 @@ class ArquitecturaTest {
                 }
         }
 
-        // Deudas conocidas de 4.4: se activan despues del refactor 16.4
-        @ArchIgnore(reason = "Deuda 4.4: ciclo Inventario<->Compras/Ventas y common->seguridad")
+        // Antes eran deudas conocidas de 4.4; se activaron tras el refactor 16.4
         @ArchTest
         static final ArchRule sinCiclosEntreModulos = slices().matching("com.xorr.(*)..").should().beFreeOfCycles();
 
-        @ArchIgnore(reason = "Deuda 4.4: ContextoActual importa DatosToken")
         @ArchTest
         static final ArchRule commonNoDependeDeSeguridad = noClasses().that().resideInAPackage("com.xorr.common..")
                         .should().dependOnClassesThat().resideInAPackage("com.xorr.seguridad..");

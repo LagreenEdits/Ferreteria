@@ -22,12 +22,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.xorr.common.CredencialesInvalidasException;
 import com.xorr.common.OperacionInvalidaException;
+import com.xorr.common.Rol;
 import com.xorr.negocio.service.EmpresaService;
 import com.xorr.seguridad.dto.LoginRequest;
 import com.xorr.seguridad.dto.LoginResponse;
 import com.xorr.seguridad.dto.RegistroAdminRequest;
 import com.xorr.seguridad.dto.UsuarioResponse;
-import com.xorr.seguridad.entity.Rol;
 import com.xorr.seguridad.entity.Usuario;
 import com.xorr.seguridad.repository.UsuarioRepository;
 

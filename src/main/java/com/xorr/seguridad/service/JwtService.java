@@ -10,7 +10,8 @@ import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.xorr.seguridad.entity.Rol;
+import com.xorr.common.DatosToken;
+import com.xorr.common.Rol;
 import com.xorr.seguridad.entity.Usuario;
 
 import io.jsonwebtoken.Claims;

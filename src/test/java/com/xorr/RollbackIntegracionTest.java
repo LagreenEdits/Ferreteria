@@ -16,7 +16,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.xorr.common.ContextoActual;
+import com.xorr.common.DatosToken;
 import com.xorr.common.RecursoNoEncontradoException;
+import com.xorr.common.Rol;
 import com.xorr.common.StockInsuficienteException;
 import com.xorr.compras.entity.DetalleOrdenCompra;
 import com.xorr.compras.entity.EstadoOrdenCompra;
@@ -25,8 +27,6 @@ import com.xorr.compras.repository.OrdenCompraRepository;
 import com.xorr.compras.service.OrdenCompraService;
 import com.xorr.inventario.entity.Producto;
 import com.xorr.inventario.repository.ProductoRepository;
-import com.xorr.seguridad.entity.Rol;
-import com.xorr.seguridad.service.DatosToken;
 import com.xorr.ventas.dto.DetalleFacturaRequest;
 import com.xorr.ventas.dto.FacturaRequest;
 import com.xorr.ventas.repository.FacturaRepository;

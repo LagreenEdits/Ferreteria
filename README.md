@@ -32,7 +32,7 @@ Es un proyecto académico del curso de **Calidad de Software** (IDEAD, Universid
 
 ## 1. Estado actual del proyecto
 
-**Fase actual: Fase 1 (MVP), en curso.** La Fase 0 (versión mínima) está completada y la Fase 1 empezó por la **Seguridad**: ya se puede **registrar un administrador** (que crea su empresa), **iniciar sesión** para recibir un token JWT y **dar de alta empleados**. **El token ya se exige** en todas las rutas (salvo el registro, el login, Swagger y la consola H2) y cada petición trabaja con la empresa y el usuario del token. Solo existe el **backend** (la parte que guarda datos y aplica las reglas). **No hay pantallas todavía**: se prueba con Swagger (una página que genera el propio proyecto) o con la colección de Postman.
+**Fase actual: Fase 1 (MVP), en curso.** La Fase 0 (versión mínima) está completada y la Fase 1 empezó por la **Seguridad**: ya se puede **registrar un administrador** (que crea su empresa), **iniciar sesión** para recibir un token JWT y **dar de alta empleados**. **El token ya se exige** en todas las rutas (salvo el registro, el login, Swagger y la consola H2) y cada petición trabaja con la empresa y el usuario del token. Existe el **backend** (la parte que guarda datos y aplica las reglas) y un **frontend básico**: una sola página web (`index.html`) que Spring Boot sirve en http://localhost:8081, con inicio de sesión, productos, ventas, facturas y empleados. La API también se puede probar con Swagger (una página que genera el propio proyecto) o con la colección de Postman.
 
 | Módulo | Estado | Qué incluye |
 |---|---|---|
@@ -44,12 +44,12 @@ Es un proyecto académico del curso de **Calidad de Software** (IDEAD, Universid
 | **Ventas (facturas)** | ✅ Listo | Crear una factura con varias líneas (descuenta el stock), consultarla y listarla. Las facturas no se anulan ni se borran |
 | **Seguridad · Registro y login** | ✅ Listo | Registrar un administrador (crea su empresa) e iniciar sesión para recibir un **token JWT**. Las contraseñas se guardan con BCrypt, nunca en claro |
 | **Seguridad · Token, roles y empleados** | ✅ Listo | El token se exige en las rutas protegidas (sin token: `401`; rol sin permiso: `403`). El ADMIN puede todo; el EMPLEADO solo consulta productos y vende. El ADMIN da de alta empleados y los lista. Cada petición opera con la empresa y el usuario del token |
-| **Pantallas web (frontend)** | 🔜 Pendiente | Páginas HTML + JavaScript |
+| **Pantallas web (frontend)** | 🟡 Básico | Una sola página (`index.html`): registrar la ferretería, iniciar y cerrar sesión; productos (el ADMIN crea, edita y elimina; el stock bajo se marca en rojo); vista de stock bajo; vender con varias líneas y ver el total; listado de facturas; empleados (solo ADMIN). **Aún no tiene** proveedores, asociaciones proveedor-producto ni órdenes de compra, aunque sus endpoints ya existen |
 | **Reportes, PDF, clientes** | 🔜 Fase 2 | |
 
-**Pruebas automáticas:** 205 pruebas (`BUILD SUCCESS`, 19 de octubre de 2026): 203 ejecutadas, todas en verde, y 2 omitidas a propósito. Son 104 de la Fase 0, 95 de Seguridad y 6 de `ArquitecturaTest` (reglas de ArchUnit; 4 activas y 2 con `@ArchIgnore`, ver la [sección 12](#12-pruebas-automáticas)).
+**Pruebas automáticas:** 208 pruebas (`BUILD SUCCESS`, 19 de octubre de 2026): todas en verde y ninguna omitida. Son 104 de la Fase 0, 98 de Seguridad y 6 de `ArquitecturaTest` (reglas de ArchUnit, todas activas), ver la [sección 12](#12-pruebas-automáticas).
 
-**Cobertura y complejidad (JaCoCo, releída el 19 de octubre de 2026 tras correr las 205 pruebas, Seguridad incluida):** 95 % de las instrucciones y 96 % de las ramas cubiertas; en los servicios, 98 % (inventario), 98 % (compras) y 100 % (ventas). La complejidad máxima por método, V(G), es **3** (medida con Checkstyle).
+**Cobertura y complejidad (JaCoCo, releída el 19 de octubre de 2026 tras correr las 205 pruebas, Seguridad incluida; es la lectura anterior al refactor del mismo día y aún no se ha releído con las 208):** 95 % de las instrucciones y 96 % de las ramas cubiertas; en los servicios, 98 % (inventario), 98 % (compras) y 100 % (ventas). La complejidad máxima por método, V(G), es **3** (medida con Checkstyle).
 
 **Colección de Postman:** 44 peticiones con 74 comprobaciones automáticas, todas pasadas el 19 de octubre de 2026 (ver la [sección 7](#7-probar-la-api-paso-a-paso)).
 
@@ -63,7 +63,7 @@ Es un proyecto académico del curso de **Calidad de Software** (IDEAD, Universid
 
 Imagina un restaurante:
 
-- El **cliente** (tú, o en el futuro una página web) hace un **pedido**.
+- El **cliente** (tú, o la página web de Xorr) hace un **pedido**.
 - El **mesero** (el *controlador*) recibe el pedido y lo lleva a la cocina.
 - La **cocina** (el *servicio*) decide si el pedido se puede preparar y sigue las reglas de la casa.
 - La **despensa** (el *repositorio*) guarda y entrega los ingredientes (los datos).
@@ -122,6 +122,7 @@ Cuando llega mercancía, el dueño marca la orden como **RECIBIDA** y el stock s
 | **Spring Security** | (versión de Spring Boot) | Exige el token en cada petición, aplica los permisos por rol y trae **BCrypt**, que se usa para guardar las contraseñas cifradas |
 | **jjwt** | 0.12.6 | Crea y lee los **tokens JWT**: los entrega el login y el filtro de seguridad los lee en cada petición |
 | **springdoc-openapi** | 2.6.0 | Genera **Swagger**, la página para probar la API |
+| **HTML + JavaScript (`fetch`)** | — | El frontend básico: una sola página (`index.html`) que Spring Boot sirve tal cual y que habla con la API |
 | **JUnit 5 + Mockito** | (incluido) | Pruebas automáticas |
 | **JaCoCo** | 0.8.15 | Mide qué parte del código ejecutan las pruebas (cobertura) y su complejidad |
 
@@ -179,7 +180,7 @@ mvn test
 La primera vez tarda más porque Maven descarga las librerías (necesitas internet). Al final debes ver:
 
 ```
-Tests run: 205, Failures: 0, Errors: 0, Skipped: 2
+Tests run: 208, Failures: 0, Errors: 0, Skipped: 0
 BUILD SUCCESS
 ```
 
@@ -197,6 +198,7 @@ Espera a ver una línea parecida a `Started XorrApplication in ... seconds`. La 
 
 | Qué | Dirección |
 |---|---|
+| **La página web (frontend)** | http://localhost:8081 |
 | **Swagger** (probar la API desde el navegador) | http://localhost:8081/swagger-ui.html |
 | **Consola de H2** (ver las tablas y datos) | http://localhost:8081/h2-console |
 | La API | http://localhost:8081/api/... |
@@ -394,6 +396,18 @@ Respuesta: `201` con `id`, `nombre`, `correo` y `rol` (`EMPLEADO`). No envías n
 Con el token del administrador: crear otro empleado con el mismo correo (aunque cambies mayúsculas) da `400` · `Ya existe un usuario con el correo luis@correo.com`, y una contraseña de menos de 8 caracteres da `400` · `password: La contraseña debe tener entre 8 y 72 caracteres`.
 
 
+**Paso 13 · Usar la página web (frontend)**
+
+Con la aplicación arrancada (`mvn spring-boot:run`), abre http://localhost:8081 en el navegador. No necesitas Swagger ni Postman.
+
+1. Pulsa **Registrar mi ferretería**, escribe el nombre de la ferretería y los datos del administrador. Al terminar entras directo.
+2. En **Productos** el ADMIN crea, edita y elimina; el stock bajo se marca en rojo. **Stock bajo** muestra solo los que están por debajo del mínimo.
+3. En **Vender** armas la factura con varias líneas y ves el total antes de registrarla. Si falta stock, la página muestra el mensaje `409` del servidor.
+4. En **Facturas** ves el listado. En **Empleados** (solo ADMIN) creas y listas empleados.
+5. Cierra sesión y entra con un empleado: ve productos, stock bajo, ventas y facturas, pero **sin** los botones de administrador (el servidor igual responde `403` si alguien intenta saltárselos).
+
+La sesión dura mientras la pestaña esté abierta. Como la base H2 es en memoria, al reiniciar la aplicación hay que registrar la ferretería otra vez. Todavía no hay pantallas de proveedores, asociaciones ni órdenes de compra: para eso usa Swagger o Postman.
+
 ---
 
 ## 8. Estructura de archivos y rutas
@@ -413,13 +427,17 @@ Xorr/
     ├── main/
     │   ├── resources/
     │   │   ├── application.properties        ← Activa el perfil "dev"
-    │   │   └── application-dev.properties    ← Puerto 8081, base H2, consola H2 y secreto del JWT
+    │   │   ├── application-dev.properties    ← Puerto 8081, base H2, consola H2 y secreto del JWT
+    │   │   └── static/
+    │   │       └── index.html                ← Frontend básico: una página HTML + JavaScript que usa la API con `fetch`
     │   │
     │   └── java/com/xorr/
     │       ├── XorrApplication.java          ← Punto de entrada: aquí arranca todo
     │       │
     │       ├── common/                       ← Piezas compartidas por todos los módulos
     │       │   ├── ContextoActual.java            ← Da el idEmpresa y el idUsuario que vienen en el token
+    │       │   ├── DatosToken.java                ← Lo que viaja dentro del token (usuario, empresa, rol)
+    │       │   ├── Rol.java                       ← ADMIN, EMPLEADO
     │       │   ├── GlobalExceptionHandler.java    ← Convierte los errores en respuestas JSON
     │       │   ├── RecursoNoEncontradoException.java   ← Error 404
     │       │   ├── OperacionInvalidaException.java     ← Error 400
@@ -434,7 +452,9 @@ Xorr/
     │       │   ├── service/
     │       │   │   ├── ProductoService.java            ← Reglas de stock (RN-01, RN-04, RN-07, RN-12)
     │       │   │   ├── ProveedorService.java
-    │       │   │   └── ProveedorProductoService.java   ← Asociaciones y precio de compra
+    │       │   │   ├── ProveedorProductoService.java   ← Asociaciones y precio de compra
+    │       │   │   ├── MovimientosCompra.java          ← Interfaz que define Inventario (RN-12); la implementa Compras
+    │       │   │   └── MovimientosVenta.java           ← Interfaz que define Inventario (RN-12); la implementa Ventas
     │       │   ├── repository/
     │       │   │   ├── ProductoRepository.java
     │       │   │   ├── ProveedorRepository.java
@@ -453,7 +473,7 @@ Xorr/
     │           │   └── OrdenCompraController.java
     │           ├── service/
     │           │   ├── OrdenCompraService.java         ← Crear, recibir, cancelar, consultar
-    │           │   └── MovimientosCompraService.java   ← Consulta de solo lectura que usa Inventario (RN-12)
+    │           │   └── MovimientosCompraService.java   ← Implementa MovimientosCompra de Inventario (RN-12)
     │           ├── repository/
     │           │   └── OrdenCompraRepository.java
     │           ├── entity/
@@ -469,7 +489,7 @@ Xorr/
     │           │   └── FacturaController.java
     │           ├── service/
     │           │   ├── FacturaService.java             ← Crear (descuenta stock), listar, consultar
-    │           │   └── MovimientosVentaService.java    ← Consulta de solo lectura que usa Inventario (RN-12)
+    │           │   └── MovimientosVentaService.java    ← Implementa MovimientosVenta, la interfaz de Inventario (RN-12)
     │           ├── repository/
     │           │   └── FacturaRepository.java
     │           ├── entity/
@@ -494,17 +514,16 @@ Xorr/
     │           ├── service/
     │           │   ├── AuthService.java                ← Registrar al administrador e iniciar sesión
     │           │   ├── JwtService.java                 ← Crea y lee los tokens
-    │           │   ├── DatosToken.java                 ← Lo que viaja dentro del token (usuario, empresa, rol)
+    │           │   ├── CorreoUsuario.java              ← Regla única del correo (normalizar y validar repetido)
     │           │   └── UsuarioService.java             ← Alta y listado de empleados (solo ADMIN)
     │           ├── repository/
     │           │   └── UsuarioRepository.java
     │           ├── entity/
-    │           │   ├── Usuario.java
-    │           │   └── Rol.java                        ← ADMIN, EMPLEADO
+    │           │   └── Usuario.java
     │           ├── config/
     │           │   ├── PasswordConfig.java             ← Cifrado BCrypt de contraseñas
     │           │   ├── JwtAuthenticationFilter.java     ← Lee el token de cada petición y deja la sesión
-    │           │   ├── SecurityConfig.java              ← Qué rol puede llamar a qué ruta
+    │           │   ├── SecurityConfig.java              ← Qué rol puede llamar a qué ruta; deja abrir sin token `GET /` y `GET /index.html`
     │           │   ├── ManejadorErroresSeguridad.java   ← Respuestas JSON de 401 y 403
     │           │   └── OpenApiConfig.java               ← Botón Authorize de Swagger
     │           └── dto/
@@ -523,6 +542,7 @@ Xorr/
         ├── seguridad/
         │   ├── service/
         │   │   ├── AuthServiceTest.java              ← 11 pruebas (registro y login)
+        │   │   ├── CorreoUsuarioTest.java            ← 3 pruebas (normalizar y validar correo repetido)
         │   │   ├── JwtServiceTest.java               ← 8 pruebas (crear y leer tokens)
         │   │   └── UsuarioServiceTest.java           ← 6 pruebas (alta y listado de empleados)
         │   ├── dto/
@@ -555,11 +575,12 @@ Xorr/
 
 ## 9. Endpoints disponibles
 
-Prefijo de todas las rutas: `http://localhost:8081`. Todas exigen el token en la cabecera `Authorization: Bearer <token>`, salvo el registro y el login (y Swagger y la consola H2, solo para desarrollo). El rol del token decide quién puede usar cada ruta:
+Prefijo de todas las rutas: `http://localhost:8081`. Todas exigen el token en la cabecera `Authorization: Bearer <token>`, salvo el registro, el login y la página web (`GET /` y `GET /index.html`, que no traen datos), y Swagger y la consola H2 (solo para desarrollo). El rol del token decide quién puede usar cada ruta:
 
 | Rutas | ADMIN | EMPLEADO |
 |---|---|---|
 | `POST /api/auth/registro-admin` y `POST /api/auth/login` | público | público |
+| `GET /` y `GET /index.html` (la página web) | público | público |
 | `GET /api/productos/**` (ver y stock bajo) | ✅ | ✅ |
 | `POST`, `PUT` y `DELETE /api/productos/**` | ✅ | `403` |
 | `/api/facturas/**` | ✅ | ✅ |
@@ -663,8 +684,9 @@ Cuerpo de `POST`: `detalles` (lista con al menos una línea). Cada línea: `idPr
 Reglas de convivencia entre módulos:
 
 - La API **siempre** usa DTO, **nunca** entidades.
+- El frontend (`static/index.html`) **solo habla con la API** por `fetch`; no usa clases del backend.
 - Un servicio usa **solo los repositorios de su módulo**. Si necesita datos de otro módulo, llama al **servicio** de ese módulo (por ejemplo, `OrdenCompraService` llama a `ProductoService`, no a `ProductoRepository`).
-- Dependencias permitidas: **Seguridad → Negocio** (crear la empresa al registrar al administrador), **Compras → Inventario** y **Ventas → Inventario**; e **Inventario → Compras** e **Inventario → Ventas** solo a través de `MovimientosCompraService` y `MovimientosVentaService` (consultas de lectura para impedir borrar productos o proveedores con órdenes o facturas). Estas dos últimas son excepciones justificadas que se corregirán en la Fase 2. Hay otra: **common → seguridad**, porque `ContextoActual` importa `DatosToken` para leer el token; también se corrige en la Fase 2.
+- Dependencias permitidas: **Seguridad → Negocio** (crear la empresa al registrar al administrador), **Compras → Inventario**, **Ventas → Inventario** y todos → **common**. No hay ciclos entre módulos: Inventario no conoce a Compras ni a Ventas; define las interfaces `MovimientosCompra` y `MovimientosVenta` (consultas de lectura para impedir borrar productos o proveedores con órdenes o facturas) y Compras y Ventas las implementan (inversión de dependencias). `DatosToken` y `Rol` viven en `common`, así que `common` no depende de `seguridad`. Lo comprueba `ArquitecturaTest`.
 
 ### El "contexto actual"
 
@@ -732,13 +754,14 @@ Estas son **pruebas unitarias de los servicios**: usan **JUnit 5** (para escribi
 | `ContextoActualTest` | 3 | Leer empresa y usuario del token: con sesión, sin sesión y con un principal ajeno al token |
 | `SeguridadIntegracionTest` | 26 | Con la aplicación real en un puerto: `401` sin token o con token inválido, `403` por rol, rutas abiertas y el `405` de las facturas |
 | `AislamientoEmpresasIntegracionTest` | 5 | Dos empresas reales: la otra empresa recibe `404` al ver, listar, eliminar o vender el producto ajeno (RN-05) |
+| `CorreoUsuarioTest` | 3 | Regla única del correo: normalizar (espacios y mayúsculas) y error si el correo ya existe |
 | `UsuarioServiceTest` | 6 | Alta de empleados (rol `EMPLEADO`, empresa del token, hash BCrypt, correo en minúsculas, correo repetido sin guardar) y listado por empresa |
 | `ValidacionCrearEmpleadoRequestTest` | 12 | Validación del alta de empleados: nombre y correo obligatorios, correo mal escrito, contraseña nula, corta o larga |
 | `UsuariosIntegracionTest` | 10 | Con la aplicación real: `401` sin token, `403` para EMPLEADO, el ADMIN lista usuarios, el empleado creado inicia sesión, `400` por datos inválidos y aislamiento entre empresas |
-| `ArquitecturaTest` | 6 | ArchUnit: 4 reglas activas (todas pasan) y 2 omitidas con `@ArchIgnore` (deudas conocidas) |
-| **Total** | **205** | 203 ejecutadas en verde y 2 omitidas (`mvn clean test`, 19-10-2026) |
+| `ArquitecturaTest` | 6 | ArchUnit: 6 reglas activas (todas pasan), incluidas «sin ciclos entre módulos» y «`common` no depende de `seguridad`» |
+| **Total** | **208** | Todas en verde y ninguna omitida (`mvn clean test`, 19-10-2026) |
 
-`ArquitecturaTest` (ArchUnit 1.4.1) comprueba las reglas de dependencia de la sección 10: los controladores no usan repositorios ni entidades, las entidades no dependen de servicios ni controladores y cada servicio usa solo los repositorios de su módulo. Dos reglas (sin ciclos entre módulos y `common` sin depender de `seguridad`) están desactivadas con `@ArchIgnore` porque son deudas conocidas que se pagan en el refactor de la Fase 2. El 19-10-2026 las 4 reglas activas pasaron y las 2 desactivadas figuran como omitidas (`Skipped: 2`).
+`ArquitecturaTest` (ArchUnit 1.4.1) comprueba las reglas de dependencia de la sección 10: los controladores no usan repositorios ni entidades, las entidades no dependen de servicios ni controladores, cada servicio usa solo los repositorios de su módulo, no hay ciclos entre módulos y `common` no depende de `seguridad`. Las dos últimas estuvieron desactivadas con `@ArchIgnore` como deuda conocida; el refactor del 19-10-2026 las dejó activas y las 6 reglas pasan.
 
 ### Cobertura y complejidad (JaCoCo)
 
@@ -751,7 +774,7 @@ Estas son **pruebas unitarias de los servicios**: usan **JUnit 5** (para escribi
 | Servicios de inventario / compras / ventas | 98 % / 98 % / 100 % |
 | Complejidad máxima por método, V(G) (meta: 10 o menos) | 3 (Checkstyle; 3 métodos con 3, 10 con 2, el resto con 1) |
 
-Los controladores no tienen pruebas unitarias propias (inventario 45 %, compras 33 %, ventas 50 %): su comportamiento se verifica con la colección de Postman y con las pruebas de integración de seguridad. Estas cifras se leyeron en el reporte de JaCoCo el 19 de octubre de 2026 tras correr las 205 pruebas (ArchUnit no cambia la cobertura, porque analiza el código sin ejecutarlo).
+Los controladores no tienen pruebas unitarias propias (inventario 45 %, compras 33 %, ventas 50 %): su comportamiento se verifica con la colección de Postman y con las pruebas de integración de seguridad. Estas cifras se leyeron en el reporte de JaCoCo el 19 de octubre de 2026 tras correr las 205 pruebas, antes del refactor del mismo día (ArchUnit no cambia la cobertura, porque analiza el código sin ejecutarlo; falta releerlas con las 208).
 
 ### Comandos útiles
 
@@ -813,6 +836,7 @@ Cuando falla la validación de varios campos a la vez, el mensaje los junta: `no
 | Todas las peticiones responden `401` | Falta el token, está vencido o está mal escrito | Inicia sesión otra vez y envía `Authorization: Bearer <token>`. En Swagger, pulsa **Authorize** y pega solo el token, sin la palabra `Bearer` |
 | Recibo `403` aunque inicié sesión | Tu rol no tiene permiso para esa ruta (por ejemplo, un EMPLEADO intentando crear un producto) | Usa el token de un ADMIN o revisa la tabla de permisos de la [sección 9](#9-endpoints-disponibles) |
 | Una prueba nueva falla con `IllegalStateException: No hay una sesión autenticada` | La prueba usa `ContextoActual` real y no tiene sesión | Añade `SesionDePrueba.class` al `@ExtendWith` de la prueba |
+| `http://localhost:8081` da `404`, `401` o `403` en vez de la pantalla de inicio de sesión | `index.html` no está en `src/main/resources/static/` (la carpeta debe llamarse exactamente `static`) o no se copió el `SecurityConfig.java` actualizado | Revisa la ruta del archivo, copia el `SecurityConfig.java` nuevo y vuelve a arrancar con `mvn spring-boot:run` |
 
 ---
 
@@ -822,11 +846,11 @@ Cuando falla la validación de varios campos a la vez, el mensaje los junta: `no
 |---|---|---|
 | **Fase 0** | Inventario, Compras y Ventas en el backend, sin login | ✅ Hecho |
 | **Fase 0 (resto)** | Colección de Postman, medición de complejidad y cobertura de pruebas (JaCoCo) | ✅ Hecho |
-| **Fase 1 · MVP** | Registro y login con JWT, roles ADMIN y EMPLEADO, empresa; páginas HTML + JavaScript | 🟡 En curso: el backend de Seguridad está hecho (registro, login, token exigido, roles y alta de empleados); las pruebas de integración de usuarios y la medición de cobertura ya están hechas; sigue decidir la duplicación de `normalizar` y, después, las páginas |
-| **Fase 2** | Reportes, PDF de facturas y órdenes, clientes, logo, más pruebas de integración y refactor de inversión de dependencias | Futuro |
+| **Fase 1 · MVP** | Registro y login con JWT, roles ADMIN y EMPLEADO, empresa; páginas HTML + JavaScript | 🟡 En curso: el backend de Seguridad está hecho (registro, login, token exigido, roles y alta de empleados); las pruebas de integración de usuarios y la medición de cobertura ya están hechas; el frontend básico (`index.html`) ya existe; sigue decidir la duplicación de `normalizar` y ampliar el frontend con proveedores, asociaciones y órdenes de compra |
+| **Fase 2** | Reportes, PDF de facturas y órdenes, clientes, logo, más pruebas de integración (el refactor de inversión de dependencias ya se hizo el 19-10-2026) | Futuro |
 | **Fase 3** | Permisos por rol en la interfaz, HTTPS, instalador, despliegue en la nube, modo sin conexión, React, app móvil | Futuro |
 
-**Limitaciones conocidas hoy:** el token se exige y los datos se filtran por la empresa del token; no hay edición ni baja de empleados; Swagger y la consola H2 están abiertos sin token (hay que cerrarlos con un perfil de producción antes de un despliegue real); el secreto del token de desarrollo está en el repositorio; la base de datos es temporal; las pruebas unitarias no usan base de datos real (las consultas, las validaciones y el rollback se cubren con clases de integración; el resto de la integración queda para la Fase 2).
+**Limitaciones conocidas hoy:** el token se exige y los datos se filtran por la empresa del token; no hay edición ni baja de empleados; el frontend es básico (sin proveedores, asociaciones ni órdenes de compra, y la sesión dura mientras la pestaña esté abierta); Swagger y la consola H2 están abiertos sin token (hay que cerrarlos con un perfil de producción antes de un despliegue real); el secreto del token de desarrollo está en el repositorio; la base de datos es temporal; las pruebas unitarias no usan base de datos real (las consultas, las validaciones y el rollback se cubren con clases de integración; el resto de la integración queda para la Fase 2).
 
 ---
 

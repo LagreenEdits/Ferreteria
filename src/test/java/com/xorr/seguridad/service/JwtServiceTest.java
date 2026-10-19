@@ -8,7 +8,8 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
-import com.xorr.seguridad.entity.Rol;
+import com.xorr.common.DatosToken;
+import com.xorr.common.Rol;
 import com.xorr.seguridad.entity.Usuario;
 
 // Sin Spring ni Mockito: JwtService se crea directamente con su secreto.
