@@ -128,6 +128,8 @@ Cuando llega mercancía, el dueño marca la orden como **RECIBIDA** y el stock s
 | **HTML + JavaScript (`fetch`)** | — | El frontend: una sola página (`index.html`) que Spring Boot sirve tal cual, habla con la API y genera los PDF sin librerías externas |
 | **JUnit 5 + Mockito** | (incluido) | Pruebas automáticas |
 | **JaCoCo** | 0.8.15 | Mide qué parte del código ejecutan las pruebas (cobertura) y su complejidad |
+| **ArchUnit** | 1.4.1 (solo pruebas) | Comprueba con 6 reglas automáticas que las capas y los módulos respetan las reglas de dependencia (sección 10) |
+| **Checkstyle** | 9.3 (plugin 3.6.0) | Mide la complejidad V(G) de cada método. Se ejecuta a mano; no forma parte de `mvn test` |
 
 > **Dato técnico:** el proyecto compila para Java 17, pero se ha probado con **JDK 25**. Para que Mockito funcione en JDK 25, el `pom.xml` fuerza la versión `1.17.7` de Byte Buddy (propiedad `byte-buddy.version`). No la quites.
 
@@ -429,7 +431,7 @@ Xorr/
 ├── README.md                        ← Este archivo
 ├── postman/
 │   └── Xorr.postman_collection.json ← Colección de Postman (44 peticiones, 74 comprobaciones)
-├── .github/modernize/               ← Lo generó una herramienta de VS Code (actualización de Java); no es parte del proyecto
+├── .github/modernize/               ← Lo generó una herramienta de VS Code (actualización de Java); no es parte del proyecto y no se sube a GitHub (está en `.gitignore`)
 │
 └── src/
     ├── main/
@@ -542,6 +544,8 @@ Xorr/
     └── test/java/com/xorr/                   ← Pruebas automáticas (misma estructura de paquetes)
         ├── RollbackIntegracionTest.java              ← 3 pruebas de integración (rollback real, RN-06)
         ├── SesionDePrueba.java                       ← Abre una sesión simulada (empresa 1, usuario 1, ADMIN) en las pruebas unitarias
+        ├── arquitectura/
+        │   └── ArquitecturaTest.java                 ← 6 pruebas (ArchUnit: reglas de dependencia entre capas y módulos)
         ├── common/
         │   ├── ValidacionDtoTest.java                ← 22 pruebas (validación de los DTO, RN-07)
         │   └── ContextoActualTest.java               ← 3 pruebas (empresa y usuario del token: con sesión, sin sesión y principal ajeno)
@@ -559,12 +563,13 @@ Xorr/
         │   │   └── ValidacionCrearEmpleadoRequestTest.java ← 12 pruebas
         │   ├── SeguridadIntegracionTest.java         ← 26 pruebas con la aplicación real en un puerto (401, 403, rutas abiertas, 405)
         │   ├── AislamientoEmpresasIntegracionTest.java ← 5 pruebas con dos empresas reales (RN-05)
+        │   ├── UsuariosIntegracionTest.java          ← 10 pruebas con la aplicación real (401, 403, alta de empleados, aislamiento entre empresas)
         │   └── ClienteHttp.java                      ← Apoyo (no es una prueba): cliente HTTP real de Java para las pruebas de integración
         ├── compras/service/
         │   ├── OrdenCompraServiceTest.java           ← 14 pruebas
         │   └── MovimientosCompraServiceTest.java     ← 4 pruebas
         ├── ventas/service/
-        │   ├── FacturaServiceTest.java               ← 11 pruebas
+        │   ├── FacturaServiceTest.java               ← 12 pruebas (incluye RN-15)
         │   └── MovimientosVentaServiceTest.java      ← 2 pruebas
         ├── inventario/repository/
         │   └── ProductoRepositoryTest.java           ← 4 pruebas con H2 (consulta de stock bajo, RN-04)
@@ -770,6 +775,8 @@ Estas son **pruebas unitarias de los servicios**: usan **JUnit 5** (para escribi
 | `ArquitecturaTest` | 6 | ArchUnit: 6 reglas activas (todas pasan), incluidas «sin ciclos entre módulos» y «`common` no depende de `seguridad`» |
 | **Total** | **209** | Todas en verde y ninguna omitida (`mvn clean test`, 19-10-2026) |
 
+**Por nivel**, las 209 pruebas se reparten así (contadas por clase en `target/surefire-reports`): 108 unitarias con Mockito, 47 de validación de DTO, 48 de integración (con H2 o con la aplicación completa) y 6 de arquitectura.
+
 `ArquitecturaTest` (ArchUnit 1.4.1) comprueba las reglas de dependencia de la sección 10: los controladores no usan repositorios ni entidades, las entidades no dependen de servicios ni controladores, cada servicio usa solo los repositorios de su módulo, no hay ciclos entre módulos y `common` no depende de `seguridad`. Las dos últimas estuvieron desactivadas con `@ArchIgnore` como deuda conocida; el refactor del 19-10-2026 las dejó activas y las 6 reglas pasan.
 
 ### Cobertura y complejidad (JaCoCo)
@@ -857,7 +864,7 @@ Cuando falla la validación de varios campos a la vez, el mensaje los junta: `no
 |---|---|---|
 | **Fase 0** | Inventario, Compras y Ventas en el backend, sin login | ✅ Hecho |
 | **Fase 0 (resto)** | Colección de Postman, medición de complejidad y cobertura de pruebas (JaCoCo) | ✅ Hecho |
-| **Fase 1 · MVP** | Registro y login con JWT, roles ADMIN y EMPLEADO, empresa; páginas HTML + JavaScript | 🟡 En curso: el backend de Seguridad está hecho (registro, login, token exigido, roles y alta de empleados); las pruebas de integración de usuarios y la medición de cobertura ya están hechas; el frontend ya cubre todos los módulos, descarga PDF y fue probado a mano; sigue decidir la duplicación de `normalizar` |
+| **Fase 1 · MVP** | Registro y login con JWT, roles ADMIN y EMPLEADO, empresa; páginas HTML + JavaScript | 🟡 En curso: el backend de Seguridad está hecho (registro, login, token exigido, roles y alta de empleados); las pruebas de integración de usuarios y la medición de cobertura ya están hechas; el frontend ya cubre todos los módulos, descarga PDF y fue probado a mano; la duplicación de `normalizar` ya se resolvió el 19-10-2026 al extraerla a `CorreoUsuario` |
 | **Fase 2** | Reportes, clientes, logo, endpoint `GET /api/empresa` para el nombre de la ferretería (hoy vive en el navegador), RN-15 en órdenes de compra, más pruebas de integración (el refactor de inversión de dependencias ya se hizo el 19-10-2026) | Futuro |
 | **Fase 3** | Permisos por rol en la interfaz, HTTPS, instalador, despliegue en la nube, modo sin conexión, React, app móvil | Futuro |
 
