@@ -59,6 +59,7 @@ input,select{width:100%;padding:.6rem .75rem;border:1px solid #d1d5db;border-rad
 input::placeholder{color:#9ca3af}
 input:hover,select:hover{border-color:#9ca3af}
 input:focus,select:focus{outline:0;border-color:var(--c);box-shadow:0 0 0 3px rgba(230,30,50,.15)}
+select:disabled{background:#f3f4f6;color:var(--m);cursor:not-allowed}
 .row{display:flex;gap:.8rem;flex-wrap:wrap;align-items:flex-end}
 .row>div{flex:1;min-width:130px}
 .row label{margin-top:0}
@@ -111,6 +112,40 @@ body.noauth{min-height:100vh;display:grid;place-items:center;padding:1.5rem;back
 .auth .acts .p{width:100%;padding:.7rem}
 .auth .acts .link{text-align:center}
 
+/* Detalle desplegable y estados */
+.det td{background:#fafafa;white-space:normal;font-weight:400;padding:.4rem .75rem .9rem 1.5rem}
+.det table{margin:0}.det th{background:transparent;border-top:0}
+.badge.st-p{background:var(--warnbg);color:var(--warn);margin:0}
+.badge.st-r{background:var(--okbg);color:var(--ok);margin:0}
+.badge.st-c{background:#f3f4f6;color:var(--m);margin:0}
+button.x{background:none;border:0;box-shadow:none;color:var(--c);padding:.2rem .4rem;font-weight:700}
+button.x:hover{background:none;text-decoration:underline}
+
+/* Inicio y detalles de interfaz */
+.hello h1{margin:0;font-size:1.5rem;font-weight:800;letter-spacing:-.02em}
+.hello p{margin:.15rem 0 1.1rem;color:var(--m);font-size:.9rem}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:.9rem;margin-bottom:1.1rem}
+.stat{display:flex;flex-direction:column;align-items:flex-start;gap:.1rem;text-align:left;padding:1rem 1.1rem;border:1px solid var(--b);border-radius:var(--r);background:#fff;color:var(--t);box-shadow:var(--sh)}
+button.stat{font-weight:400}
+.stat[data-go]{cursor:pointer}
+.stat[data-go]:hover{border-color:var(--c);background:var(--tint2)}
+.stat *{pointer-events:none}
+.stat small{color:var(--m);font-weight:600;font-size:.78rem}
+.stat strong{font-size:1.5rem;font-weight:800;letter-spacing:-.02em;line-height:1.25}
+.stat em{font-style:normal;color:var(--m);font-size:.8rem}
+.stat.alert strong{color:var(--cd)}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1.1rem;align-items:start}
+.cols .card{margin-bottom:0}
+.acts-row{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1.1rem}
+.ok-card{border-color:#bbf7d0;background:#f0fdf4}
+.chk{display:flex;gap:.5rem;align-items:center;font-weight:500;margin:.5rem 0 0;cursor:pointer}
+.chk input{width:auto;margin:0}
+.cargando{text-align:center;color:var(--m)}
+
+/* Validación */
+.err{display:block;color:var(--er);font-size:.78rem;font-weight:600;margin-top:.25rem;white-space:normal}
+input[aria-invalid="true"],select[aria-invalid="true"]{border-color:var(--er);box-shadow:0 0 0 3px rgba(185,28,28,.12)}
+
 /* Aviso */
 #msg{position:fixed;bottom:1.2rem;left:50%;transform:translateX(-50%);padding:.75rem 1.1rem;border-radius:10px;color:#fff;display:none;max-width:90%;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:50}
 [hidden]{display:none!important}
@@ -132,11 +167,12 @@ body.noauth{min-height:100vh;display:grid;place-items:center;padding:1.5rem;back
   <h2 id="auth-t">Iniciar sesión</h2>
   <p class="lead" id="auth-l">Entra para ver tu inventario, vender y consultar facturas.</p>
   <div id="f-reg" hidden>
-    <label for="r-emp">Nombre de la ferretería</label><input id="r-emp" placeholder="Ej: Ferretería El Tornillo" autocomplete="organization">
-    <label for="r-nom">Tu nombre</label><input id="r-nom" placeholder="Ej: Ana Gómez" autocomplete="name">
+    <label for="r-emp">Nombre de la ferretería</label><input id="r-emp" maxlength="255" placeholder="Ej: Ferretería El Tornillo" autocomplete="organization">
+    <label for="r-nom">Tu nombre</label><input id="r-nom" maxlength="255" placeholder="Ej: Ana Gómez" autocomplete="name">
   </div>
-  <label for="a-cor">Correo</label><input id="a-cor" type="email" placeholder="tucorreo@ejemplo.com" autocomplete="email">
-  <label for="a-pas">Contraseña</label><input id="a-pas" type="password" placeholder="8 a 72 caracteres" autocomplete="current-password">
+  <label for="a-cor">Correo</label><input id="a-cor" type="email" maxlength="255" placeholder="tucorreo@ejemplo.com" autocomplete="email">
+  <label for="a-pas">Contraseña</label><input id="a-pas" type="password" maxlength="72" placeholder="8 a 72 caracteres" autocomplete="current-password">
+  <label class="chk" for="a-ver"><input type="checkbox" id="a-ver"> Mostrar contraseña</label>
   <div class="acts">
     <button class="p" id="a-go">Entrar</button>
     <button class="link" id="a-sw">Registrar mi ferretería</button>
@@ -145,7 +181,7 @@ body.noauth{min-height:100vh;display:grid;place-items:center;padding:1.5rem;back
 
 <div id="app" hidden>
   <header>
-    <div class="brand"><div class="logo">X</div><div><b>Xorr</b><small>Gestor de ferreterías</small></div></div>
+    <div class="brand"><div class="logo">X</div><div><b id="h-emp">Xorr</b><small id="h-sub">Gestor de ferreterías</small></div></div>
     <div id="quien"></div>
     <button id="salir">Cerrar sesión</button>
   </header>
@@ -158,7 +194,9 @@ body.noauth{min-height:100vh;display:grid;place-items:center;padding:1.5rem;back
 
 <script>
 "use strict";
-var token = null, user = null, vista = "productos", lineas = [], prods = [], editando = null;
+var token = null, user = null, vista = "productos", lineas = [], prods = [], editando = null,
+    provs = [], edProv = null, edAso = null, lineasC = [], compraProv = "",
+    empresa = "", ultima = null, listaFact = [], listaOrd = [], nprovG = {};
 var $ = function (id) { return document.getElementById(id); };
 var money = new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", minimumFractionDigits: 2, maximumFractionDigits: 2 });
 function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
@@ -176,7 +214,93 @@ async function api(ruta, metodo, cuerpo) {
   if (!r.ok) throw new Error((d && d.mensaje) || "Error " + r.status);
   return d;
 }
+/* El backend no devuelve el nombre de la empresa: se recuerda en este navegador al registrarla */
+function mapaEmp() { try { return JSON.parse(localStorage.getItem("xorr_emp") || "{}"); } catch (e) { return {}; } }
+function recordarEmp(correo, nombre) {
+  try { var m = mapaEmp(); m[String(correo).trim().toLowerCase()] = nombre; localStorage.setItem("xorr_emp", JSON.stringify(m)); } catch (e) { }
+}
+function pintarEncabezado() {
+  $("h-emp").textContent = empresa || "Xorr";
+  $("h-sub").textContent = empresa ? "Xorr · Gestor de ferreterías" : "Gestor de ferreterías";
+  document.title = (empresa ? empresa + " · " : "") + "Xorr";
+}
 async function intentar(fn) { try { await fn(); } catch (e) { aviso(e.message, false); } }
+
+/* ---------- Validación: mismas reglas que los DTO del backend ----------
+   Obligatorios (@NotBlank/@NotNull), correo (@Email), contraseña 8-72 (@Size),
+   precios >= 0 (@DecimalMin), stock >= 0 y cantidades >= 1 (@Min), enteros (Integer).
+   El servidor sigue validando: esto solo evita viajes inútiles y da mensajes junto al campo. */
+var INT_MAX = 2147483647, PRECIO_MAX = 999999999999;
+var Val = {
+  req: function (v, msg) { return String(v == null ? "" : v).trim() ? null : msg; },
+  nombre: function (v, msg) { var t = String(v == null ? "" : v).trim(); return !t ? msg : (t.length > 255 ? "Máximo 255 caracteres" : null); },
+  texto255: function (v) { return String(v == null ? "" : v).trim().length > 255 ? "Máximo 255 caracteres" : null; },
+  correo: function (v) {
+    var t = String(v == null ? "" : v).trim();
+    if (!t) return "El correo es obligatorio";
+    return (/^[^\s@]+@[^\s@]+$/.test(t) && t.length <= 255) ? null : "El correo no es válido";
+  },
+  clave: function (v) {
+    v = String(v == null ? "" : v);
+    if (!v.trim()) return "La contraseña es obligatoria";
+    return (v.length < 8 || v.length > 72) ? "La contraseña debe tener entre 8 y 72 caracteres" : null;
+  },
+  precio: function (txt, msgReq, msgNeg) {
+    var t = String(txt == null ? "" : txt).trim();
+    if (!t) return msgReq;
+    var n = numPrecio(t);
+    if (!isFinite(n)) return "Escribe un precio válido";
+    if (n < 0) return msgNeg;
+    return n > PRECIO_MAX ? "El precio es demasiado grande" : null;
+  },
+  entero: function (txt, msgReq, msgMin, min) {
+    var t = String(txt == null ? "" : txt).trim();
+    if (!t) return msgReq;
+    var n = Number(t);
+    if (!isFinite(n) || Math.floor(n) !== n) return "Escribe un número entero, sin decimales";
+    if (n < min) return msgMin;
+    return n > INT_MAX ? "El valor es demasiado grande" : null;
+  }
+};
+function limpiarErrores(raiz) {
+  Array.prototype.forEach.call(raiz.querySelectorAll(".err"), function (e) { e.remove(); });
+  Array.prototype.forEach.call(raiz.querySelectorAll("[aria-invalid]"), function (e) { e.removeAttribute("aria-invalid"); });
+}
+/* reglas: [[idDelCampo, mensajeOnull], ...]. Marca todos los campos con error y enfoca el primero. */
+function validar(raiz, reglas) {
+  limpiarErrores(raiz);
+  var primero = null;
+  reglas.forEach(function (r) {
+    if (!r[1]) return;
+    var el = $(r[0]), m = document.createElement("small");
+    el.setAttribute("aria-invalid", "true");
+    m.className = "err"; m.setAttribute("role", "alert"); m.textContent = r[1];
+    el.insertAdjacentElement("afterend", m);
+    if (!primero) primero = { el: el, msg: r[1] };
+  });
+  if (!primero) return true;
+  primero.el.focus(); aviso(primero.msg, false);
+  return false;
+}
+/* El error del campo desaparece cuando la persona lo corrige */
+function quitarError(e) {
+  var el = e.target;
+  if (!el.getAttribute || el.getAttribute("aria-invalid") !== "true") return;
+  el.removeAttribute("aria-invalid");
+  var n = el.nextElementSibling;
+  if (n && n.classList.contains("err")) n.remove();
+}
+document.addEventListener("input", quitarError);
+document.addEventListener("change", quitarError);
+/* Campos numéricos: sin signo, punto, coma ni exponente. Enter confirma en formularios y líneas. */
+var ENTER = { "p-nom": "p-ok", "p-pre": "p-ok", "p-sto": "p-ok", "p-min": "p-ok", "pv-nom": "pv-ok", "pv-tel": "pv-ok", "as-pre": "as-ok", "u-nom": "u-ok", "u-cor": "u-ok", "u-pas": "u-ok", "e-nom": "e-ok" };
+document.addEventListener("keydown", function (e) {
+  if (e.target.type === "number" && ["e", "E", "+", "-", ".", ","].indexOf(e.key) >= 0) e.preventDefault();
+  if (e.key !== "Enter") return;
+  if (e.target.id === "v-can") { e.preventDefault(); agregarLinea(); }
+  else if (e.target.id === "c-can") { e.preventDefault(); agregarLineaC(); }
+  else if (ENTER[e.target.id]) { e.preventDefault(); $(ENTER[e.target.id]).click(); }
+});
 
 /* ---------- Acceso ---------- */
 var registrando = false;
@@ -188,13 +312,20 @@ $("a-sw").onclick = function () {
   $("a-go").textContent = registrando ? "Registrar y entrar" : "Entrar";
   $("a-sw").textContent = registrando ? "Ya tengo cuenta" : "Registrar mi ferretería";
   $("a-pas").autocomplete = registrando ? "new-password" : "current-password";
+  limpiarErrores($("auth"));
 };
+$("a-ver").onchange = function () { $("a-pas").type = this.checked ? "text" : "password"; };
 $("auth").onkeydown = function (e) { if (e.key === "Enter" && e.target.tagName === "INPUT") $("a-go").click(); };
 $("a-go").onclick = function () {
   intentar(async function () {
     var correo = $("a-cor").value.trim(), password = $("a-pas").value;
+    var reglas = registrando
+      ? [["r-emp", Val.nombre($("r-emp").value, "El nombre de la empresa es obligatorio")], ["r-nom", Val.nombre($("r-nom").value, "El nombre es obligatorio")], ["a-cor", Val.correo(correo)], ["a-pas", Val.clave(password)]]
+      : [["a-cor", Val.req(correo, "El correo es obligatorio")], ["a-pas", Val.req(password, "La contraseña es obligatoria")]];
+    if (!validar($("auth"), reglas)) return;
     if (registrando) {
-      await api("/api/auth/registro-admin", "POST", { nombreEmpresa: $("r-emp").value, nombre: $("r-nom").value, correo: correo, password: password });
+      await api("/api/auth/registro-admin", "POST", { nombreEmpresa: $("r-emp").value.trim(), nombre: $("r-nom").value.trim(), correo: correo, password: password });
+      recordarEmp(correo, $("r-emp").value.trim());
     }
     var d = await api("/api/auth/login", "POST", { correo: correo, password: password });
     token = d.token; user = d.usuario; guardar(); entrar();
@@ -205,10 +336,11 @@ function entrar() {
   $("auth").hidden = true; $("app").hidden = false;
   var ini = (user.nombre || "?").trim().charAt(0).toUpperCase();
   $("quien").innerHTML = '<span class="av">' + esc(ini) + '</span><span>' + esc(user.nombre) + '<span class="rol">' + (esAdmin() ? "Administrador" : "Empleado") + "</span></span>";
-  vista = "productos"; menu(); ir("productos");
+  empresa = mapaEmp()[String(user.correo || "").toLowerCase()] || ""; pintarEncabezado();
+  vista = "inicio"; menu(); ir("inicio");
 }
 function salir() {
-  token = null; user = null; lineas = [];
+  token = null; user = null; lineas = []; lineasC = []; compraProv = ""; editando = null; edProv = null; edAso = null; empresa = ""; ultima = null; listaFact = []; listaOrd = []; pintarEncabezado();
   try { sessionStorage.removeItem("xorr"); } catch (e) { }
   document.body.classList.add("noauth");
   $("app").hidden = true; $("auth").hidden = false; $("a-pas").value = "";
@@ -217,21 +349,32 @@ $("salir").onclick = salir;
 
 /* ---------- Menú ---------- */
 var ICO = {
+  inicio: '<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>',
   productos: '<path d="M21 8l-9-5-9 5v8l9 5 9-5V8z"/><path d="M3 8l9 5 9-5M12 13v8"/>',
   bajo: '<path d="M12 3l10 18H2L12 3z"/><path d="M12 10v5M12 18h.01"/>',
   vender: '<circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.5 12h11L21 7H6"/>',
   facturas: '<path d="M6 2h12v20l-3-2-3 2-3-2-3 2V2z"/><path d="M9 8h6M9 12h6"/>',
+  proveedores: '<path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/>',
+  asociaciones: '<path d="M10 14a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 00-5.7 0l-3 3a4 4 0 005.7 5.7l1-1"/>',
+  compras: '<path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h8M8 17h4"/>',
   empleados: '<circle cx="9" cy="8" r="3.5"/><path d="M2 21c0-3.5 3-6 7-6s7 2.5 7 6"/><path d="M17 4.5a3.5 3.5 0 010 7M19 15c2 .7 3 2.5 3 6"/>'
 };
 function menu() {
-  var op = [["productos", "Productos"], ["bajo", "Stock bajo"], ["vender", "Vender"], ["facturas", "Facturas"]];
-  if (esAdmin()) op.push(["empleados", "Empleados"]);
+  var op = [["inicio", "Inicio"], ["productos", "Productos"], ["bajo", "Stock bajo"], ["vender", "Vender"], ["facturas", "Facturas"]];
+  if (esAdmin()) op.push(["proveedores", "Proveedores"], ["asociaciones", "Asociaciones"], ["compras", "Compras"], ["empleados", "Empleados"]);
   $("nav").innerHTML = op.map(function (o) {
     return '<button data-v="' + o[0] + '"' + (o[0] === vista ? ' class="on"' : "") + '><svg viewBox="0 0 24 24">' + ICO[o[0]] + "</svg><span>" + o[1] + "</span></button>";
   }).join("");
 }
 $("nav").onclick = function (e) { var b = e.target.closest("button"), v = b && b.dataset.v; if (v) { vista = v; menu(); ir(v); } };
-function ir(v) { intentar(function () { return ({ productos: pProductos, bajo: pBajo, vender: pVender, facturas: pFacturas, empleados: pEmpleados })[v](); }); }
+function ir(v) {
+  ultima = null;
+  $("v").innerHTML = '<div class="card cargando">Cargando…</div>';
+  intentar(async function () {
+    try { await ({ inicio: pInicio, productos: pProductos, bajo: pBajo, vender: pVender, facturas: pFacturas, proveedores: pProveedores, asociaciones: pAsociaciones, compras: pCompras, empleados: pEmpleados })[v](); }
+    catch (e) { $("v").innerHTML = '<div class="card"><div class="empty"><b>No se pudo cargar esta pantalla</b>' + esc(e.message) + '<br><br><button class="p" data-go="' + v + '">Reintentar</button></div></div>'; throw e; }
+  });
+}
 function tabla(cols, filas, vacio) {
   if (!filas.length) return '<div class="empty"><b>Nada por aquí todavía</b>' + (vacio || "No hay registros.") + "</div>";
   return '<div class="tw"><table><tr>' + cols.map(function (c) { return '<th class="' + (c[1] || "") + '">' + c[0] + "</th>"; }).join("") + "</tr>" + filas.join("") + "</table></div>";
@@ -245,10 +388,10 @@ async function pProductos() {
     var p = editando || { nombre: "", precioVenta: "", stock: "", stockMinimo: "" };
     f = '<div class="card"><h2>' + (editando ? "Editar producto" : "Nuevo producto") + '</h2>' +
       '<p class="hint">El stock mínimo es el nivel en el que te avisamos que toca reponer.</p><div class="row">' +
-      '<div style="flex:2"><label for="p-nom">Nombre</label><input id="p-nom" placeholder="Ej: Martillo 16 oz" value="' + esc(p.nombre) + '"></div>' +
-      '<div><label for="p-pre">Precio de venta</label><input id="p-pre" type="text" inputmode="decimal" autocomplete="off" placeholder="0" value="' + (p.precioVenta === "" ? "" : esc(new Intl.NumberFormat("es-CO", { maximumFractionDigits: 2 }).format(p.precioVenta))) + '"></div>' +
-      '<div><label for="p-sto">Stock</label><input id="p-sto" type="number" min="0" placeholder="0" value="' + esc(p.stock) + '"></div>' +
-      '<div><label for="p-min">Stock mínimo</label><input id="p-min" type="number" min="0" placeholder="0" value="' + esc(p.stockMinimo) + '"></div>' +
+      '<div style="flex:2"><label for="p-nom">Nombre</label><input id="p-nom" maxlength="255" placeholder="Ej: Martillo 16 oz" value="' + esc(p.nombre) + '"></div>' +
+      '<div><label for="p-pre">Precio de venta</label><input id="p-pre" type="text" inputmode="decimal" maxlength="20" autocomplete="off" placeholder="0" value="' + (p.precioVenta === "" ? "" : esc(new Intl.NumberFormat("es-CO", { maximumFractionDigits: 2 }).format(p.precioVenta))) + '"></div>' +
+      '<div><label for="p-sto">Stock</label><input id="p-sto" type="number" min="0" max="2147483647" step="1" placeholder="0" value="' + esc(p.stock) + '"></div>' +
+      '<div><label for="p-min">Stock mínimo</label><input id="p-min" type="number" min="0" max="2147483647" step="1" placeholder="0" value="' + esc(p.stockMinimo) + '"></div>' +
       '<div style="flex:none"><button class="p" id="p-ok">Guardar producto</button> ' + (editando ? '<button class="g" id="p-no">Cancelar</button>' : "") + "</div></div></div>";
   }
   var filas = prods.map(function (x) {
@@ -268,8 +411,9 @@ function fmtPrecio(raw) {
   ent = ent.replace(/^0+(?=\d)/, "").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   return dec === null ? ent : ent + "," + dec;
 }
+function numPrecio(txt) { return Number(String(txt).replace(/\./g, "").replace(",", ".")); }
 $("v").oninput = function (e) {
-  if (e.target.id === "p-pre") {
+  if (e.target.id === "p-pre" || e.target.id === "as-pre") {
     var el = e.target, pos = el.selectionStart, n = el.value.slice(0, pos).replace(/[^\d,]/g, "").length;
     el.value = fmtPrecio(el.value);
     var k = 0; pos = 0;
@@ -281,10 +425,18 @@ $("v").oninput = function (e) {
   var q = e.target.value.trim().toLowerCase();
   Array.prototype.forEach.call($("v").querySelectorAll("tr[data-n]"), function (tr) { tr.hidden = q && tr.dataset.n.indexOf(q) < 0; });
 };
+$("v").onchange = function (e) {
+  if (e.target.id === "c-prv") { compraProv = e.target.value; lineasC = []; intentar(pCompras); }
+};
 $("v").onclick = function (e) {
   var t = e.target, id;
   if (t.id === "p-ok") intentar(async function () {
-    var c = { nombre: $("p-nom").value, precioVenta: Number($("p-pre").value.replace(/\./g, "").replace(",", ".")), stock: Number($("p-sto").value), stockMinimo: Number($("p-min").value) };
+    if (!validar($("v"), [
+      ["p-nom", Val.nombre($("p-nom").value, "El nombre es obligatorio")],
+      ["p-pre", Val.precio($("p-pre").value, "El precio de venta es obligatorio", "El precio de venta no puede ser negativo")],
+      ["p-sto", Val.entero($("p-sto").value, "El stock es obligatorio", "El stock no puede ser negativo", 0)],
+      ["p-min", Val.entero($("p-min").value, "El stock mínimo es obligatorio", "El stock mínimo no puede ser negativo", 0)]])) return;
+    var c = { nombre: $("p-nom").value.trim(), precioVenta: numPrecio($("p-pre").value), stock: Number($("p-sto").value), stockMinimo: Number($("p-min").value) };
     if (editando) await api("/api/productos/" + editando.id, "PUT", c); else await api("/api/productos", "POST", c);
     aviso("Producto guardado", true); editando = null; await pProductos();
   });
@@ -294,8 +446,39 @@ $("v").onclick = function (e) {
   else if (t.id === "v-add") agregarLinea();
   else if (t.id === "v-ok") vender();
   else if ((id = t.dataset.q)) { lineas.splice(Number(id), 1); pintarLineas(); }
+  else if (t.id === "pv-ok") guardarProveedor();
+  else if (t.id === "pv-no") { edProv = null; ir("proveedores"); }
+  else if ((id = t.dataset.pe)) { edProv = provs.filter(function (x) { return String(x.id) === id; })[0]; ir("proveedores"); window.scrollTo({ top: 0, behavior: "smooth" }); }
+  else if ((id = t.dataset.pd)) { if (confirm("¿Eliminar este proveedor? También se eliminan sus asociaciones.")) intentar(async function () { await api("/api/proveedores/" + id, "DELETE"); aviso("Proveedor eliminado", true); await pProveedores(); }); }
+  else if (t.id === "as-ok") guardarAsociacion();
+  else if (t.id === "as-no") { edAso = null; ir("asociaciones"); }
+  else if ((id = t.dataset.ae)) { edAso = datosAso.filter(function (x) { return String(x.id) === id; })[0]; ir("asociaciones"); window.scrollTo({ top: 0, behavior: "smooth" }); }
+  else if ((id = t.dataset.ad)) { if (confirm("¿Eliminar esta asociación?")) intentar(async function () { await api("/api/proveedor-productos/" + id, "DELETE"); aviso("Asociación eliminada", true); await pAsociaciones(); }); }
+  else if (t.id === "c-add") agregarLineaC();
+  else if (t.id === "c-ok") crearOrden();
+  else if ((id = t.dataset.cq)) { lineasC.splice(Number(id), 1); pintarLineasC(); }
+  else if ((id = t.dataset.cr)) { if (confirm("¿Marcar la orden #" + id + " como recibida? Esto aumenta el stock y no se puede revertir.")) intentar(async function () { await api("/api/ordenes-compra/" + id + "/recibir", "PUT"); aviso("Orden recibida: el stock aumentó", true); await pCompras(); }); }
+  else if ((id = t.dataset.cc)) { if (confirm("¿Cancelar la orden #" + id + "?")) intentar(async function () { await api("/api/ordenes-compra/" + id + "/cancelar", "PUT"); aviso("Orden cancelada", true); await pCompras(); }); }
+  else if ((id = t.dataset.fd)) verDetalle("f" + id, t);
+  else if ((id = t.dataset.od)) verDetalle("o" + id, t);
+  else if (t.id === "e-ok") {
+    if (validar($("v"), [["e-nom", Val.nombre($("e-nom").value, "Escribe el nombre de tu ferretería")]])) {
+      empresa = $("e-nom").value.trim(); recordarEmp(user.correo, empresa); pintarEncabezado(); aviso("Nombre guardado", true); ir("inicio");
+    }
+  }
+  else if ((id = t.dataset.pf)) {
+    var fa = listaFact.concat(ultima ? [ultima] : []).filter(function (x) { return String(x.id) === id; })[0];
+    if (fa) pdfFactura(fa);
+  }
+  else if ((id = t.dataset.po)) {
+    var oc = listaOrd.filter(function (x) { return String(x.id) === id; })[0];
+    if (oc) pdfOrden(oc);
+  }
+  else if (t.closest("[data-go]")) { id = t.closest("[data-go]").dataset.go; vista = id; menu(); ir(id); }
   else if (t.id === "u-ok") intentar(async function () {
-    await api("/api/usuarios", "POST", { nombre: $("u-nom").value, correo: $("u-cor").value, password: $("u-pas").value });
+    if (!validar($("v"), [["u-nom", Val.nombre($("u-nom").value, "El nombre es obligatorio")], ["u-cor", Val.correo($("u-cor").value)], ["u-pas", Val.clave($("u-pas").value)]])) return;
+    await api("/api/usuarios", "POST", { nombre: $("u-nom").value.trim(), correo: $("u-cor").value.trim(), password: $("u-pas").value });
+    if (empresa) recordarEmp($("u-cor").value, empresa);
     aviso("Empleado creado", true); await pEmpleados();
   });
 };
@@ -311,10 +494,11 @@ async function pBajo() {
 /* ---------- Vender ---------- */
 async function pVender() {
   prods = (await api("/api/productos")).filter(function (x) { return x.stock > 0; });
-  $("v").innerHTML = '<div class="card"><h2>Nueva venta</h2><p class="hint">Elige un producto, indica la cantidad y agrégalo al detalle.</p>' +
+  $("v").innerHTML = (ultima ? '<div class="card ok-card"><h2>✓ Venta registrada: factura #' + ultima.id + '</h2><p class="hint">Total ' + money.format(ultima.total) + '. Ya puedes entregarle la factura al cliente.</p><button class="p" data-pf="' + ultima.id + '">Descargar factura en PDF</button></div>' : "") +
+    '<div class="card"><h2>Nueva venta</h2><p class="hint">Elige un producto, indica la cantidad y agrégalo al detalle.</p>' +
     (prods.length ? '<div class="row"><div style="flex:3"><label for="v-pro">Producto</label><select id="v-pro">' +
     prods.map(function (x) { return '<option value="' + x.id + '">' + esc(x.nombre) + " (stock " + x.stock + ")</option>"; }).join("") +
-    '</select></div><div><label for="v-can">Cantidad</label><input id="v-can" type="number" min="1" value="1"></div><div style="flex:none"><button class="p" id="v-add">Agregar</button></div></div>'
+    '</select></div><div><label for="v-can">Cantidad</label><input id="v-can" type="number" min="1" max="2147483647" step="1" value="1"></div><div style="flex:none"><button class="p" id="v-add">Agregar</button></div></div>'
     : '<div class="empty"><b>No hay productos con stock</b>Agrega o repón productos para poder vender.</div>') + '</div>' +
     '<div class="card"><h2>Detalle de la venta</h2><div id="v-lin"></div></div>';
   pintarLineas();
@@ -322,8 +506,12 @@ async function pVender() {
 function agregarLinea() {
   var id = Number($("v-pro").value), can = Number($("v-can").value);
   var p = prods.filter(function (x) { return x.id === id; })[0];
-  if (!p || !(can >= 1)) { aviso("Elige un producto y una cantidad de 1 o más", false); return; }
+  if (!p) { validar($("v"), [["v-pro", "Elige un producto"]]); return; }
   var l = lineas.filter(function (x) { return x.id === id; })[0];
+  var libre = p.stock - (l ? l.cantidad : 0);
+  var err = Val.entero($("v-can").value, "La cantidad es obligatoria", "La cantidad debe ser mayor que cero", 1);
+  if (!err && can > libre) err = libre > 0 ? "Solo quedan " + libre + " unidades disponibles de " + p.nombre : "Ya agregaste todo el stock disponible de " + p.nombre;
+  if (!validar($("v"), [["v-can", err]])) return;
   if (l) l.cantidad += can; else lineas.push({ id: id, nombre: p.nombre, precio: p.precioVenta, cantidad: can });
   pintarLineas();
 }
@@ -337,27 +525,302 @@ function pintarLineas() {
     (lineas.length ? '<div class="tot"><div><span>Total a cobrar</span><strong>' + money.format(total) + '</strong></div><button class="p" id="v-ok">Registrar venta</button></div>' : "");
 }
 function vender() {
+  if (!lineas.length) { aviso("La factura debe tener al menos un producto", false); return; }
   intentar(async function () {
     var f = await api("/api/facturas", "POST", { detalles: lineas.map(function (l) { return { idProducto: l.id, cantidad: l.cantidad }; }) });
-    lineas = []; aviso("Venta registrada: factura " + f.id + " por " + money.format(f.total), true); await pVender();
+    lineas.forEach(function (l) { nombres[l.id] = l.nombre; });
+    lineas = []; ultima = f; aviso("Venta registrada: factura " + f.id + " por " + money.format(f.total), true); await pVender();
   });
+}
+
+/* ---------- Detalle desplegable (facturas y órdenes) ---------- */
+var nombres = {}, detalles = {};
+function nombreProd(id) { return nombres[id] || "Producto #" + id; }
+function filasDetalle(ds) {
+  return tabla([["Producto"], ["Cant.", "n"], ["Precio unit.", "n"], ["Subtotal", "n"]], ds.map(function (d) {
+    return "<tr><td>" + esc(nombreProd(d.idProducto)) + '</td><td class="n">' + d.cantidad + '</td><td class="n">' + money.format(d.precioUnitario) + '</td><td class="n">' + money.format(d.subtotal) + "</td></tr>";
+  }));
+}
+function verDetalle(clave, btn) {
+  var tr = btn.closest("tr"), sig = tr.nextElementSibling;
+  if (sig && sig.classList.contains("det")) { sig.remove(); btn.textContent = "Ver detalle"; return; }
+  var f = document.createElement("tr"); f.className = "det";
+  f.innerHTML = '<td colspan="' + tr.children.length + '">' + filasDetalle(detalles[clave]) + "</td>";
+  tr.parentNode.insertBefore(f, tr.nextSibling); btn.textContent = "Ocultar";
+}
+async function cargarNombres() {
+  var l = await api("/api/productos");
+  nombres = {}; l.forEach(function (p) { nombres[p.id] = p.nombre; });
+}
+
+/* ---------- PDF sin librerías (texto y rectángulos, Helvetica) ---------- */
+var AN = { " ": 278, ".": 278, ",": 278, "$": 556, "-": 333, "#": 556, ":": 278, "/": 278 };
+function anchoPdf(s, tam) { var w = 0; for (var i = 0; i < s.length; i++) w += AN[s.charAt(i)] || 556; return w * tam / 1000; }
+function lat1(s) {
+  s = String(s).replace(/[\r\n\t]/g, " ").replace(/[\u00a0\u202f]/g, " ").replace(/[\u2013\u2014]/g, "-").replace(/[\u2018\u2019]/g, "'").replace(/[\u201c\u201d]/g, '"');
+  var o = "";
+  for (var i = 0; i < s.length; i++) o += s.charCodeAt(i) > 255 ? "?" : s.charAt(i);
+  return o.replace(/[\\()]/g, "\\$&");
+}
+function crearPdf(d) {
+  var W = 595, H = 842, M = 48, paginas = [], op, y, GRIS = "0.25 0.25 0.28";
+  function txt(x, yy, s, tam, neg, color) { op.push("BT /" + (neg ? "F2" : "F1") + " " + tam + " Tf " + color + " rg " + x.toFixed(2) + " " + yy.toFixed(2) + " Td (" + lat1(s) + ") Tj ET"); }
+  function txtD(xd, yy, s, tam, neg, color) { txt(xd - anchoPdf(s, tam), yy, s, tam, neg, color); }
+  function cabecera() {
+    op.push("0.96 0.96 0.97 rg " + M + " " + (y - 6) + " " + (W - 2 * M) + " 20 re f");
+    txt(M + 6, y, d.columnas[0], 9, true, GRIS);
+    txtD(330, y, d.columnas[1], 9, true, GRIS); txtD(440, y, d.columnas[2], 9, true, GRIS); txtD(W - M - 6, y, d.columnas[3], 9, true, GRIS);
+    y -= 24;
+  }
+  function nueva(primera) {
+    op = []; paginas.push(op);
+    if (primera) {
+      op.push("0.902 0.118 0.196 rg 0 " + (H - 92) + " " + W + " 92 re f");
+      txt(M, H - 44, d.empresa || "Xorr", 20, true, "1 1 1");
+      txt(M, H - 68, d.titulo + " N.\u00ba " + d.numero, 11, false, "1 1 1");
+      y = H - 124;
+      txt(M, y, "Fecha: " + d.fecha, 10, false, GRIS); y -= 15;
+      d.extra.forEach(function (e) { txt(M, y, e, 10, false, GRIS); y -= 15; });
+      y -= 14;
+    } else y = H - M - 10;
+    cabecera();
+  }
+  nueva(true);
+  d.filas.forEach(function (f) {
+    if (y < 110) nueva(false);
+    txt(M + 6, y, f[0].length > 48 ? f[0].slice(0, 47) + "..." : f[0], 10, false, "0.07 0.09 0.15");
+    txtD(330, y, f[1], 10, false, "0.07 0.09 0.15"); txtD(440, y, f[2], 10, false, "0.07 0.09 0.15"); txtD(W - M - 6, y, f[3], 10, false, "0.07 0.09 0.15");
+    op.push("0.9 0.9 0.92 RG 0.5 w " + M + " " + (y - 6) + " m " + (W - M) + " " + (y - 6) + " l S");
+    y -= 20;
+  });
+  if (y < 130) nueva(false);
+  y -= 10;
+  op.push("0.992 0.925 0.933 rg " + (W - M - 230) + " " + (y - 10) + " 230 32 re f");
+  txt(W - M - 222, y, "TOTAL", 10, true, GRIS);
+  txtD(W - M - 8, y, d.total, 14, true, "0.72 0.08 0.12");
+  paginas.forEach(function (pg, i) { op = pg; txt(M, 26, (d.empresa || "Xorr") + " \u00b7 generado con Xorr \u00b7 p\u00e1gina " + (i + 1) + " de " + paginas.length, 8, false, "0.55 0.55 0.6"); });
+  var obj = [], kids = [], n = paginas.length, k;
+  obj[1] = "<< /Type /Catalog /Pages 2 0 R >>";
+  for (k = 0; k < n; k++) kids.push((5 + 2 * k) + " 0 R");
+  obj[2] = "<< /Type /Pages /Kids [" + kids.join(" ") + "] /Count " + n + " >>";
+  obj[3] = "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>";
+  obj[4] = "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>";
+  paginas.forEach(function (pg, i) {
+    var c = pg.join("\n");
+    obj[5 + 2 * i] = "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 " + W + " " + H + "] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents " + (6 + 2 * i) + " 0 R >>";
+    obj[6 + 2 * i] = "<< /Length " + c.length + " >>\nstream\n" + c + "\nendstream";
+  });
+  var out = "%PDF-1.4\n", offs = [];
+  for (k = 1; k < obj.length; k++) { offs[k] = out.length; out += k + " 0 obj\n" + obj[k] + "\nendobj\n"; }
+  var xref = out.length;
+  out += "xref\n0 " + obj.length + "\n0000000000 65535 f \n";
+  for (k = 1; k < obj.length; k++) out += ("0000000000" + offs[k]).slice(-10) + " 00000 n \n";
+  out += "trailer\n<< /Size " + obj.length + " /Root 1 0 R >>\nstartxref\n" + xref + "\n%%EOF";
+  var bytes = new Uint8Array(out.length);
+  for (k = 0; k < out.length; k++) bytes[k] = out.charCodeAt(k);
+  return bytes;
+}
+function bajarPdf(archivo, bytes) {
+  var u = URL.createObjectURL(new Blob([bytes], { type: "application/pdf" })), a = document.createElement("a");
+  a.href = u; a.download = archivo; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function () { URL.revokeObjectURL(u); }, 4000);
+}
+function estadoTxt(e) { return e === "PENDIENTE" ? "Pendiente" : e === "RECIBIDA" ? "Recibida" : "Cancelada"; }
+function filasPdf(ds) { return ds.map(function (d) { return [nombreProd(d.idProducto), String(d.cantidad), money.format(d.precioUnitario), money.format(d.subtotal)]; }); }
+function pdfFactura(f) {
+  bajarPdf("Factura-" + f.id + ".pdf", crearPdf({ empresa: empresa, titulo: "Factura de venta", numero: f.id, fecha: new Date(f.fecha).toLocaleString("es-CO"), extra: [],
+    columnas: ["Producto", "Cant.", "Precio unit.", "Subtotal"], filas: filasPdf(f.detalles), total: money.format(f.total) }));
+  aviso("Factura #" + f.id + " descargada", true);
+}
+function pdfOrden(o) {
+  bajarPdf("Orden-compra-" + o.id + ".pdf", crearPdf({ empresa: empresa, titulo: "Orden de compra", numero: o.id, fecha: new Date(o.fecha).toLocaleString("es-CO"),
+    extra: ["Proveedor: " + (nprovG[o.idProveedor] || "#" + o.idProveedor), "Estado: " + estadoTxt(o.estado)],
+    columnas: ["Producto", "Cant.", "Precio unit.", "Subtotal"], filas: filasPdf(o.detalles), total: money.format(o.total) }));
+  aviso("Orden #" + o.id + " descargada", true);
+}
+
+/* ---------- Inicio ---------- */
+function stat(etiqueta, valor, sub, ir, alerta) {
+  var c = "stat" + (alerta ? " alert" : ""), cuerpo = "<small>" + etiqueta + "</small><strong>" + valor + "</strong><em>" + sub + "</em>";
+  return ir ? '<button class="' + c + '" data-go="' + ir + '">' + cuerpo + "</button>" : '<div class="' + c + '">' + cuerpo + "</div>";
+}
+async function pInicio() {
+  var pedir = [api("/api/productos"), api("/api/facturas")];
+  if (esAdmin()) pedir.push(api("/api/ordenes-compra"));
+  var r = await Promise.all(pedir), ps = r[0], fs = r[1], os = r[2] || [];
+  nombres = {}; ps.forEach(function (p) { nombres[p.id] = p.nombre; });
+  listaFact = fs;
+  var hoy = new Date().toDateString();
+  var deHoy = fs.filter(function (f) { return new Date(f.fecha).toDateString() === hoy; });
+  var totHoy = deHoy.reduce(function (a, f) { return a + Number(f.total); }, 0);
+  var bajos = ps.filter(function (p) { return p.stock < p.stockMinimo; }).sort(function (a, b) { return (a.stock - a.stockMinimo) - (b.stock - b.stockMinimo); });
+  var pend = os.filter(function (o) { return o.estado === "PENDIENTE"; }).length;
+  var h = new Date().getHours(), saludo = h < 12 ? "Buenos días" : h < 19 ? "Buenas tardes" : "Buenas noches";
+  var fecha = new Date().toLocaleDateString("es-CO", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  fecha = fecha.charAt(0).toUpperCase() + fecha.slice(1);
+  var nombre = (user.nombre || "").trim().split(/\s+/)[0] || "";
+  var pide = (esAdmin() && !empresa)
+    ? '<div class="card"><h2>¿Cómo se llama tu ferretería?</h2><p class="hint">Aparecerá en el encabezado y en las facturas en PDF. Se guarda en este navegador.</p><div class="row"><div style="flex:3"><label for="e-nom">Nombre de la ferretería</label><input id="e-nom" maxlength="255" placeholder="Ej: Ferretería El Tornillo"></div><div style="flex:none"><button class="p" id="e-ok">Guardar nombre</button></div></div></div>' : "";
+  var ult = fs.slice(-5).reverse().map(function (f) {
+    return "<tr><td>#" + f.id + "</td><td>" + esc(new Date(f.fecha).toLocaleString("es-CO", { dateStyle: "short", timeStyle: "short" })) + '</td><td class="n"><strong>' + money.format(f.total) + '</strong></td><td class="n"><button class="x" data-pf="' + f.id + '">PDF</button></td></tr>';
+  });
+  $("v").innerHTML = '<div class="hello"><h1>' + saludo + (nombre ? ", " + esc(nombre) : "") + ' 👋</h1><p>' + esc(fecha) + (empresa ? " · " + esc(empresa) : "") + "</p></div>" + pide +
+    '<div class="stats">' +
+    stat("Ventas de hoy", money.format(totHoy), deHoy.length + (deHoy.length === 1 ? " factura" : " facturas"), "facturas") +
+    stat("Productos", ps.length, "en el inventario", "productos") +
+    stat("Stock bajo", bajos.length, bajos.length ? "Conviene reponer" : "Todo en orden", "bajo", bajos.length > 0) +
+    (esAdmin() ? stat("Órdenes pendientes", pend, "por recibir", "compras") : "") + "</div>" +
+    '<div class="acts-row"><button class="p" data-go="vender">+ Nueva venta</button>' + (esAdmin() ? '<button data-go="productos">Agregar producto</button><button data-go="compras">Nueva orden de compra</button>' : "") + "</div>" +
+    '<div class="cols"><div class="card"><h2>Últimas facturas</h2><p class="hint">Las 5 ventas más recientes.</p>' +
+    tabla([["N.º"], ["Fecha"], ["Total", "n"], ["", "n"]], ult, "Cuando registres una venta aparecerá aquí.") + "</div>" +
+    '<div class="card"><h2>Para reponer</h2><p class="hint">Productos por debajo de su mínimo.</p>' +
+    tabla([["Producto"], ["Stock", "n"], ["Mínimo", "n"]], bajos.slice(0, 5).map(function (x) {
+      return "<tr><td>" + esc(x.nombre) + '</td><td class="n low">' + x.stock + '</td><td class="n">' + x.stockMinimo + "</td></tr>";
+    }), "Todo en orden: nada por debajo de su mínimo.") + "</div></div>";
 }
 
 /* ---------- Facturas ---------- */
 async function pFacturas() {
-  var l = await api("/api/facturas");
-  $("v").innerHTML = '<div class="card"><h2>Facturas</h2><p class="hint">Ventas registradas, de la más reciente a la más antigua.</p>' + tabla([["N.º"], ["Fecha"], ["Productos", "n"], ["Total", "n"]],
+  var r = await Promise.all([api("/api/facturas"), cargarNombres()]), l = r[0];
+  listaFact = l;
+  detalles = {}; l.forEach(function (f) { detalles["f" + f.id] = f.detalles; });
+  var suma = l.reduce(function (a, f) { return a + Number(f.total); }, 0);
+  $("v").innerHTML = '<div class="card"><h2>Facturas (' + l.length + ')</h2><p class="hint">Ventas registradas, de la más reciente a la más antigua.' +
+    (l.length ? " Total vendido: <strong>" + money.format(suma) + "</strong>." : "") + "</p>" +
+    tabla([["N.º"], ["Fecha"], ["Productos", "n"], ["Total", "n"], ["", "n"]],
     l.slice().reverse().map(function (f) {
       return "<tr><td>#" + f.id + "</td><td>" + esc(new Date(f.fecha).toLocaleString("es-CO")) + '</td><td class="n">' +
-        f.detalles.reduce(function (a, d) { return a + d.cantidad; }, 0) + '</td><td class="n"><strong>' + money.format(f.total) + "</strong></td></tr>";
+        f.detalles.reduce(function (a, d) { return a + d.cantidad; }, 0) + '</td><td class="n"><strong>' + money.format(f.total) +
+        '</strong></td><td class="n"><button class="x" data-fd="' + f.id + '">Ver detalle</button> <button class="x" data-pf="' + f.id + '">Descargar PDF</button></td></tr>';
     }), "Todavía no has registrado ventas.") + "</div>";
+}
+
+/* ---------- Proveedores (solo ADMIN) ---------- */
+async function pProveedores() {
+  provs = await api("/api/proveedores");
+  var p = edProv || { nombre: "", telefono: "" };
+  $("v").innerHTML = '<div class="card"><h2>' + (edProv ? "Editar proveedor" : "Nuevo proveedor") + '</h2><p class="hint">Quienes te surten los productos. El teléfono es opcional.</p><div class="row">' +
+    '<div style="flex:2"><label for="pv-nom">Nombre</label><input id="pv-nom" maxlength="255" placeholder="Ej: Distribuidora Andina" value="' + esc(p.nombre) + '"></div>' +
+    '<div><label for="pv-tel">Teléfono</label><input id="pv-tel" type="tel" maxlength="255" placeholder="Ej: 3001234567" value="' + esc(p.telefono || "") + '"></div>' +
+    '<div style="flex:none"><button class="p" id="pv-ok">Guardar proveedor</button> ' + (edProv ? '<button class="g" id="pv-no">Cancelar</button>' : "") + "</div></div></div>" +
+    '<div class="card"><h2>Proveedores (' + provs.length + ')</h2><p class="hint">Si un proveedor tiene órdenes de compra, no se puede eliminar.</p>' +
+    tabla([["Proveedor"], ["Teléfono"], ["", "n"]], provs.map(function (x) {
+      return "<tr><td>" + esc(x.nombre) + "</td><td>" + esc(x.telefono || "—") + '</td><td class="n"><button class="sm" data-pe="' + x.id + '">Editar</button> <button class="sm d" data-pd="' + x.id + '">Eliminar</button></td></tr>';
+    }), "Crea tu primer proveedor con el formulario de arriba.") + "</div>";
+}
+function guardarProveedor() {
+  intentar(async function () {
+    if (!validar($("v"), [["pv-nom", Val.nombre($("pv-nom").value, "El nombre es obligatorio")], ["pv-tel", Val.texto255($("pv-tel").value)]])) return;
+    var c = { nombre: $("pv-nom").value.trim(), telefono: $("pv-tel").value.trim() || null };
+    if (edProv) await api("/api/proveedores/" + edProv.id, "PUT", c); else await api("/api/proveedores", "POST", c);
+    aviso("Proveedor guardado", true); edProv = null; await pProveedores();
+  });
+}
+
+/* ---------- Asociaciones proveedor-producto (solo ADMIN) ---------- */
+var datosAso = [];
+function opciones(lista, sel) {
+  return lista.map(function (x) { return '<option value="' + x.id + '"' + (String(x.id) === String(sel) ? " selected" : "") + ">" + esc(x.nombre) + "</option>"; }).join("");
+}
+async function pAsociaciones() {
+  var r = await Promise.all([api("/api/proveedor-productos"), api("/api/proveedores"), api("/api/productos")]);
+  datosAso = r[0]; provs = r[1]; prods = r[2];
+  nombres = {}; prods.forEach(function (p) { nombres[p.id] = p.nombre; });
+  var nprov = {}; provs.forEach(function (p) { nprov[p.id] = p.nombre; });
+  var a = edAso || { idProveedor: "", idProducto: "", precioCompra: "" };
+  var form = (provs.length && prods.length)
+    ? '<div class="row"><div><label for="as-prv">Proveedor</label><select id="as-prv"' + (edAso ? " disabled" : "") + ">" + opciones(provs, a.idProveedor) + "</select></div>" +
+      '<div><label for="as-pro">Producto</label><select id="as-pro"' + (edAso ? " disabled" : "") + ">" + opciones(prods, a.idProducto) + "</select></div>" +
+      '<div><label for="as-pre">Precio de compra</label><input id="as-pre" type="text" inputmode="decimal" maxlength="20" autocomplete="off" placeholder="0" value="' + (a.precioCompra === "" ? "" : esc(new Intl.NumberFormat("es-CO", { maximumFractionDigits: 2 }).format(a.precioCompra))) + '"></div>' +
+      '<div style="flex:none"><button class="p" id="as-ok">Guardar asociación</button> ' + (edAso ? '<button class="g" id="as-no">Cancelar</button>' : "") + "</div></div>"
+    : '<div class="empty"><b>Faltan datos</b>Necesitas al menos un proveedor y un producto para crear una asociación.</div>';
+  $("v").innerHTML = '<div class="card"><h2>' + (edAso ? "Editar precio de compra" : "Nueva asociación") + '</h2><p class="hint">Indica qué productos vende cada proveedor y a qué precio. Solo estos productos se pueden pedir en una orden de compra.</p>' + form + "</div>" +
+    '<div class="card"><h2>Asociaciones (' + datosAso.length + ')</h2><p class="hint">Cada proveedor y producto pueden asociarse una sola vez; para cambiar el precio, edita la asociación.</p>' +
+    tabla([["Proveedor"], ["Producto"], ["Precio de compra", "n"], ["", "n"]], datosAso.map(function (x) {
+      return "<tr><td>" + esc(nprov[x.idProveedor] || "#" + x.idProveedor) + "</td><td>" + esc(nombres[x.idProducto] || "#" + x.idProducto) + '</td><td class="n">' + money.format(x.precioCompra) +
+        '</td><td class="n"><button class="sm" data-ae="' + x.id + '">Editar</button> <button class="sm d" data-ad="' + x.id + '">Eliminar</button></td></tr>';
+    }), "Aún no hay asociaciones. Crea una con el formulario de arriba.") + "</div>";
+}
+function guardarAsociacion() {
+  intentar(async function () {
+    var idPv = Number(edAso ? edAso.idProveedor : $("as-prv").value), idPr = Number(edAso ? edAso.idProducto : $("as-pro").value);
+    var repetida = !edAso && datosAso.some(function (x) { return x.idProveedor === idPv && x.idProducto === idPr; });
+    if (!validar($("v"), [
+      ["as-prv", idPv ? null : "El proveedor es obligatorio"],
+      ["as-pro", !idPr ? "El producto es obligatorio" : (repetida ? "Ya existe esa asociación" : null)],
+      ["as-pre", Val.precio($("as-pre").value, "El precio de compra es obligatorio", "El precio de compra no puede ser negativo")]])) return;
+    var c = { idProveedor: idPv, idProducto: idPr, precioCompra: numPrecio($("as-pre").value) };
+    if (edAso) await api("/api/proveedor-productos/" + edAso.id, "PUT", c); else await api("/api/proveedor-productos", "POST", c);
+    aviso("Asociación guardada", true); edAso = null; await pAsociaciones();
+  });
+}
+
+/* ---------- Compras: órdenes de compra (solo ADMIN) ---------- */
+var asoC = [];
+async function pCompras() {
+  var r = await Promise.all([api("/api/ordenes-compra"), api("/api/proveedores"), api("/api/proveedor-productos"), api("/api/productos")]);
+  var ords = r[0]; provs = r[1]; asoC = r[2]; prods = r[3];
+  nombres = {}; prods.forEach(function (p) { nombres[p.id] = p.nombre; });
+  var nprov = {}; provs.forEach(function (p) { nprov[p.id] = p.nombre; });
+  nprovG = nprov; listaOrd = ords;
+  if (!provs.some(function (p) { return String(p.id) === String(compraProv); })) compraProv = provs.length ? String(provs[0].id) : "";
+  detalles = {}; ords.forEach(function (o) { detalles["o" + o.id] = o.detalles; });
+  var form;
+  if (!provs.length) form = '<div class="empty"><b>No hay proveedores</b>Crea un proveedor y asócialo a productos para poder pedir.</div>';
+  else {
+    var disp = asoC.filter(function (a) { return String(a.idProveedor) === compraProv; });
+    form = '<div class="row"><div><label for="c-prv">Proveedor</label><select id="c-prv">' + opciones(provs, compraProv) + "</select></div>" +
+      (disp.length
+        ? '<div style="flex:2"><label for="c-pro">Producto</label><select id="c-pro">' + disp.map(function (a) { return '<option value="' + a.idProducto + '">' + esc(nombres[a.idProducto] || "#" + a.idProducto) + " (" + money.format(a.precioCompra) + ")</option>"; }).join("") + "</select></div>" +
+          '<div><label for="c-can">Cantidad</label><input id="c-can" type="number" min="1" max="2147483647" step="1" value="1"></div><div style="flex:none"><button class="p" id="c-add">Agregar</button></div>'
+        : '<div style="flex:3"><div class="empty" style="padding:.7rem"><b>Este proveedor no tiene productos asociados</b>Asócialos en la pestaña Asociaciones.</div></div>') + "</div>";
+  }
+  $("v").innerHTML = '<div class="card"><h2>Nueva orden de compra</h2><p class="hint">Solo se pueden pedir productos asociados al proveedor. El precio sale de la asociación.</p>' + form + '<div id="c-lin"></div></div>' +
+    '<div class="card"><h2>Órdenes de compra (' + ords.length + ')</h2><p class="hint">Al recibir una orden el stock aumenta; una orden recibida no se puede revertir ni cancelar.</p>' +
+    tabla([["N.º"], ["Fecha"], ["Proveedor"], ["Estado"], ["Total", "n"], ["", "n"]], ords.slice().reverse().map(function (o) {
+      var cl = o.estado === "PENDIENTE" ? "st-p" : o.estado === "RECIBIDA" ? "st-r" : "st-c";
+      var tx = o.estado === "PENDIENTE" ? "Pendiente" : o.estado === "RECIBIDA" ? "Recibida" : "Cancelada";
+      return "<tr><td>#" + o.id + "</td><td>" + esc(new Date(o.fecha).toLocaleString("es-CO")) + "</td><td>" + esc(nprov[o.idProveedor] || "#" + o.idProveedor) + '</td><td><span class="badge ' + cl + '">' + tx + '</span></td><td class="n"><strong>' + money.format(o.total) + '</strong></td><td class="n">' +
+        '<button class="x" data-od="' + o.id + '">Ver detalle</button> <button class="x" data-po="' + o.id + '">PDF</button>' +
+        (o.estado === "PENDIENTE" ? ' <button class="sm" data-cr="' + o.id + '">Recibir</button> <button class="sm d" data-cc="' + o.id + '">Cancelar</button>' : "") + "</td></tr>";
+    }), "Todavía no hay órdenes de compra.") + "</div>";
+  pintarLineasC();
+}
+function agregarLineaC() {
+  var id = Number($("c-pro").value), can = Number($("c-can").value);
+  var a = asoC.filter(function (x) { return String(x.idProveedor) === compraProv && x.idProducto === id; })[0];
+  if (!a) { validar($("v"), [["c-pro", "Elige un producto asociado al proveedor"]]); return; }
+  var l = lineasC.filter(function (x) { return x.id === id; })[0];
+  var err = Val.entero($("c-can").value, "La cantidad es obligatoria", "La cantidad debe ser mayor que cero", 1);
+  if (!err && l && l.cantidad + can > INT_MAX) err = "El valor es demasiado grande";
+  if (!validar($("v"), [["c-can", err]])) return;
+  if (l) l.cantidad += can; else lineasC.push({ id: id, nombre: nombres[id] || "#" + id, precio: a.precioCompra, cantidad: can });
+  pintarLineasC();
+}
+function pintarLineasC() {
+  var cont = $("c-lin"); if (!cont) return;
+  var total = 0;
+  var filas = lineasC.map(function (l, i) {
+    var s = l.precio * l.cantidad; total += s;
+    return "<tr><td>" + esc(l.nombre) + '</td><td class="n">' + l.cantidad + '</td><td class="n">' + money.format(l.precio) + '</td><td class="n">' + money.format(s) + '</td><td class="n"><button class="sm d" data-cq="' + i + '">Quitar</button></td></tr>';
+  });
+  cont.innerHTML = '<div style="margin-top:1rem"></div>' + tabla([["Producto"], ["Cant.", "n"], ["Precio unit.", "n"], ["Subtotal", "n"], ["", "n"]], filas, "Agrega productos para armar la orden.") +
+    (lineasC.length ? '<div class="tot"><div><span>Total de la orden</span><strong>' + money.format(total) + '</strong></div><button class="p" id="c-ok">Crear orden</button></div>' : "");
+}
+function crearOrden() {
+  if (!compraProv) { aviso("El proveedor es obligatorio", false); return; }
+  if (!lineasC.length) { aviso("La orden debe tener al menos un producto", false); return; }
+  intentar(async function () {
+    var o = await api("/api/ordenes-compra", "POST", { idProveedor: Number(compraProv), detalles: lineasC.map(function (l) { return { idProducto: l.id, cantidad: l.cantidad }; }) });
+    lineasC = []; aviso("Orden #" + o.id + " creada por " + money.format(o.total), true); await pCompras();
+  });
 }
 
 /* ---------- Empleados (solo ADMIN) ---------- */
 async function pEmpleados() {
   var l = await api("/api/usuarios");
-  $("v").innerHTML = '<div class="card"><h2>Nuevo empleado</h2><p class="hint">Los empleados pueden vender y consultar, pero no editar productos.</p><div class="row"><div><label for="u-nom">Nombre</label><input id="u-nom" placeholder="Nombre completo"></div>' +
-    '<div><label for="u-cor">Correo</label><input id="u-cor" type="email" placeholder="correo@ejemplo.com"></div><div><label for="u-pas">Contraseña</label><input id="u-pas" type="password" placeholder="8 a 72 caracteres"></div>' +
+  $("v").innerHTML = '<div class="card"><h2>Nuevo empleado</h2><p class="hint">Los empleados pueden vender y consultar, pero no editar productos.</p><div class="row"><div><label for="u-nom">Nombre</label><input id="u-nom" maxlength="255" placeholder="Nombre completo"></div>' +
+    '<div><label for="u-cor">Correo</label><input id="u-cor" type="email" maxlength="255" placeholder="correo@ejemplo.com"></div><div><label for="u-pas">Contraseña</label><input id="u-pas" type="password" maxlength="72" placeholder="8 a 72 caracteres"></div>' +
     '<div style="flex:none"><button class="p" id="u-ok">Crear empleado</button></div></div></div><div class="card"><h2>Usuarios de la empresa</h2>' +
     tabla([["Nombre"], ["Correo"], ["Rol"]], l.map(function (u) {
       var a = u.rol === "ADMIN";
