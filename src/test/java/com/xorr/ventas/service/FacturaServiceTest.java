@@ -9,6 +9,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -27,6 +28,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.xorr.SesionDePrueba;
 import com.xorr.common.ContextoActual;
+import com.xorr.common.OperacionInvalidaException;
 import com.xorr.common.RecursoNoEncontradoException;
 import com.xorr.common.StockInsuficienteException;
 import com.xorr.inventario.dto.ProductoResponse;
@@ -159,6 +161,25 @@ class FacturaServiceTest {
         assertThrows(RecursoNoEncontradoException.class,
                 () -> servicio.crear(solicitud(linea(ID_MARTILLO, 1))));
 
+        verify(productoService, never()).decrementarStock(anyLong(), anyInt());
+        verify(facturas, never()).save(any());
+    }
+
+    // ---- crear: RN-15 (ciclo TDD 16.5) ----
+
+    // RN-15: el mismo producto en dos líneas se rechaza antes de tocar el stock.
+    // lenient: con la regla implementada el producto ni se consulta, pero sin ella
+    // el stub evita que la prueba falle por un null y no por la regla ausente.
+    @Test
+    void crear_conElMismoProductoEnDosLineas_seRechazaYNoTocaElStock() {
+        lenient().when(productoService.obtener(ID_MARTILLO))
+                .thenReturn(new ProductoResponse(ID_MARTILLO, "Martillo", new BigDecimal("15000"), 100, 5));
+
+        OperacionInvalidaException error = assertThrows(OperacionInvalidaException.class,
+                () -> servicio.crear(solicitud(linea(ID_MARTILLO, 1), linea(ID_MARTILLO, 2))));
+
+        assertEquals("La factura repite un producto en varias líneas; usa una sola línea con la cantidad total",
+                error.getMessage());
         verify(productoService, never()).decrementarStock(anyLong(), anyInt());
         verify(facturas, never()).save(any());
     }
