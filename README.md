@@ -32,7 +32,7 @@ Es un proyecto académico del curso de **Calidad de Software** (IDEAD, Universid
 
 ## 1. Estado actual del proyecto
 
-**Fase actual: Fase 1 (MVP), en curso.** La Fase 0 (versión mínima) está completada y la Fase 1 empezó por la **Seguridad**: ya se puede **registrar un administrador** (que crea su empresa), **iniciar sesión** para recibir un token JWT y **dar de alta empleados**. **El token ya se exige** en todas las rutas (salvo el registro, el login, Swagger y la consola H2) y cada petición trabaja con la empresa y el usuario del token. Existe el **backend** (la parte que guarda datos y aplica las reglas) y un **frontend básico**: una sola página web (`index.html`) que Spring Boot sirve en http://localhost:8081, con inicio de sesión, productos, ventas, facturas y empleados. La API también se puede probar con Swagger (una página que genera el propio proyecto) o con la colección de Postman.
+**Fase actual: Fase 1 (MVP), en curso.** La Fase 0 (versión mínima) está completada y la Fase 1 empezó por la **Seguridad**: ya se puede **registrar un administrador** (que crea su empresa), **iniciar sesión** para recibir un token JWT y **dar de alta empleados**. **El token ya se exige** en todas las rutas (salvo el registro, el login, Swagger y la consola H2) y cada petición trabaja con la empresa y el usuario del token. Existe el **backend** (la parte que guarda datos y aplica las reglas) y un **frontend**: una sola página web (`index.html`) que Spring Boot sirve en http://localhost:8081, con inicio de sesión, un panel de inicio, productos, ventas, facturas, proveedores, asociaciones, órdenes de compra y empleados, y con **facturas y órdenes de compra descargables en PDF**. La API también se puede probar con Swagger (una página que genera el propio proyecto) o con la colección de Postman.
 
 | Módulo | Estado | Qué incluye |
 |---|---|---|
@@ -44,12 +44,15 @@ Es un proyecto académico del curso de **Calidad de Software** (IDEAD, Universid
 | **Ventas (facturas)** | ✅ Listo | Crear una factura con varias líneas (descuenta el stock), consultarla y listarla. Las facturas no se anulan ni se borran |
 | **Seguridad · Registro y login** | ✅ Listo | Registrar un administrador (crea su empresa) e iniciar sesión para recibir un **token JWT**. Las contraseñas se guardan con BCrypt, nunca en claro |
 | **Seguridad · Token, roles y empleados** | ✅ Listo | El token se exige en las rutas protegidas (sin token: `401`; rol sin permiso: `403`). El ADMIN puede todo; el EMPLEADO solo consulta productos y vende. El ADMIN da de alta empleados y los lista. Cada petición opera con la empresa y el usuario del token |
-| **Pantallas web (frontend)** | 🟡 Básico | Una sola página (`index.html`): registrar la ferretería, iniciar y cerrar sesión; productos (el ADMIN crea, edita y elimina; el stock bajo se marca en rojo); vista de stock bajo; vender con varias líneas y ver el total; listado de facturas; empleados (solo ADMIN). **Aún no tiene** proveedores, asociaciones proveedor-producto ni órdenes de compra, aunque sus endpoints ya existen |
-| **Reportes, PDF, clientes** | 🔜 Fase 2 | |
+| **Pantallas web (frontend)** | 🟡 Funcional, con prueba manual pendiente | Una sola página (`index.html`). Para todos los roles: registrar la ferretería, iniciar y cerrar sesión, **Inicio** (ventas de hoy, productos, stock bajo y últimas facturas), productos (solo el ADMIN crea, edita y elimina; el stock bajo se marca en rojo), vista de stock bajo, **Vender** con varias líneas y total, y **Facturas** con detalle. Solo para el ADMIN: **Proveedores**, **Asociaciones** proveedor-producto, **Compras** (crear, recibir y cancelar órdenes) y **Empleados**. Los formularios validan en el navegador las mismas reglas que el backend (el servidor sigue validando). Pendiente: recorrer toda la interfaz a mano en un navegador (ver abajo) |
+| **Facturas y órdenes en PDF** | 🟡 Hecho en el navegador | Botón **Descargar factura en PDF** (tras vender, en Inicio y en Facturas) y botón **PDF** en cada orden de compra. El PDF lo arma la propia página, sin librerías ni endpoint nuevo en el servidor |
+| **Reportes y clientes** | 🔜 Fase 2 | |
 
-**Pruebas automáticas:** 208 pruebas (`BUILD SUCCESS`, 19 de octubre de 2026): todas en verde y ninguna omitida. Son 104 de la Fase 0, 98 de Seguridad y 6 de `ArquitecturaTest` (reglas de ArchUnit, todas activas), ver la [sección 12](#12-pruebas-automáticas).
+**Pruebas automáticas:** 209 pruebas (`BUILD SUCCESS`, 19 de octubre de 2026): todas en verde y ninguna omitida. Son 105 de la Fase 0, 98 de Seguridad y 6 de `ArquitecturaTest` (reglas de ArchUnit, todas activas), ver la [sección 12](#12-pruebas-automáticas).
 
-**Cobertura y complejidad (JaCoCo, releída el 19 de octubre de 2026 tras correr las 205 pruebas, Seguridad incluida; es la lectura anterior al refactor del mismo día y aún no se ha releído con las 208):** 95 % de las instrucciones y 96 % de las ramas cubiertas; en los servicios, 98 % (inventario), 98 % (compras) y 100 % (ventas). La complejidad máxima por método, V(G), es **3** (medida con Checkstyle).
+**Cobertura y complejidad (JaCoCo, releída el 19 de octubre de 2026 tras correr las 209 pruebas, ya con el refactor y la regla RN-15):** 95 % de las instrucciones (119 de 2.683 sin cubrir) y 96 % de las ramas (1 de 30); en los servicios, 98 % (inventario), 98 % (compras) y 100 % (ventas). La complejidad máxima por método, V(G), es **3** (medida con Checkstyle).
+
+**Verificación del frontend (lo que sí y lo que no se ha comprobado):** el JavaScript compila sin errores y el generador de PDF produce archivos válidos (revisados con `qpdf`, `pdftotext` y a simple vista). El resto de la interfaz **aún no se ha recorrido en un navegador contra el servidor**: esa prueba manual sigue pendiente. Las pruebas automáticas y Postman cubren el backend, no la página.
 
 **Colección de Postman:** 44 peticiones con 74 comprobaciones automáticas, todas pasadas el 19 de octubre de 2026 (ver la [sección 7](#7-probar-la-api-paso-a-paso)).
 
@@ -122,7 +125,7 @@ Cuando llega mercancía, el dueño marca la orden como **RECIBIDA** y el stock s
 | **Spring Security** | (versión de Spring Boot) | Exige el token en cada petición, aplica los permisos por rol y trae **BCrypt**, que se usa para guardar las contraseñas cifradas |
 | **jjwt** | 0.12.6 | Crea y lee los **tokens JWT**: los entrega el login y el filtro de seguridad los lee en cada petición |
 | **springdoc-openapi** | 2.6.0 | Genera **Swagger**, la página para probar la API |
-| **HTML + JavaScript (`fetch`)** | — | El frontend básico: una sola página (`index.html`) que Spring Boot sirve tal cual y que habla con la API |
+| **HTML + JavaScript (`fetch`)** | — | El frontend: una sola página (`index.html`) que Spring Boot sirve tal cual, habla con la API y genera los PDF sin librerías externas |
 | **JUnit 5 + Mockito** | (incluido) | Pruebas automáticas |
 | **JaCoCo** | 0.8.15 | Mide qué parte del código ejecutan las pruebas (cobertura) y su complejidad |
 
@@ -180,7 +183,7 @@ mvn test
 La primera vez tarda más porque Maven descarga las librerías (necesitas internet). Al final debes ver:
 
 ```
-Tests run: 208, Failures: 0, Errors: 0, Skipped: 0
+Tests run: 209, Failures: 0, Errors: 0, Skipped: 0
 BUILD SUCCESS
 ```
 
@@ -400,13 +403,18 @@ Con el token del administrador: crear otro empleado con el mismo correo (aunque 
 
 Con la aplicación arrancada (`mvn spring-boot:run`), abre http://localhost:8081 en el navegador. No necesitas Swagger ni Postman.
 
-1. Pulsa **Registrar mi ferretería**, escribe el nombre de la ferretería y los datos del administrador. Al terminar entras directo.
+1. Pulsa **Registrar mi ferretería**, escribe el nombre de la ferretería y los datos del administrador. Al terminar entras directo, al **Inicio**: ventas de hoy, número de productos, productos con stock bajo, órdenes pendientes (solo ADMIN) y atajos para vender, agregar un producto o crear una orden.
 2. En **Productos** el ADMIN crea, edita y elimina; el stock bajo se marca en rojo. **Stock bajo** muestra solo los que están por debajo del mínimo.
-3. En **Vender** armas la factura con varias líneas y ves el total antes de registrarla. Si falta stock, la página muestra el mensaje `409` del servidor.
-4. En **Facturas** ves el listado. En **Empleados** (solo ADMIN) creas y listas empleados.
-5. Cierra sesión y entra con un empleado: ve productos, stock bajo, ventas y facturas, pero **sin** los botones de administrador (el servidor igual responde `403` si alguien intenta saltárselos).
+3. En **Vender** armas la factura con varias líneas y ves el total antes de registrarla. Si falta stock, la página muestra el mensaje `409` del servidor. Al registrar la venta aparece una tarjeta verde con el botón **Descargar factura en PDF**.
+4. En **Facturas** ves el listado, el detalle de cada una y el botón **Descargar PDF**.
+5. Solo el ADMIN ve estas pestañas: **Proveedores** (crear, editar, eliminar), **Asociaciones** (qué producto vende cada proveedor y a qué precio de compra), **Compras** (crear una orden con productos del proveedor elegido, **Recibir** para subir el stock, **Cancelar**, y el botón **PDF** de cada orden) y **Empleados** (crear y listar).
+6. Cierra sesión y entra con un empleado: ve Inicio, productos, stock bajo, ventas y facturas, pero **sin** los botones de administrador (el servidor igual responde `403` si alguien intenta saltárselos).
 
-La sesión dura mientras la pestaña esté abierta. Como la base H2 es en memoria, al reiniciar la aplicación hay que registrar la ferretería otra vez. Todavía no hay pantallas de proveedores, asociaciones ni órdenes de compra: para eso usa Swagger o Postman.
+**El nombre de la ferretería.** El backend no lo devuelve en el login ni en ningún endpoint: la página lo guarda en **este navegador**, asociado al correo de quien registró la ferretería y de los empleados que crea desde aquí. Por eso, si el administrador entra desde otro equipo, el Inicio le pide escribirlo una vez; y un empleado que entre desde otro equipo verá solo «Xorr» en el encabezado y en los PDF. La solución limpia sería un endpoint `GET /api/empresa` (queda para después; tocaría el servicio, el controlador y una regla de `SecurityConfig`).
+
+**Los PDF.** Se generan en el navegador (texto en Helvetica, sin librerías) y llevan el nombre de la ferretería, el número y la fecha, las líneas con precio unitario y subtotal, y el total. La orden de compra añade el proveedor y el estado.
+
+La sesión dura mientras la pestaña esté abierta. Como la base H2 es en memoria, al reiniciar la aplicación hay que registrar la ferretería otra vez.
 
 ---
 
@@ -429,7 +437,7 @@ Xorr/
     │   │   ├── application.properties        ← Activa el perfil "dev"
     │   │   ├── application-dev.properties    ← Puerto 8081, base H2, consola H2 y secreto del JWT
     │   │   └── static/
-    │   │       └── index.html                ← Frontend básico: una página HTML + JavaScript que usa la API con `fetch`
+    │   │       └── index.html                ← Frontend: una página HTML + JavaScript que usa la API con `fetch` y genera los PDF de facturas y órdenes
     │   │
     │   └── java/com/xorr/
     │       ├── XorrApplication.java          ← Punto de entrada: aquí arranca todo
@@ -722,6 +730,7 @@ Las reglas viven en los **servicios** y están probadas con pruebas automáticas
 | RN-12 | No se elimina un producto o proveedor con movimientos | ✅ órdenes de compra y facturas |
 | RN-13 | No puede haber dos asociaciones con el mismo proveedor y producto | ✅ |
 | RN-14 | Al eliminar un producto o proveedor se eliminan sus asociaciones | ✅ |
+| RN-15 | Una factura no puede repetir un producto en dos líneas: responde `400` con «La factura repite un producto en varias líneas; usa una sola línea con la cantidad total» y no descuenta stock. En las órdenes de compra todavía no se aplica (el formulario web sí suma las cantidades repetidas en una sola línea) | ✅ en facturas |
 
 ---
 
@@ -741,7 +750,7 @@ Estas son **pruebas unitarias de los servicios**: usan **JUnit 5** (para escribi
 | `ProductoServiceCrudTest` | 6 | Crear, listar, obtener y actualizar; un producto de otra empresa se trata como no encontrado |
 | `ProveedorServiceTest` | 8 | CRUD, eliminar con y sin órdenes, multi-tenant |
 | `ProveedorProductoServiceTest` | 11 | Asociaciones, duplicados, precio de compra |
-| `FacturaServiceTest` | 11 | Crear facturas, precios y totales, descuento de stock, atomicidad, multi-tenant |
+| `FacturaServiceTest` | 12 | Crear facturas, precios y totales, descuento de stock, atomicidad, multi-tenant y rechazo del mismo producto en dos líneas (RN-15) |
 | `MovimientosVentaServiceTest` | 2 | Consulta de facturas por producto |
 | `ProductoRepositoryTest` | 4 | Integración con H2: stock bajo con `<` estricto (RN-04) y filtro por empresa (RN-05) |
 | `ValidacionDtoTest` | 22 | Validación real de los DTO: negativos, cero y nulos (RN-07) |
@@ -759,7 +768,7 @@ Estas son **pruebas unitarias de los servicios**: usan **JUnit 5** (para escribi
 | `ValidacionCrearEmpleadoRequestTest` | 12 | Validación del alta de empleados: nombre y correo obligatorios, correo mal escrito, contraseña nula, corta o larga |
 | `UsuariosIntegracionTest` | 10 | Con la aplicación real: `401` sin token, `403` para EMPLEADO, el ADMIN lista usuarios, el empleado creado inicia sesión, `400` por datos inválidos y aislamiento entre empresas |
 | `ArquitecturaTest` | 6 | ArchUnit: 6 reglas activas (todas pasan), incluidas «sin ciclos entre módulos» y «`common` no depende de `seguridad`» |
-| **Total** | **208** | Todas en verde y ninguna omitida (`mvn clean test`, 19-10-2026) |
+| **Total** | **209** | Todas en verde y ninguna omitida (`mvn clean test`, 19-10-2026) |
 
 `ArquitecturaTest` (ArchUnit 1.4.1) comprueba las reglas de dependencia de la sección 10: los controladores no usan repositorios ni entidades, las entidades no dependen de servicios ni controladores, cada servicio usa solo los repositorios de su módulo, no hay ciclos entre módulos y `common` no depende de `seguridad`. Las dos últimas estuvieron desactivadas con `@ArchIgnore` como deuda conocida; el refactor del 19-10-2026 las dejó activas y las 6 reglas pasan.
 
@@ -769,12 +778,12 @@ Estas son **pruebas unitarias de los servicios**: usan **JUnit 5** (para escribi
 
 | Medida | Resultado |
 |---|---|
-| Instrucciones cubiertas (total) | 95 % (119 de 2.661 sin cubrir) |
+| Instrucciones cubiertas (total) | 95 % (119 de 2.683 sin cubrir) |
 | Ramas cubiertas | 96 % (1 de 30 sin cubrir) |
 | Servicios de inventario / compras / ventas | 98 % / 98 % / 100 % |
 | Complejidad máxima por método, V(G) (meta: 10 o menos) | 3 (Checkstyle; 3 métodos con 3, 10 con 2, el resto con 1) |
 
-Los controladores no tienen pruebas unitarias propias (inventario 45 %, compras 33 %, ventas 50 %): su comportamiento se verifica con la colección de Postman y con las pruebas de integración de seguridad. Estas cifras se leyeron en el reporte de JaCoCo el 19 de octubre de 2026 tras correr las 205 pruebas, antes del refactor del mismo día (ArchUnit no cambia la cobertura, porque analiza el código sin ejecutarlo; falta releerlas con las 208).
+Los controladores no tienen pruebas unitarias propias (inventario 45 %, compras 33 %, ventas 50 %): su comportamiento se verifica con la colección de Postman y con las pruebas de integración de seguridad. Estas cifras se leyeron en el reporte de JaCoCo el 19 de octubre de 2026 tras correr las 209 pruebas (con el refactor de inversión de dependencias y la regla RN-15 ya incluidos); la clase `FacturaService` queda al 100 % de instrucciones y de ramas.
 
 ### Comandos útiles
 
@@ -837,6 +846,8 @@ Cuando falla la validación de varios campos a la vez, el mensaje los junta: `no
 | Recibo `403` aunque inicié sesión | Tu rol no tiene permiso para esa ruta (por ejemplo, un EMPLEADO intentando crear un producto) | Usa el token de un ADMIN o revisa la tabla de permisos de la [sección 9](#9-endpoints-disponibles) |
 | Una prueba nueva falla con `IllegalStateException: No hay una sesión autenticada` | La prueba usa `ContextoActual` real y no tiene sesión | Añade `SesionDePrueba.class` al `@ExtendWith` de la prueba |
 | `http://localhost:8081` da `404`, `401` o `403` en vez de la pantalla de inicio de sesión | `index.html` no está en `src/main/resources/static/` (la carpeta debe llamarse exactamente `static`) o no se copió el `SecurityConfig.java` actualizado | Revisa la ruta del archivo, copia el `SecurityConfig.java` nuevo y vuelve a arrancar con `mvn spring-boot:run` |
+| El encabezado y los PDF dicen solo «Xorr», sin el nombre de la ferretería | El nombre se guarda en el navegador y este equipo no lo tiene (otro navegador, otro equipo o datos del sitio borrados) | Entra como administrador y escríbelo en la tarjeta «¿Cómo se llama tu ferretería?» del Inicio. Un empleado no puede ponerlo |
+| El botón de PDF no descarga nada | El navegador bloqueó la descarga o la sesión terminó | Permite las descargas de `localhost:8081`, entra de nuevo y repite |
 
 ---
 
@@ -846,11 +857,11 @@ Cuando falla la validación de varios campos a la vez, el mensaje los junta: `no
 |---|---|---|
 | **Fase 0** | Inventario, Compras y Ventas en el backend, sin login | ✅ Hecho |
 | **Fase 0 (resto)** | Colección de Postman, medición de complejidad y cobertura de pruebas (JaCoCo) | ✅ Hecho |
-| **Fase 1 · MVP** | Registro y login con JWT, roles ADMIN y EMPLEADO, empresa; páginas HTML + JavaScript | 🟡 En curso: el backend de Seguridad está hecho (registro, login, token exigido, roles y alta de empleados); las pruebas de integración de usuarios y la medición de cobertura ya están hechas; el frontend básico (`index.html`) ya existe; sigue decidir la duplicación de `normalizar` y ampliar el frontend con proveedores, asociaciones y órdenes de compra |
-| **Fase 2** | Reportes, PDF de facturas y órdenes, clientes, logo, más pruebas de integración (el refactor de inversión de dependencias ya se hizo el 19-10-2026) | Futuro |
+| **Fase 1 · MVP** | Registro y login con JWT, roles ADMIN y EMPLEADO, empresa; páginas HTML + JavaScript | 🟡 En curso: el backend de Seguridad está hecho (registro, login, token exigido, roles y alta de empleados); las pruebas de integración de usuarios y la medición de cobertura ya están hechas; el frontend ya cubre todos los módulos y descarga PDF, pero falta recorrerlo a mano en un navegador; sigue decidir la duplicación de `normalizar` |
+| **Fase 2** | Reportes, clientes, logo, endpoint `GET /api/empresa` para el nombre de la ferretería (hoy vive en el navegador), RN-15 en órdenes de compra, más pruebas de integración (el refactor de inversión de dependencias ya se hizo el 19-10-2026) | Futuro |
 | **Fase 3** | Permisos por rol en la interfaz, HTTPS, instalador, despliegue en la nube, modo sin conexión, React, app móvil | Futuro |
 
-**Limitaciones conocidas hoy:** el token se exige y los datos se filtran por la empresa del token; no hay edición ni baja de empleados; el frontend es básico (sin proveedores, asociaciones ni órdenes de compra, y la sesión dura mientras la pestaña esté abierta); Swagger y la consola H2 están abiertos sin token (hay que cerrarlos con un perfil de producción antes de un despliegue real); el secreto del token de desarrollo está en el repositorio; la base de datos es temporal; las pruebas unitarias no usan base de datos real (las consultas, las validaciones y el rollback se cubren con clases de integración; el resto de la integración queda para la Fase 2).
+**Limitaciones conocidas hoy:** el token se exige y los datos se filtran por la empresa del token; no hay edición ni baja de empleados; el frontend no se ha probado a mano de punta a punta y la sesión dura mientras la pestaña esté abierta; el nombre de la ferretería solo existe en el navegador donde se registró; los PDF salen de la página y no quedan guardados en el servidor; Swagger y la consola H2 están abiertos sin token (hay que cerrarlos con un perfil de producción antes de un despliegue real); el secreto del token de desarrollo está en el repositorio; la base de datos es temporal; las pruebas unitarias no usan base de datos real (las consultas, las validaciones y el rollback se cubren con clases de integración; el resto de la integración queda para la Fase 2).
 
 ---
 
