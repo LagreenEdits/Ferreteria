@@ -47,9 +47,9 @@ Es un proyecto académico del curso de **Calidad de Software** (IDEAD, Universid
 | **Pantallas web (frontend)** | 🔜 Pendiente | Páginas HTML + JavaScript |
 | **Reportes, PDF, clientes** | 🔜 Fase 2 | |
 
-**Pruebas automáticas:** 189 pruebas, todas en verde (`BUILD SUCCESS`): 104 de la Fase 0 y 85 de Seguridad.
+**Pruebas automáticas:** 205 pruebas (`BUILD SUCCESS`, 19 de octubre de 2026): 203 ejecutadas, todas en verde, y 2 omitidas a propósito. Son 104 de la Fase 0, 95 de Seguridad y 6 de `ArquitecturaTest` (reglas de ArchUnit; 4 activas y 2 con `@ArchIgnore`, ver la [sección 12](#12-pruebas-automáticas)).
 
-**Cobertura y complejidad (JaCoCo, medida con las 104 pruebas de la Fase 0; sin remedir con las de Seguridad):** 88 % de las instrucciones y 100 % de las ramas cubiertas; en los servicios, 96 % (inventario), 98 % (compras) y 100 % (ventas). La complejidad máxima por método (V(G)) es 2.
+**Cobertura y complejidad (JaCoCo, releída el 19 de octubre de 2026 tras correr las 205 pruebas, Seguridad incluida):** 95 % de las instrucciones y 96 % de las ramas cubiertas; en los servicios, 98 % (inventario), 98 % (compras) y 100 % (ventas). La complejidad máxima por método, V(G), es **3** (medida con Checkstyle).
 
 **Colección de Postman:** 44 peticiones con 74 comprobaciones automáticas, todas pasadas el 19 de octubre de 2026 (ver la [sección 7](#7-probar-la-api-paso-a-paso)).
 
@@ -179,7 +179,7 @@ mvn test
 La primera vez tarda más porque Maven descarga las librerías (necesitas internet). Al final debes ver:
 
 ```
-Tests run: 189, Failures: 0, Errors: 0, Skipped: 0
+Tests run: 205, Failures: 0, Errors: 0, Skipped: 2
 BUILD SUCCESS
 ```
 
@@ -734,7 +734,11 @@ Estas son **pruebas unitarias de los servicios**: usan **JUnit 5** (para escribi
 | `AislamientoEmpresasIntegracionTest` | 5 | Dos empresas reales: la otra empresa recibe `404` al ver, listar, eliminar o vender el producto ajeno (RN-05) |
 | `UsuarioServiceTest` | 6 | Alta de empleados (rol `EMPLEADO`, empresa del token, hash BCrypt, correo en minúsculas, correo repetido sin guardar) y listado por empresa |
 | `ValidacionCrearEmpleadoRequestTest` | 12 | Validación del alta de empleados: nombre y correo obligatorios, correo mal escrito, contraseña nula, corta o larga |
-| **Total** | **189** | |
+| `UsuariosIntegracionTest` | 10 | Con la aplicación real: `401` sin token, `403` para EMPLEADO, el ADMIN lista usuarios, el empleado creado inicia sesión, `400` por datos inválidos y aislamiento entre empresas |
+| `ArquitecturaTest` | 6 | ArchUnit: 4 reglas activas (todas pasan) y 2 omitidas con `@ArchIgnore` (deudas conocidas) |
+| **Total** | **205** | 203 ejecutadas en verde y 2 omitidas (`mvn clean test`, 19-10-2026) |
+
+`ArquitecturaTest` (ArchUnit 1.4.1) comprueba las reglas de dependencia de la sección 10: los controladores no usan repositorios ni entidades, las entidades no dependen de servicios ni controladores y cada servicio usa solo los repositorios de su módulo. Dos reglas (sin ciclos entre módulos y `common` sin depender de `seguridad`) están desactivadas con `@ArchIgnore` porque son deudas conocidas que se pagan en el refactor de la Fase 2. El 19-10-2026 las 4 reglas activas pasaron y las 2 desactivadas figuran como omitidas (`Skipped: 2`).
 
 ### Cobertura y complejidad (JaCoCo)
 
@@ -742,12 +746,12 @@ Estas son **pruebas unitarias de los servicios**: usan **JUnit 5** (para escribi
 
 | Medida | Resultado |
 |---|---|
-| Instrucciones cubiertas (total) | 88 % |
-| Ramas cubiertas | 100 % |
-| Servicios de inventario / compras / ventas | 96 % / 98 % / 100 % |
-| Complejidad máxima por método, V(G) (meta: 10 o menos) | 2 |
+| Instrucciones cubiertas (total) | 95 % (119 de 2.661 sin cubrir) |
+| Ramas cubiertas | 96 % (1 de 30 sin cubrir) |
+| Servicios de inventario / compras / ventas | 98 % / 98 % / 100 % |
+| Complejidad máxima por método, V(G) (meta: 10 o menos) | 3 (Checkstyle; 3 métodos con 3, 10 con 2, el resto con 1) |
 
-Los controladores y `common` no tienen pruebas unitarias a propósito, por eso bajan el total. Estas cifras son de la Fase 0 (104 pruebas); todavía no se han vuelto a medir con las pruebas de Seguridad.
+Los controladores no tienen pruebas unitarias propias (inventario 45 %, compras 33 %, ventas 50 %): su comportamiento se verifica con la colección de Postman y con las pruebas de integración de seguridad. Estas cifras se leyeron en el reporte de JaCoCo el 19 de octubre de 2026 tras correr las 205 pruebas (ArchUnit no cambia la cobertura, porque analiza el código sin ejecutarlo).
 
 ### Comandos útiles
 
@@ -818,7 +822,7 @@ Cuando falla la validación de varios campos a la vez, el mensaje los junta: `no
 |---|---|---|
 | **Fase 0** | Inventario, Compras y Ventas en el backend, sin login | ✅ Hecho |
 | **Fase 0 (resto)** | Colección de Postman, medición de complejidad y cobertura de pruebas (JaCoCo) | ✅ Hecho |
-| **Fase 1 · MVP** | Registro y login con JWT, roles ADMIN y EMPLEADO, empresa; páginas HTML + JavaScript | 🟡 En curso: el backend de Seguridad está hecho (registro, login, token exigido, roles y alta de empleados); siguen cerrar Seguridad con más pruebas de integración y medir la cobertura, y después las páginas |
+| **Fase 1 · MVP** | Registro y login con JWT, roles ADMIN y EMPLEADO, empresa; páginas HTML + JavaScript | 🟡 En curso: el backend de Seguridad está hecho (registro, login, token exigido, roles y alta de empleados); las pruebas de integración de usuarios y la medición de cobertura ya están hechas; sigue decidir la duplicación de `normalizar` y, después, las páginas |
 | **Fase 2** | Reportes, PDF de facturas y órdenes, clientes, logo, más pruebas de integración y refactor de inversión de dependencias | Futuro |
 | **Fase 3** | Permisos por rol en la interfaz, HTTPS, instalador, despliegue en la nube, modo sin conexión, React, app móvil | Futuro |
 
