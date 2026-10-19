@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Xorr · Sistema Gestor de Ferreterías</title>
+<style>
+:root{--c:#b45309;--cd:#92400e;--bg:#f7f5f2;--t:#1f2937;--m:#6b7280;--b:#e5e0d8;--ok:#15803d;--er:#b91c1c}
+*{box-sizing:border-box}
+body{margin:0;font:15px/1.5 system-ui,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--t)}
+header{background:var(--c);color:#fff;padding:.7rem 1rem;display:flex;gap:1rem;align-items:center;flex-wrap:wrap}
+header h1{font-size:1.2rem;margin:0;flex:1}
+main{max-width:900px;margin:1rem auto;padding:0 1rem}
+nav{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:1rem}
+nav button.on{background:var(--c);color:#fff;border-color:var(--c)}
+.card{background:#fff;border:1px solid var(--b);border-radius:8px;padding:1rem;margin-bottom:1rem}
+.auth{max-width:380px;margin:3rem auto}
+h2{margin:.2rem 0 .8rem;font-size:1.1rem}
+label{display:block;font-size:.85rem;color:var(--m);margin:.5rem 0 .15rem}
+input,select{width:100%;padding:.5rem;border:1px solid var(--b);border-radius:6px;font:inherit}
+button{padding:.45rem .8rem;border:1px solid var(--c);background:#fff;color:var(--c);border-radius:6px;font:inherit;cursor:pointer}
+button.p{background:var(--c);color:#fff}
+button:hover{opacity:.85}
+.row{display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end}
+.row>div{flex:1;min-width:120px}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:.45rem .5rem;border-bottom:1px solid var(--b)}
+th{font-size:.8rem;color:var(--m);text-transform:uppercase}
+td.n,th.n{text-align:right}
+.low{color:var(--er);font-weight:600}
+#msg{position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);padding:.6rem 1rem;border-radius:6px;color:#fff;display:none;max-width:90%}
+.link{background:none;border:0;color:var(--c);text-decoration:underline;padding:0}
+[hidden]{display:none!important}
+.empty{color:var(--m);padding:.5rem}
+</style>
+</head>
+<body>
+<div id="auth" class="card auth">
+  <h2 id="auth-t">Iniciar sesión</h2>
+  <div id="f-reg" hidden>
+    <label>Nombre de la ferretería</label><input id="r-emp">
+    <label>Tu nombre</label><input id="r-nom">
+  </div>
+  <label>Correo</label><input id="a-cor" type="email">
+  <label>Contraseña (8 a 72 caracteres)</label><input id="a-pas" type="password">
+  <p><button class="p" id="a-go">Entrar</button>
+  <button class="link" id="a-sw">Registrar mi ferretería</button></p>
+</div>
+
+<div id="app" hidden>
+  <header><h1>Xorr</h1><span id="quien"></span><button id="salir">Salir</button></header>
+  <main>
+    <nav id="nav"></nav>
+    <section id="v"></section>
+  </main>
+</div>
+<div id="msg"></div>
+
+<script>
+"use strict";
+var token = null, user = null, vista = "productos", lineas = [], prods = [], editando = null;
+var $ = function (id) { return document.getElementById(id); };
+var money = new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 2 });
+function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+function aviso(t, ok) { var m = $("msg"); m.textContent = t; m.style.background = ok ? "var(--ok)" : "var(--er)"; m.style.display = "block"; setTimeout(function () { m.style.display = "none"; }, 3500); }
+function guardar() { try { sessionStorage.setItem("xorr", JSON.stringify({ token: token, user: user })); } catch (e) { } }
+function esAdmin() { return user && user.rol === "ADMIN"; }
+
+async function api(ruta, metodo, cuerpo) {
+  var h = { "Content-Type": "application/json" };
+  if (token) h.Authorization = "Bearer " + token;
+  var r = await fetch(ruta, { method: metodo || "GET", headers: h, body: cuerpo ? JSON.stringify(cuerpo) : undefined });
+  var d = null;
+  try { d = await r.json(); } catch (e) { }
+  if (r.status === 401 && token && ruta.indexOf("/api/auth/") < 0) { salir(); throw new Error("Tu sesión terminó, entra de nuevo"); }
+  if (!r.ok) throw new Error((d && d.mensaje) || "Error " + r.status);
+  return d;
+}
+async function intentar(fn) { try { await fn(); } catch (e) { aviso(e.message, false); } }
+
+/* ---------- Acceso ---------- */
+var registrando = false;
+$("a-sw").onclick = function () {
+  registrando = !registrando;
+  $("f-reg").hidden = !registrando;
+  $("auth-t").textContent = registrando ? "Registrar mi ferretería" : "Iniciar sesión";
+  $("a-go").textContent = registrando ? "Registrar y entrar" : "Entrar";
+  $("a-sw").textContent = registrando ? "Ya tengo cuenta" : "Registrar mi ferretería";
+};
+$("a-go").onclick = function () {
+  intentar(async function () {
+    var correo = $("a-cor").value.trim(), password = $("a-pas").value;
+    if (registrando) {
+      await api("/api/auth/registro-admin", "POST", { nombreEmpresa: $("r-emp").value, nombre: $("r-nom").value, correo: correo, password: password });
+    }
+    var d = await api("/api/auth/login", "POST", { correo: correo, password: password });
+    token = d.token; user = d.usuario; guardar(); entrar();
+  });
+};
+function entrar() {
+  $("auth").hidden = true; $("app").hidden = false;
+  $("quien").textContent = user.nombre + " (" + user.rol + ")";
+  vista = "productos"; menu(); ir("productos");
+}
+function salir() {
+  token = null; user = null; lineas = [];
+  try { sessionStorage.removeItem("xorr"); } catch (e) { }
+  $("app").hidden = true; $("auth").hidden = false; $("a-pas").value = "";
+}
+$("salir").onclick = salir;
+
+/* ---------- Menú ---------- */
+function menu() {
+  var op = [["productos", "Productos"], ["bajo", "Stock bajo"], ["vender", "Vender"], ["facturas", "Facturas"]];
+  if (esAdmin()) op.push(["empleados", "Empleados"]);
+  $("nav").innerHTML = op.map(function (o) { return '<button data-v="' + o[0] + '"' + (o[0] === vista ? ' class="on"' : "") + ">" + o[1] + "</button>"; }).join("");
+}
+$("nav").onclick = function (e) { var v = e.target.dataset.v; if (v) { vista = v; menu(); ir(v); } };
+function ir(v) { intentar(function () { return ({ productos: pProductos, bajo: pBajo, vender: pVender, facturas: pFacturas, empleados: pEmpleados })[v](); }); }
+function tabla(cols, filas) {
+  if (!filas.length) return '<div class="empty">No hay registros.</div>';
+  return "<table><tr>" + cols.map(function (c) { return '<th class="' + (c[1] || "") + '">' + c[0] + "</th>"; }).join("") + "</tr>" + filas.join("") + "</table>";
+}
+
+/* ---------- Productos ---------- */
+async function pProductos() {
+  prods = await api("/api/productos");
+  var f = "";
+  if (esAdmin()) {
+    var p = editando || { nombre: "", precioVenta: "", stock: "", stockMinimo: "" };
+    f = '<div class="card"><h2>' + (editando ? "Editar producto" : "Nuevo producto") + '</h2><div class="row">' +
+      '<div style="flex:2"><label>Nombre</label><input id="p-nom" value="' + esc(p.nombre) + '"></div>' +
+      '<div><label>Precio de venta</label><input id="p-pre" type="number" min="0" step="any" value="' + esc(p.precioVenta) + '"></div>' +
+      '<div><label>Stock</label><input id="p-sto" type="number" min="0" value="' + esc(p.stock) + '"></div>' +
+      '<div><label>Stock mínimo</label><input id="p-min" type="number" min="0" value="' + esc(p.stockMinimo) + '"></div>' +
+      '<div><button class="p" id="p-ok">Guardar</button> ' + (editando ? '<button id="p-no">Cancelar</button>' : "") + "</div></div></div>";
+  }
+  var filas = prods.map(function (x) {
+    return "<tr><td>" + esc(x.nombre) + '</td><td class="n">' + money.format(x.precioVenta) + '</td><td class="n' + (x.stock < x.stockMinimo ? " low" : "") + '">' + x.stock + '</td><td class="n">' + x.stockMinimo + "</td>" +
+      (esAdmin() ? '<td class="n"><button data-e="' + x.id + '">Editar</button> <button data-d="' + x.id + '">Eliminar</button></td>' : "") + "</tr>";
+  });
+  var cols = [["Producto"], ["Precio", "n"], ["Stock", "n"], ["Mínimo", "n"]];
+  if (esAdmin()) cols.push(["", "n"]);
+  $("v").innerHTML = f + '<div class="card"><h2>Productos</h2>' + tabla(cols, filas) + "</div>";
+}
+$("v").onclick = function (e) {
+  var t = e.target, id;
+  if (t.id === "p-ok") intentar(async function () {
+    var c = { nombre: $("p-nom").value, precioVenta: Number($("p-pre").value), stock: Number($("p-sto").value), stockMinimo: Number($("p-min").value) };
+    if (editando) await api("/api/productos/" + editando.id, "PUT", c); else await api("/api/productos", "POST", c);
+    aviso("Producto guardado", true); editando = null; await pProductos();
+  });
+  else if (t.id === "p-no") { editando = null; ir("productos"); }
+  else if ((id = t.dataset.e)) { editando = prods.filter(function (x) { return String(x.id) === id; })[0]; ir("productos"); }
+  else if ((id = t.dataset.d)) { if (confirm("¿Eliminar este producto?")) intentar(async function () { await api("/api/productos/" + id, "DELETE"); aviso("Producto eliminado", true); await pProductos(); }); }
+  else if (t.id === "v-add") agregarLinea();
+  else if (t.id === "v-ok") vender();
+  else if ((id = t.dataset.q)) { lineas.splice(Number(id), 1); pintarLineas(); }
+  else if (t.id === "u-ok") intentar(async function () {
+    await api("/api/usuarios", "POST", { nombre: $("u-nom").value, correo: $("u-cor").value, password: $("u-pas").value });
+    aviso("Empleado creado", true); await pEmpleados();
+  });
+};
+
+/* ---------- Stock bajo ---------- */
+async function pBajo() {
+  var l = await api("/api/productos/stock-bajo");
+  $("v").innerHTML = '<div class="card"><h2>Productos con stock bajo</h2>' + tabla([["Producto"], ["Stock", "n"], ["Mínimo", "n"]],
+    l.map(function (x) { return "<tr><td>" + esc(x.nombre) + '</td><td class="n low">' + x.stock + '</td><td class="n">' + x.stockMinimo + "</td></tr>"; })) + "</div>";
+}
+
+/* ---------- Vender ---------- */
+async function pVender() {
+  prods = (await api("/api/productos")).filter(function (x) { return x.stock > 0; });
+  $("v").innerHTML = '<div class="card"><h2>Nueva venta</h2><div class="row"><div style="flex:3"><label>Producto</label><select id="v-pro">' +
+    prods.map(function (x) { return '<option value="' + x.id + '">' + esc(x.nombre) + " (stock " + x.stock + ")</option>"; }).join("") +
+    '</select></div><div><label>Cantidad</label><input id="v-can" type="number" min="1" value="1"></div><div><button id="v-add">Agregar</button></div></div></div>' +
+    '<div class="card"><h2>Detalle</h2><div id="v-lin"></div></div>';
+  pintarLineas();
+}
+function agregarLinea() {
+  var id = Number($("v-pro").value), can = Number($("v-can").value);
+  var p = prods.filter(function (x) { return x.id === id; })[0];
+  if (!p || !(can >= 1)) { aviso("Elige un producto y una cantidad de 1 o más", false); return; }
+  var l = lineas.filter(function (x) { return x.id === id; })[0];
+  if (l) l.cantidad += can; else lineas.push({ id: id, nombre: p.nombre, precio: p.precioVenta, cantidad: can });
+  pintarLineas();
+}
+function pintarLineas() {
+  var total = 0;
+  var filas = lineas.map(function (l, i) {
+    var s = l.precio * l.cantidad; total += s;
+    return "<tr><td>" + esc(l.nombre) + '</td><td class="n">' + l.cantidad + '</td><td class="n">' + money.format(s) + '</td><td class="n"><button data-q="' + i + '">Quitar</button></td></tr>';
+  });
+  $("v-lin").innerHTML = tabla([["Producto"], ["Cant.", "n"], ["Subtotal", "n"], ["", "n"]], filas) +
+    (lineas.length ? '<p><strong>Total: ' + money.format(total) + '</strong> <button class="p" id="v-ok">Registrar venta</button></p>' : "");
+}
+function vender() {
+  intentar(async function () {
+    var f = await api("/api/facturas", "POST", { detalles: lineas.map(function (l) { return { idProducto: l.id, cantidad: l.cantidad }; }) });
+    lineas = []; aviso("Venta registrada: factura " + f.id + " por " + money.format(f.total), true); await pVender();
+  });
+}
+
+/* ---------- Facturas ---------- */
+async function pFacturas() {
+  var l = await api("/api/facturas");
+  $("v").innerHTML = '<div class="card"><h2>Facturas</h2>' + tabla([["N.º"], ["Fecha"], ["Productos", "n"], ["Total", "n"]],
+    l.slice().reverse().map(function (f) {
+      return "<tr><td>" + f.id + "</td><td>" + esc(new Date(f.fecha).toLocaleString("es-CO")) + '</td><td class="n">' +
+        f.detalles.reduce(function (a, d) { return a + d.cantidad; }, 0) + '</td><td class="n">' + money.format(f.total) + "</td></tr>";
+    })) + "</div>";
+}
+
+/* ---------- Empleados (solo ADMIN) ---------- */
+async function pEmpleados() {
+  var l = await api("/api/usuarios");
+  $("v").innerHTML = '<div class="card"><h2>Nuevo empleado</h2><div class="row"><div><label>Nombre</label><input id="u-nom"></div>' +
+    '<div><label>Correo</label><input id="u-cor" type="email"></div><div><label>Contraseña (8 a 72)</label><input id="u-pas" type="password"></div>' +
+    '<div><button class="p" id="u-ok">Crear</button></div></div></div><div class="card"><h2>Usuarios de la empresa</h2>' +
+    tabla([["Nombre"], ["Correo"], ["Rol"]], l.map(function (u) { return "<tr><td>" + esc(u.nombre) + "</td><td>" + esc(u.correo) + "</td><td>" + esc(u.rol) + "</td></tr>"; })) + "</div>";
+}
+
+/* ---------- Arranque: recupera la sesión de esta pestaña ---------- */
+try {
+  var g = JSON.parse(sessionStorage.getItem("xorr") || "null");
+  if (g && g.token) { token = g.token; user = g.user; entrar(); }
+} catch (e) { }
+</script>
+</body>
+</html>
