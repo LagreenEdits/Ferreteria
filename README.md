@@ -46,11 +46,11 @@ Es un proyecto académico del curso de **Calidad de Software** (IDEAD, Universid
 | **Pantallas web (frontend)** | 🔜 Pendiente | Páginas HTML + JavaScript |
 | **Reportes, PDF, clientes** | 🔜 Fase 2 | |
 
-**Pruebas automáticas:** 75 pruebas, todas en verde (`BUILD SUCCESS`).
+**Pruebas automáticas:** 104 pruebas, todas en verde (`BUILD SUCCESS`).
 
-**Cobertura y complejidad (JaCoCo):** 86 % de las instrucciones y 100 % de las ramas cubiertas; en los servicios, 96 % (inventario), 98 % (compras) y 100 % (ventas). La complejidad máxima por método (V(G)) es 2.
+**Cobertura y complejidad (JaCoCo, medidas con las primeras 75 pruebas; vuelve a correr `mvn test` para ver las actuales):** 86 % de las instrucciones y 100 % de las ramas cubiertas; en los servicios, 96 % (inventario), 98 % (compras) y 100 % (ventas). La complejidad máxima por método (V(G)) es 2.
 
-**Colección de Postman:** 24 peticiones con 34 comprobaciones automáticas, todas en verde (ver la [sección 7](#7-probar-la-api-paso-a-paso)).
+**Colección de Postman:** 31 peticiones con 47 comprobaciones automáticas (ver la [sección 7](#7-probar-la-api-paso-a-paso)).
 
 **Base de datos:** H2 en memoria. Es una base de datos temporal que **se borra cada vez que apagas la aplicación**. MySQL ya está incluido como dependencia, pero todavía no está configurado.
 
@@ -176,7 +176,7 @@ mvn test
 La primera vez tarda más porque Maven descarga las librerías (necesitas internet). Al final debes ver:
 
 ```
-Tests run: 75, Failures: 0, Errors: 0, Skipped: 0
+Tests run: 104, Failures: 0, Errors: 0, Skipped: 0
 BUILD SUCCESS
 ```
 
@@ -314,12 +314,12 @@ Respuesta: `201`. Fíjate: **no envías precios**. El servidor toma el precio de
 
 **Paso 10 · Hacer el mismo recorrido con Postman**
 
-La colección `postman/Xorr.postman_collection.json` (24 peticiones, con la variable `baseUrl` = `http://localhost:8081`) repite este recorrido de forma automática. Impórtala en Postman y ejecútala con el **Collection Runner**, en el orden en que aparecen las peticiones. Cada corrida crea datos nuevos (la base es en memoria) y no necesita login.
+La colección `postman/Xorr.postman_collection.json` (31 peticiones, con la variable `baseUrl` = `http://localhost:8081`) repite este recorrido de forma automática. Impórtala en Postman y ejecútala con el **Collection Runner**, en el orden en que aparecen las peticiones. Cada corrida crea datos nuevos (la base es en memoria) y no necesita login.
 
 - **Carpeta 1 · Flujo principal (11 pasos):** crear producto y proveedor, asociarlos, crear y recibir una orden, vender, comprobar el stock, el stock bajo y las facturas.
-- **Carpeta 2 · Reglas y protecciones (13 casos):** los errores `400`, `404`, `405` y `409` de las tablas anteriores.
+- **Carpeta 2 · Reglas y protecciones (20 casos):** los errores `400`, `404`, `405` y `409` de las tablas anteriores, el límite del stock bajo (un producto con stock igual al mínimo no aparece) y los valores negativos (stock, precios y cantidades).
 
-Resultado esperado: **34 comprobaciones, 34 pasadas, 0 fallos**. Cuando llegue el login, la colección deberá guardar el token y enviarlo en `Authorization: Bearer`.
+Resultado esperado: **47 comprobaciones pasadas, 0 fallos**. Cuando llegue el login, la colección deberá guardar el token y enviarlo en `Authorization: Bearer`.
 
 ---
 
@@ -406,12 +406,17 @@ Xorr/
     │               └── DetalleFacturaRequest.java / DetalleFacturaResponse.java
     │
     └── test/java/com/xorr/                   ← Pruebas automáticas (misma estructura de paquetes)
+        ├── RollbackIntegracionTest.java              ← 3 pruebas de integración (rollback real, RN-06)
+        ├── common/
+        │   └── ValidacionDtoTest.java                ← 22 pruebas (validación de los DTO, RN-07)
         ├── compras/service/
         │   ├── OrdenCompraServiceTest.java           ← 14 pruebas
         │   └── MovimientosCompraServiceTest.java     ← 4 pruebas
         ├── ventas/service/
         │   ├── FacturaServiceTest.java               ← 11 pruebas
         │   └── MovimientosVentaServiceTest.java      ← 2 pruebas
+        ├── inventario/repository/
+        │   └── ProductoRepositoryTest.java           ← 4 pruebas con H2 (consulta de stock bajo, RN-04)
         └── inventario/service/
             ├── ProductoServiceTest.java              ← 19 pruebas
             ├── ProductoServiceCrudTest.java          ← 6 pruebas
@@ -551,7 +556,7 @@ Las reglas viven en los **servicios** y están probadas con pruebas automáticas
 
 Es código que **comprueba que otro código funciona**, sin que tengas que probarlo a mano cada vez. Si cambias algo y rompes una regla, la prueba falla y te avisa.
 
-Estas son **pruebas unitarias de los servicios**: usan **JUnit 5** (para escribir las pruebas) y **Mockito** (para crear "dobles" de los repositorios, de modo que **no necesitan base de datos**). Son rápidas: toda la suite corre en pocos segundos.
+Estas son **pruebas unitarias de los servicios**: usan **JUnit 5** (para escribir las pruebas) y **Mockito** (para crear "dobles" de los repositorios, de modo que **no necesitan base de datos**). Las unitarias son rápidas; las de integración tardan unos segundos más porque arrancan la aplicación.
 
 | Clase de prueba | Pruebas | Qué cubre |
 |---|---|---|
@@ -563,7 +568,10 @@ Estas son **pruebas unitarias de los servicios**: usan **JUnit 5** (para escribi
 | `ProveedorProductoServiceTest` | 11 | Asociaciones, duplicados, precio de compra |
 | `FacturaServiceTest` | 11 | Crear facturas, precios y totales, descuento de stock, atomicidad, multi-tenant |
 | `MovimientosVentaServiceTest` | 2 | Consulta de facturas por producto |
-| **Total** | **75** | |
+| `ProductoRepositoryTest` | 4 | Integración con H2: stock bajo con `<` estricto (RN-04) y filtro por empresa (RN-05) |
+| `ValidacionDtoTest` | 22 | Validación real de los DTO: negativos, cero y nulos (RN-07) |
+| `RollbackIntegracionTest` | 3 | Integración con la aplicación completa: rollback real al fallar una línea (RN-06) |
+| **Total** | **104** | |
 
 ### Cobertura y complejidad (JaCoCo)
 
@@ -590,7 +598,7 @@ Los reportes detallados quedan en `target/surefire-reports/`.
 
 ### Lo que las pruebas unitarias **no** cubren (y se comprueba en Swagger o con Postman)
 
-Como no usan base de datos real, no ejecutan: las consultas de los repositorios (por ejemplo, el `<` estricto del stock bajo), la validación de los DTO (campos obligatorios, números negativos) ni el "deshacer" (rollback) de las transacciones. Por eso el recorrido de la [sección 7](#7-probar-la-api-paso-a-paso) y la colección de Postman, que sí usan la aplicación real, son parte de las comprobaciones del proyecto.
+Como no usan base de datos real, no ejecutan: las consultas de los repositorios (por ejemplo, el `<` estricto del stock bajo), la validación de los DTO (campos obligatorios, números negativos) ni el "deshacer" (rollback) de las transacciones. Esos tres puntos los cubren tres clases de integración (`ProductoRepositoryTest`, `ValidacionDtoTest` y `RollbackIntegracionTest`). Además, el recorrido de la [sección 7](#7-probar-la-api-paso-a-paso) y la colección de Postman, que sí usan la aplicación real, son parte de las comprobaciones del proyecto.
 
 ### Si escribes pruebas con Mockito
 
@@ -639,10 +647,10 @@ Cuando falla la validación de varios campos a la vez, el mensaje los junta: `no
 | **Fase 0** | Inventario, Compras y Ventas en el backend, sin login | ✅ Hecho |
 | **Fase 0 (resto)** | Colección de Postman, medición de complejidad y cobertura de pruebas (JaCoCo) | ✅ Hecho |
 | **Fase 1 · MVP** | Registro y login con JWT, roles ADMIN y EMPLEADO, empresa; páginas HTML + JavaScript | 🔜 Siguiente (empieza por Seguridad) |
-| **Fase 2** | Reportes, PDF de facturas y órdenes, clientes, logo, pruebas de integración y refactor de inversión de dependencias | Futuro |
+| **Fase 2** | Reportes, PDF de facturas y órdenes, clientes, logo, más pruebas de integración y refactor de inversión de dependencias | Futuro |
 | **Fase 3** | Permisos por rol en la interfaz, HTTPS, instalador, despliegue en la nube, modo sin conexión, React, app móvil | Futuro |
 
-**Limitaciones conocidas hoy:** no hay login ni roles; todo opera como empresa `1`, usuario `1`; la base de datos es temporal; las pruebas unitarias no usan base de datos real (consultas, validaciones y rollback se comprueban a mano en Swagger o con Postman).
+**Limitaciones conocidas hoy:** no hay login ni roles; todo opera como empresa `1`, usuario `1`; la base de datos es temporal; las pruebas unitarias no usan base de datos real (las consultas, las validaciones y el rollback se cubren con tres clases de integración; el resto de la integración queda para la Fase 2).
 
 ---
 
@@ -695,6 +703,7 @@ Reglas de oro: no mezcles lógica de negocio en los controladores, no uses entid
 | **Postman** | Programa para enviar peticiones a una API |
 | **Cobertura (JaCoCo)** | Porcentaje del código que ejecutan las pruebas; JaCoCo es la herramienta que lo mide |
 | **V(G) (complejidad ciclomática)** | Número de caminos de decisión de un método; entre más bajo, más fácil de entender y probar |
+| **Prueba de integración** | Prueba que usa piezas reales (base de datos, transacciones) en vez de dobles, para comprobar que trabajan bien juntas |
 | **Prueba unitaria** | Código que comprueba que una pieza pequeña funciona bien |
 | **Mock (Mockito)** | Un "doble" de una clase, usado en pruebas para no depender de la base de datos |
 | **JUnit** | Librería para escribir pruebas en Java |

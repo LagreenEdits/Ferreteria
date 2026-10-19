@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Xorr · Fase 0 (Inventario, Compras y Ventas)",
-    "description": "Flujo principal (crear producto y proveedor, asociar, comprar, recibir, vender) y comprobación de las reglas de negocio y protecciones. Ejecutar con el Collection Runner en el orden en que aparecen. Requiere la aplicación arrancada en http://localhost:8081 (perfil dev, sin login).",
+    "description": "Flujo principal (crear producto y proveedor, asociar, comprar, recibir, vender) y comprobación de las reglas de negocio y protecciones, incluidos el límite estricto de stock bajo (RN-04) y los valores negativos (RN-07). Ejecutar con el Collection Runner en el orden en que aparecen. Requiere la aplicación arrancada en http://localhost:8081 (perfil dev, sin login).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -886,6 +886,295 @@
               }
             }
           ]
+        },
+        {
+          "name": "RN-04 · Crear producto con stock = stockMínimo (5 = 5)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/productos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "productos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Limite Postman\",\n  \"precioVenta\": 1000,\n  \"stock\": 5,\n  \"stockMinimo\": 5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('productoLimiteId', pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "RN-04 · Stock bajo NO incluye el producto con stock = mínimo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/productos/stock-bajo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "productos",
+                "stock-bajo"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "const id = Number(pm.collectionVariables.get('productoLimiteId'));",
+                  "pm.test('Con stock igual al mínimo no aparece (RN-04, límite estricto)', () => pm.expect(pm.response.json().map(p => p.id)).to.not.include(id));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "RN-07 · Producto con stock -1 -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/productos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "productos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Negativo\",\n  \"precioVenta\": 1000,\n  \"stock\": -1,\n  \"stockMinimo\": 5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('El mensaje nombra el campo', () => pm.expect(pm.response.json().mensaje).to.include('stock'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "RN-07 · Producto con precioVenta -1 -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/productos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "productos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Negativo\",\n  \"precioVenta\": -1,\n  \"stock\": 1,\n  \"stockMinimo\": 5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('El mensaje nombra el campo', () => pm.expect(pm.response.json().mensaje).to.include('precioVenta'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "RN-07 · Asociación con precioCompra -1 -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/proveedor-productos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "proveedor-productos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idProveedor\": {{proveedorId}},\n  \"idProducto\": {{productoId}},\n  \"precioCompra\": -1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('El mensaje nombra el campo', () => pm.expect(pm.response.json().mensaje).to.include('precioCompra'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "RN-07 · Orden con cantidad -1 -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/ordenes-compra",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ordenes-compra"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idProveedor\": {{proveedorId}},\n  \"detalles\": [\n    { \"idProducto\": {{productoId}}, \"cantidad\": -1 }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('El mensaje nombra el campo', () => pm.expect(pm.response.json().mensaje).to.include('cantidad'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "RN-07 · Venta con cantidad -1 -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/facturas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "facturas"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"detalles\": [\n    { \"idProducto\": {{productoId}}, \"cantidad\": -1 }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('El mensaje nombra el campo', () => pm.expect(pm.response.json().mensaje).to.include('cantidad'));"
+                ]
+              }
+            }
+          ]
         }
       ]
     }
@@ -913,6 +1202,10 @@
     },
     {
       "key": "facturaId",
+      "value": ""
+    },
+    {
+      "key": "productoLimiteId",
       "value": ""
     }
   ]
