@@ -48,9 +48,9 @@ Es un proyecto académico del curso de **Calidad de Software** (IDEAD, Universid
 
 **Pruebas automáticas:** 104 pruebas, todas en verde (`BUILD SUCCESS`).
 
-**Cobertura y complejidad (JaCoCo, medidas con las primeras 75 pruebas; vuelve a correr `mvn test` para ver las actuales):** 86 % de las instrucciones y 100 % de las ramas cubiertas; en los servicios, 96 % (inventario), 98 % (compras) y 100 % (ventas). La complejidad máxima por método (V(G)) es 2.
+**Cobertura y complejidad (JaCoCo, con las 104 pruebas):** 88 % de las instrucciones y 100 % de las ramas cubiertas; en los servicios, 96 % (inventario), 98 % (compras) y 100 % (ventas). La complejidad máxima por método (V(G)) es 2.
 
-**Colección de Postman:** 31 peticiones con 47 comprobaciones automáticas (ver la [sección 7](#7-probar-la-api-paso-a-paso)).
+**Colección de Postman:** 31 peticiones con 47 comprobaciones automáticas, todas pasadas el 18 de octubre de 2026 (ver la [sección 7](#7-probar-la-api-paso-a-paso)).
 
 **Base de datos:** H2 en memoria. Es una base de datos temporal que **se borra cada vez que apagas la aplicación**. MySQL ya está incluido como dependencia, pero todavía no está configurado.
 
@@ -333,7 +333,7 @@ Xorr/
 ├── .gitignore                       ← Archivos que Git no sube (target/, .idea/, .vscode/, .env...)
 ├── README.md                        ← Este archivo
 ├── postman/
-│   └── Xorr.postman_collection.json ← Colección de Postman (24 peticiones, 34 comprobaciones)
+│   └── Xorr.postman_collection.json ← Colección de Postman (31 peticiones, 47 comprobaciones)
 ├── .github/modernize/               ← Lo generó una herramienta de VS Code (actualización de Java); no es parte del proyecto
 │
 └── src/
@@ -579,7 +579,7 @@ Estas son **pruebas unitarias de los servicios**: usan **JUnit 5** (para escribi
 
 | Medida | Resultado |
 |---|---|
-| Instrucciones cubiertas (total) | 86 % |
+| Instrucciones cubiertas (total) | 88 % |
 | Ramas cubiertas | 100 % |
 | Servicios de inventario / compras / ventas | 96 % / 98 % / 100 % |
 | Complejidad máxima por método, V(G) (meta: 10 o menos) | 2 |
