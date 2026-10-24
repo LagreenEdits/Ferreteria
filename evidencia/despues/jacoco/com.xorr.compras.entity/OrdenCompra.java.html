@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OrdenCompra.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xorr</a> &gt; <a href="index.source.html" class="el_package">com.xorr.compras.entity</a> &gt; <span class="el_source">OrdenCompra.java</span></div><h1>OrdenCompra.java</h1><pre class="source lang-java linenums">package com.xorr.compras.entity;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = &quot;orden_compra&quot;)
+<span class="fc" id="L22">public class OrdenCompra {</span>
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = &quot;id_empresa&quot;, nullable = false)
+    private Long idEmpresa;
+
+    @Column(name = &quot;id_proveedor&quot;, nullable = false)
+    private Long idProveedor;
+
+    @Column(name = &quot;id_usuario&quot;, nullable = false)
+    private Long idUsuario;
+
+    @Column(nullable = false)
+    private LocalDateTime fecha;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private EstadoOrdenCompra estado;
+
+    @Column(nullable = false)
+    private BigDecimal total;
+
+<span class="fc" id="L47">    @OneToMany(cascade = CascadeType.ALL)</span>
+    @JoinColumn(name = &quot;id_orden&quot;, nullable = false)
+    private List&lt;DetalleOrdenCompra&gt; detalles = new ArrayList&lt;&gt;();
+
+    public Long getId() {
+<span class="fc" id="L52">        return id;</span>
+    }
+
+    public Long getIdEmpresa() {
+<span class="fc" id="L56">        return idEmpresa;</span>
+    }
+
+    public void setIdEmpresa(Long idEmpresa) {
+<span class="fc" id="L60">        this.idEmpresa = idEmpresa;</span>
+<span class="fc" id="L61">    }</span>
+
+    public Long getIdProveedor() {
+<span class="fc" id="L64">        return idProveedor;</span>
+    }
+
+    public void setIdProveedor(Long idProveedor) {
+<span class="fc" id="L68">        this.idProveedor = idProveedor;</span>
+<span class="fc" id="L69">    }</span>
+
+    public Long getIdUsuario() {
+<span class="fc" id="L72">        return idUsuario;</span>
+    }
+
+    public void setIdUsuario(Long idUsuario) {
+<span class="fc" id="L76">        this.idUsuario = idUsuario;</span>
+<span class="fc" id="L77">    }</span>
+
+    public LocalDateTime getFecha() {
+<span class="fc" id="L80">        return fecha;</span>
+    }
+
+    public void setFecha(LocalDateTime fecha) {
+<span class="fc" id="L84">        this.fecha = fecha;</span>
+<span class="fc" id="L85">    }</span>
+
+    public EstadoOrdenCompra getEstado() {
+<span class="fc" id="L88">        return estado;</span>
+    }
+
+    public void setEstado(EstadoOrdenCompra estado) {
+<span class="fc" id="L92">        this.estado = estado;</span>
+<span class="fc" id="L93">    }</span>
+
+    public BigDecimal getTotal() {
+<span class="fc" id="L96">        return total;</span>
+    }
+
+    public void setTotal(BigDecimal total) {
+<span class="fc" id="L100">        this.total = total;</span>
+<span class="fc" id="L101">    }</span>
+
+    public List&lt;DetalleOrdenCompra&gt; getDetalles() {
+<span class="fc" id="L104">        return detalles;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.15.202606040825</span></div></body></html>

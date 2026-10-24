@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GlobalExceptionHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xorr</a> &gt; <a href="index.source.html" class="el_package">com.xorr.common</a> &gt; <span class="el_source">GlobalExceptionHandler.java</span></div><h1>GlobalExceptionHandler.java</h1><pre class="source lang-java linenums">package com.xorr.common;
+
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+@RestControllerAdvice
+<span class="fc" id="L13">public class GlobalExceptionHandler {</span>
+
+    @ExceptionHandler(RecursoNoEncontradoException.class)
+    public ResponseEntity&lt;Map&lt;String, String&gt;&gt; manejarNoEncontrado(RecursoNoEncontradoException ex) {
+<span class="fc" id="L17">        return responder(HttpStatus.NOT_FOUND, ex.getMessage());</span>
+    }
+
+    @ExceptionHandler(OperacionInvalidaException.class)
+    public ResponseEntity&lt;Map&lt;String, String&gt;&gt; manejarOperacionInvalida(OperacionInvalidaException ex) {
+<span class="nc" id="L22">        return responder(HttpStatus.BAD_REQUEST, ex.getMessage());</span>
+    }
+
+    @ExceptionHandler(StockInsuficienteException.class)
+    public ResponseEntity&lt;Map&lt;String, String&gt;&gt; manejarStockInsuficiente(StockInsuficienteException ex) {
+<span class="nc" id="L27">        return responder(HttpStatus.CONFLICT, ex.getMessage());</span>
+    }
+
+    @ExceptionHandler(CredencialesInvalidasException.class)
+    public ResponseEntity&lt;Map&lt;String, String&gt;&gt; manejarCredencialesInvalidas(CredencialesInvalidasException ex) {
+<span class="fc" id="L32">        return responder(HttpStatus.UNAUTHORIZED, ex.getMessage());</span>
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity&lt;Map&lt;String, String&gt;&gt; manejarValidacion(MethodArgumentNotValidException ex) {
+<span class="fc" id="L37">        String mensaje = ex.getBindingResult().getFieldErrors().stream()</span>
+<span class="fc" id="L38">                .map(error -&gt; error.getField() + &quot;: &quot; + error.getDefaultMessage())</span>
+<span class="fc" id="L39">                .sorted()</span>
+<span class="fc" id="L40">                .collect(Collectors.joining(&quot;; &quot;));</span>
+<span class="fc" id="L41">        return responder(HttpStatus.BAD_REQUEST, mensaje);</span>
+    }
+
+    private static ResponseEntity&lt;Map&lt;String, String&gt;&gt; responder(HttpStatus estado, String mensaje) {
+<span class="fc" id="L45">        return ResponseEntity.status(estado).body(Map.of(&quot;mensaje&quot;, mensaje));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.15.202606040825</span></div></body></html>

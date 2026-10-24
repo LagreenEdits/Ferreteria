@@ -1,0 +1,30 @@
+﻿
+Clase                                                     Pruebas Fallos Errores Omitidas
+-----                                                     ------- ------ ------- --------
+com.xorr.arquitectura.ArquitecturaTest                          7      0       0        0
+com.xorr.common.ContextoActualTest                              3      0       0        0
+com.xorr.common.LineasDeProductoTest                            2      0       0        0
+com.xorr.common.ValidacionDtoTest                              22      0       0        0
+com.xorr.compras.service.MovimientosCompraServiceTest           4      0       0        0
+com.xorr.compras.service.OrdenCompraServiceTest                15      0       0        0
+com.xorr.inventario.repository.ProductoRepositoryTest           4      0       0        0
+com.xorr.inventario.service.ProductoServiceCrudTest             6      0       0        0
+com.xorr.inventario.service.ProductoServiceTest                19      0       0        0
+com.xorr.inventario.service.ProveedorProductoServiceTest       11      0       0        0
+com.xorr.inventario.service.ProveedorServiceTest                8      0       0        0
+com.xorr.negocio.service.EmpresaServiceTest                     1      0       0        0
+com.xorr.RollbackIntegracionTest                                3      0       0        0
+com.xorr.seguridad.AislamientoEmpresasIntegracionTest           5      0       0        0
+com.xorr.seguridad.dto.ValidacionCrearEmpleadoRequestTest      12      0       0        0
+com.xorr.seguridad.dto.ValidacionLoginTest                      4      0       0        0
+com.xorr.seguridad.dto.ValidacionRegistroAdminTest              9      0       0        0
+com.xorr.seguridad.SeguridadIntegracionTest                    26      0       0        0
+com.xorr.seguridad.service.AuthServiceTest                     11      0       0        0
+com.xorr.seguridad.service.CorreoUsuarioTest                    3      0       0        0
+com.xorr.seguridad.service.JwtServiceTest                       8      0       0        0
+com.xorr.seguridad.service.UsuarioServiceTest                   6      0       0        0
+com.xorr.seguridad.UsuariosIntegracionTest                     10      0       0        0
+com.xorr.ventas.service.FacturaServiceTest                     12      0       0        0
+com.xorr.ventas.service.MovimientosVentaServiceTest             2      0       0        0
+
+

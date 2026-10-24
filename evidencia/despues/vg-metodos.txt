@@ -1,0 +1,13 @@
+﻿ContextoActual.java : línea 25 : V(G) = 3
+LineasDeProducto.java : línea 10 : V(G) = 2
+OrdenCompraService.java : línea 74 : V(G) = 2
+ProductoService.java : línea 109 : V(G) = 2
+ProductoService.java : línea 115 : V(G) = 2
+ProductoService.java : línea 124 : V(G) = 2
+ProductoService.java : línea 133 : V(G) = 2
+ProveedorProductoService.java : línea 105 : V(G) = 2
+ProveedorService.java : línea 82 : V(G) = 2
+JwtAuthenticationFilter.java : línea 47 : V(G) = 3
+CorreoUsuario.java : línea 22 : V(G) = 2
+JwtService.java : línea 55 : V(G) = 2
+JwtService.java : línea 72 : V(G) = 3

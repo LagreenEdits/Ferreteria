@@ -1,0 +1,7 @@
+﻿caf3257 M1: ArmadorDeOrden reduce el constructor de OrdenCompraService (M7 en verde)
+21fa49e M7: regla ArchUnit de dependencias del constructor (rojo a propósito)
+88ec2ba M2: RN-16 con TDD (rojo, verde, refactor)
+97805d6 M2: RN-16 rechazar productos repetidos en una orden de compra (rojo y verde)
+c1b5680 Evidencia de duplicación (M-12)
+e48e386 Corregir cierre de horas de la Fase A
+1afcbf1 Evidencia de la línea base (Fase A)

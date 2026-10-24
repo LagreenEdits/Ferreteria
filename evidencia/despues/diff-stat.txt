@@ -1,0 +1,9 @@
+﻿ postman/Xorr.postman_collection.json               | 58 ++++++++++++++++
+ .../java/com/xorr/common/LineasDeProducto.java     | 15 +++++
+ .../com/xorr/compras/service/ArmadorDeOrden.java   | 77 ++++++++++++++++++++++
+ .../xorr/compras/service/OrdenCompraService.java   | 52 ++-------------
+ .../com/xorr/ventas/service/FacturaService.java    | 16 ++---
+ .../com/xorr/arquitectura/ArquitecturaTest.java    | 29 ++++++++
+ .../java/com/xorr/common/LineasDeProductoTest.java | 24 +++++++
+ .../compras/service/OrdenCompraServiceTest.java    | 18 ++++-
+ 8 files changed, 228 insertions(+), 61 deletions(-)

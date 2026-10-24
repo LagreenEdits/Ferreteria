@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JwtAuthenticationFilter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xorr</a> &gt; <a href="index.source.html" class="el_package">com.xorr.seguridad.config</a> &gt; <span class="el_source">JwtAuthenticationFilter.java</span></div><h1>JwtAuthenticationFilter.java</h1><pre class="source lang-java linenums">package com.xorr.seguridad.config;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import com.xorr.common.DatosToken;
+import com.xorr.seguridad.service.JwtService;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+/**
+ * Si la petición trae &quot;Authorization: Bearer &lt;token&gt;&quot; y el token es válido,
+ * deja
+ * al usuario autenticado. Si no trae token o es inválido, NO responde nada:
+ * sigue
+ * sin sesión y las reglas de SecurityConfig deciden (401 en rutas protegidas).
+ * No es @Component a propósito: SecurityConfig lo crea y lo coloca en la
+ * cadena.
+ */
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    private static final String PREFIJO = &quot;Bearer &quot;;
+
+    private final JwtService jwtService;
+
+<span class="fc" id="L36">    public JwtAuthenticationFilter(JwtService jwtService) {</span>
+<span class="fc" id="L37">        this.jwtService = jwtService;</span>
+<span class="fc" id="L38">    }</span>
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain cadena)
+            throws ServletException, IOException {
+<span class="fc" id="L43">        extraerToken(request).flatMap(jwtService::leer).ifPresent(JwtAuthenticationFilter::autenticar);</span>
+<span class="fc" id="L44">        cadena.doFilter(request, response);</span>
+<span class="fc" id="L45">    }</span>
+
+    private static Optional&lt;String&gt; extraerToken(HttpServletRequest request) {
+<span class="fc" id="L48">        String cabecera = request.getHeader(HttpHeaders.AUTHORIZATION);</span>
+<span class="pc bpc" id="L49" title="1 of 4 branches missed.">        if (cabecera == null || !cabecera.startsWith(PREFIJO)) {</span>
+<span class="fc" id="L50">            return Optional.empty();</span>
+        }
+<span class="fc" id="L52">        return Optional.of(cabecera.substring(PREFIJO.length()).trim());</span>
+    }
+
+    private static void autenticar(DatosToken datos) {
+<span class="fc" id="L56">        SimpleGrantedAuthority rol = new SimpleGrantedAuthority(&quot;ROLE_&quot; + datos.rol().name());</span>
+<span class="fc" id="L57">        SecurityContextHolder.getContext()</span>
+<span class="fc" id="L58">                .setAuthentication(new UsernamePasswordAuthenticationToken(datos, null, List.of(rol)));</span>
+<span class="fc" id="L59">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.15.202606040825</span></div></body></html>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProveedorProducto.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xorr</a> &gt; <a href="index.source.html" class="el_package">com.xorr.inventario.entity</a> &gt; <span class="el_source">ProveedorProducto.java</span></div><h1>ProveedorProducto.java</h1><pre class="source lang-java linenums">package com.xorr.inventario.entity;
+
+import java.math.BigDecimal;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = &quot;proveedor_producto&quot;)
+<span class="fc" id="L14">public class ProveedorProducto {</span>
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = &quot;id_empresa&quot;, nullable = false)
+    private Long idEmpresa;
+
+    @Column(name = &quot;id_proveedor&quot;, nullable = false)
+    private Long idProveedor;
+
+    @Column(name = &quot;id_producto&quot;, nullable = false)
+    private Long idProducto;
+
+    @Column(name = &quot;precio_compra&quot;, nullable = false)
+    private BigDecimal precioCompra;
+
+    public Long getId() {
+<span class="fc" id="L33">        return id;</span>
+    }
+
+    public Long getIdEmpresa() {
+<span class="fc" id="L37">        return idEmpresa;</span>
+    }
+
+    public void setIdEmpresa(Long idEmpresa) {
+<span class="fc" id="L41">        this.idEmpresa = idEmpresa;</span>
+<span class="fc" id="L42">    }</span>
+
+    public Long getIdProveedor() {
+<span class="fc" id="L45">        return idProveedor;</span>
+    }
+
+    public void setIdProveedor(Long idProveedor) {
+<span class="fc" id="L49">        this.idProveedor = idProveedor;</span>
+<span class="fc" id="L50">    }</span>
+
+    public Long getIdProducto() {
+<span class="fc" id="L53">        return idProducto;</span>
+    }
+
+    public void setIdProducto(Long idProducto) {
+<span class="fc" id="L57">        this.idProducto = idProducto;</span>
+<span class="fc" id="L58">    }</span>
+
+    public BigDecimal getPrecioCompra() {
+<span class="fc" id="L61">        return precioCompra;</span>
+    }
+
+    public void setPrecioCompra(BigDecimal precioCompra) {
+<span class="fc" id="L65">        this.precioCompra = precioCompra;</span>
+<span class="fc" id="L66">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.15.202606040825</span></div></body></html>

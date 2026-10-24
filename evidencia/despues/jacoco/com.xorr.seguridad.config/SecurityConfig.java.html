@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SecurityConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xorr</a> &gt; <a href="index.source.html" class="el_package">com.xorr.seguridad.config</a> &gt; <span class="el_source">SecurityConfig.java</span></div><h1>SecurityConfig.java</h1><pre class="source lang-java linenums">package com.xorr.seguridad.config;
+
+import java.util.Arrays;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
+
+import com.xorr.seguridad.service.JwtService;
+
+/**
+ * Quién puede llamar a qué (sección 6 del documento maestro).
+ * Se usa AntPathRequestMatcher a propósito: con la consola H2 hay dos servlets
+ * registrados y requestMatchers(&quot;texto&quot;) no sabe decidir entre ellos y falla al
+ * arrancar.
+ */
+@Configuration
+@EnableWebSecurity
+<span class="fc" id="L27">public class SecurityConfig {</span>
+
+        private static final String ADMIN = &quot;ADMIN&quot;;
+        private static final String EMPLEADO = &quot;EMPLEADO&quot;;
+
+        @Bean
+        public SecurityFilterChain cadenaDeSeguridad(HttpSecurity http, JwtService jwtService,
+                        ManejadorErroresSeguridad errores) throws Exception {
+<span class="fc" id="L35">                http</span>
+                                // Sin cookies ni sesión: cada petición trae su token, así que CSRF no aplica.
+<span class="fc" id="L37">                                .csrf(AbstractHttpConfigurer::disable)</span>
+<span class="fc" id="L38">                                .sessionManagement(</span>
+<span class="fc" id="L39">                                                sesion -&gt; sesion.sessionCreationPolicy(SessionCreationPolicy.STATELESS))</span>
+                                // La consola H2 se dibuja dentro de marcos de la misma página.
+<span class="fc" id="L41">                                .headers(cabeceras -&gt; cabeceras.frameOptions(marco -&gt; marco.sameOrigin()))</span>
+<span class="fc" id="L42">                                .exceptionHandling(</span>
+<span class="fc" id="L43">                                                e -&gt; e.authenticationEntryPoint(errores).accessDeniedHandler(errores))</span>
+<span class="fc" id="L44">                                .addFilterBefore(new JwtAuthenticationFilter(jwtService),</span>
+                                                UsernamePasswordAuthenticationFilter.class)
+<span class="fc" id="L46">                                .authorizeHttpRequests(reglas -&gt; reglas</span>
+                                                // Públicas: registro y login.
+<span class="fc" id="L48">                                                .requestMatchers(rutas(HttpMethod.POST, &quot;/api/auth/registro-admin&quot;,</span>
+                                                                &quot;/api/auth/login&quot;))
+<span class="fc" id="L50">                                                .permitAll()</span>
+                                                // Públicas: la página del frontend
+                                                // (src/main/resources/static/index.html).
+                                                // No expone datos: todas sus llamadas a /api/** llevan el token.
+<span class="fc" id="L54">                                                .requestMatchers(rutas(HttpMethod.GET, &quot;/&quot;, &quot;/index.html&quot;))</span>
+<span class="fc" id="L55">                                                .permitAll()</span>
+                                                // Públicas: /error (Spring responde 405 y otros errores a través de
+                                                // ella),
+                                                // documentación y consola H2. Las dos últimas, solo para desarrollo.
+<span class="fc" id="L59">                                                .requestMatchers(rutas(&quot;/error&quot;, &quot;/swagger-ui.html&quot;, &quot;/swagger-ui/**&quot;,</span>
+                                                                &quot;/v3/api-docs&quot;,
+                                                                &quot;/v3/api-docs/**&quot;, &quot;/h2-console/**&quot;))
+<span class="fc" id="L62">                                                .permitAll()</span>
+                                                // Solo ADMIN: empleados, proveedores, asociaciones y órdenes de compra.
+<span class="fc" id="L64">                                                .requestMatchers(rutas(&quot;/api/usuarios/**&quot;, &quot;/api/proveedores/**&quot;,</span>
+                                                                &quot;/api/proveedor-productos/**&quot;,
+                                                                &quot;/api/ordenes-compra/**&quot;))
+<span class="fc" id="L67">                                                .hasRole(ADMIN)</span>
+                                                // Productos: leer, ADMIN y EMPLEADO; escribir, solo ADMIN.
+<span class="fc" id="L69">                                                .requestMatchers(rutas(HttpMethod.GET, &quot;/api/productos/**&quot;))</span>
+<span class="fc" id="L70">                                                .hasAnyRole(ADMIN, EMPLEADO)</span>
+<span class="fc" id="L71">                                                .requestMatchers(rutas(&quot;/api/productos/**&quot;))</span>
+<span class="fc" id="L72">                                                .hasRole(ADMIN)</span>
+                                                // Ventas: ADMIN y EMPLEADO.
+<span class="fc" id="L74">                                                .requestMatchers(rutas(&quot;/api/facturas/**&quot;))</span>
+<span class="fc" id="L75">                                                .hasAnyRole(ADMIN, EMPLEADO)</span>
+                                                // Cualquier otra ruta se deniega.
+<span class="fc" id="L77">                                                .anyRequest().denyAll());</span>
+<span class="fc" id="L78">                return http.build();</span>
+        }
+
+        private static RequestMatcher[] rutas(String... patrones) {
+<span class="fc" id="L82">                return Arrays.stream(patrones)</span>
+<span class="fc" id="L83">                                .map(patron -&gt; new AntPathRequestMatcher(patron))</span>
+<span class="fc" id="L84">                                .toArray(RequestMatcher[]::new);</span>
+        }
+
+        private static RequestMatcher[] rutas(HttpMethod metodo, String... patrones) {
+<span class="fc" id="L88">                return Arrays.stream(patrones)</span>
+<span class="fc" id="L89">                                .map(patron -&gt; new AntPathRequestMatcher(patron, metodo.name()))</span>
+<span class="fc" id="L90">                                .toArray(RequestMatcher[]::new);</span>
+        }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.15.202606040825</span></div></body></html>

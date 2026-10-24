@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.xorr.compras.service.OrdenCompraServiceTest
+-------------------------------------------------------------------------------
+Tests run: 15, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.753 s -- in com.xorr.compras.service.OrdenCompraServiceTest

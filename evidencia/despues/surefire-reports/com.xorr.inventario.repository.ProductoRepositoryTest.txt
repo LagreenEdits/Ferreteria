@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.xorr.inventario.repository.ProductoRepositoryTest
+-------------------------------------------------------------------------------
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 12.88 s -- in com.xorr.inventario.repository.ProductoRepositoryTest

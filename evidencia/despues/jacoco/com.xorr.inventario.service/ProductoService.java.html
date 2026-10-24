@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProductoService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xorr</a> &gt; <a href="index.source.html" class="el_package">com.xorr.inventario.service</a> &gt; <span class="el_source">ProductoService.java</span></div><h1>ProductoService.java</h1><pre class="source lang-java linenums">package com.xorr.inventario.service;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.xorr.common.ContextoActual;
+import com.xorr.common.OperacionInvalidaException;
+import com.xorr.common.RecursoNoEncontradoException;
+import com.xorr.common.StockInsuficienteException;
+import com.xorr.inventario.dto.ProductoRequest;
+import com.xorr.inventario.dto.ProductoResponse;
+import com.xorr.inventario.entity.Producto;
+import com.xorr.inventario.repository.ProductoRepository;
+import com.xorr.inventario.repository.ProveedorProductoRepository;
+
+@Service
+public class ProductoService {
+
+    private final ProductoRepository repositorio;
+    private final ProveedorProductoRepository asociaciones;
+    private final MovimientosCompra movimientosCompra;
+    private final MovimientosVenta movimientosVenta;
+    private final ContextoActual contexto;
+
+    public ProductoService(ProductoRepository repositorio,
+            ProveedorProductoRepository asociaciones,
+            MovimientosCompra movimientosCompra,
+            MovimientosVenta movimientosVenta,
+<span class="fc" id="L31">            ContextoActual contexto) {</span>
+<span class="fc" id="L32">        this.repositorio = repositorio;</span>
+<span class="fc" id="L33">        this.asociaciones = asociaciones;</span>
+<span class="fc" id="L34">        this.movimientosCompra = movimientosCompra;</span>
+<span class="fc" id="L35">        this.movimientosVenta = movimientosVenta;</span>
+<span class="fc" id="L36">        this.contexto = contexto;</span>
+<span class="fc" id="L37">    }</span>
+
+    @Transactional
+    public ProductoResponse crear(ProductoRequest datos) {
+<span class="fc" id="L41">        Producto producto = new Producto();</span>
+<span class="fc" id="L42">        producto.setIdEmpresa(contexto.getIdEmpresa());</span>
+<span class="fc" id="L43">        copiarDatos(producto, datos);</span>
+<span class="fc" id="L44">        return ProductoResponse.desde(repositorio.save(producto));</span>
+    }
+
+    @Transactional(readOnly = true)
+    public List&lt;ProductoResponse&gt; listar() {
+<span class="fc" id="L49">        return aRespuestas(repositorio.findByIdEmpresa(contexto.getIdEmpresa()));</span>
+    }
+
+    @Transactional(readOnly = true)
+    public ProductoResponse obtener(Long idProducto) {
+<span class="fc" id="L54">        return ProductoResponse.desde(buscarProducto(idProducto));</span>
+    }
+
+    @Transactional
+    public ProductoResponse actualizar(Long idProducto, ProductoRequest datos) {
+<span class="fc" id="L59">        Producto producto = buscarProducto(idProducto);</span>
+<span class="fc" id="L60">        copiarDatos(producto, datos);</span>
+<span class="fc" id="L61">        return ProductoResponse.desde(repositorio.save(producto));</span>
+    }
+
+    // RN-12: no se elimina un producto con movimientos. RN-14: las asociaciones
+    // guardan solo el id del producto (sin clave foránea), por eso se borran aquí
+    // para no dejarlas apuntando a un producto que ya no existe.
+    @Transactional
+    public void eliminar(Long idProducto) {
+<span class="fc" id="L69">        Producto producto = buscarProducto(idProducto);</span>
+<span class="fc" id="L70">        validarSinOrdenesDeCompra(idProducto, producto);</span>
+<span class="fc" id="L71">        validarSinFacturas(idProducto, producto);</span>
+<span class="fc" id="L72">        asociaciones.deleteByIdEmpresaAndIdProducto(contexto.getIdEmpresa(), idProducto);</span>
+<span class="fc" id="L73">        repositorio.delete(producto);</span>
+<span class="fc" id="L74">    }</span>
+
+    // RN-04: stock bajo es stock &lt; stockMinimo (la consulta del repositorio usa &quot;&lt;&quot;
+    // estricto).
+    @Transactional(readOnly = true)
+    public List&lt;ProductoResponse&gt; listarStockBajo() {
+<span class="fc" id="L80">        return aRespuestas(repositorio.buscarConStockBajo(contexto.getIdEmpresa()));</span>
+    }
+
+    @Transactional
+    public void incrementarStock(Long idProducto, int cantidad) {
+<span class="fc" id="L85">        validarCantidad(cantidad);</span>
+<span class="fc" id="L86">        Producto producto = buscarProducto(idProducto);</span>
+<span class="fc" id="L87">        producto.setStock(producto.getStock() + cantidad);</span>
+<span class="fc" id="L88">        repositorio.save(producto);</span>
+<span class="fc" id="L89">    }</span>
+
+    // RN-01: este es el único lugar donde se valida que haya stock suficiente.
+    @Transactional
+    public void decrementarStock(Long idProducto, int cantidad) {
+<span class="fc" id="L94">        validarCantidad(cantidad);</span>
+<span class="fc" id="L95">        Producto producto = buscarProducto(idProducto);</span>
+<span class="fc" id="L96">        validarStockSuficiente(producto, cantidad);</span>
+<span class="fc" id="L97">        producto.setStock(producto.getStock() - cantidad);</span>
+<span class="fc" id="L98">        repositorio.save(producto);</span>
+<span class="fc" id="L99">    }</span>
+
+    // RN-05: filtrar por empresa en la consulta evita revelar si el producto existe
+    // en otra.
+    private Producto buscarProducto(Long idProducto) {
+<span class="fc" id="L104">        return repositorio.findByIdAndIdEmpresa(idProducto, contexto.getIdEmpresa())</span>
+<span class="fc" id="L105">                .orElseThrow(() -&gt; new RecursoNoEncontradoException(</span>
+                        &quot;Producto no encontrado: &quot; + idProducto));
+    }
+
+    private void validarCantidad(int cantidad) {
+<span class="fc bfc" id="L110" title="All 2 branches covered.">        if (cantidad &lt;= 0) {</span>
+<span class="fc" id="L111">            throw new OperacionInvalidaException(&quot;La cantidad debe ser mayor que cero&quot;);</span>
+        }
+<span class="fc" id="L113">    }</span>
+
+    private void validarStockSuficiente(Producto producto, int cantidad) {
+<span class="fc bfc" id="L116" title="All 2 branches covered.">        if (producto.getStock() &lt; cantidad) {</span>
+<span class="fc" id="L117">            throw new StockInsuficienteException(</span>
+<span class="fc" id="L118">                    &quot;Stock insuficiente para '&quot; + producto.getNombre() + &quot;': disponible &quot;</span>
+<span class="fc" id="L119">                            + producto.getStock() + &quot;, solicitado &quot; + cantidad);</span>
+        }
+<span class="fc" id="L121">    }</span>
+
+    // RN-12 (órdenes de compra).
+    private void validarSinOrdenesDeCompra(Long idProducto, Producto producto) {
+<span class="fc bfc" id="L125" title="All 2 branches covered.">        if (movimientosCompra.productoTieneOrdenes(idProducto)) {</span>
+<span class="fc" id="L126">            throw new OperacionInvalidaException(</span>
+<span class="fc" id="L127">                    &quot;No se puede eliminar el producto '&quot; + producto.getNombre()</span>
+                            + &quot;' porque tiene órdenes de compra&quot;);
+        }
+<span class="fc" id="L130">    }</span>
+
+    // RN-12 (facturas).
+    private void validarSinFacturas(Long idProducto, Producto producto) {
+<span class="fc bfc" id="L134" title="All 2 branches covered.">        if (movimientosVenta.productoTieneFacturas(idProducto)) {</span>
+<span class="fc" id="L135">            throw new OperacionInvalidaException(</span>
+<span class="fc" id="L136">                    &quot;No se puede eliminar el producto '&quot; + producto.getNombre()</span>
+                            + &quot;' porque tiene facturas&quot;);
+        }
+<span class="fc" id="L139">    }</span>
+
+    private void copiarDatos(Producto producto, ProductoRequest datos) {
+<span class="fc" id="L142">        producto.setNombre(datos.nombre());</span>
+<span class="fc" id="L143">        producto.setPrecioVenta(datos.precioVenta());</span>
+<span class="fc" id="L144">        producto.setStock(datos.stock());</span>
+<span class="fc" id="L145">        producto.setStockMinimo(datos.stockMinimo());</span>
+<span class="fc" id="L146">    }</span>
+
+    private List&lt;ProductoResponse&gt; aRespuestas(List&lt;Producto&gt; productos) {
+<span class="fc" id="L149">        return productos.stream().map(ProductoResponse::desde).toList();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.15.202606040825</span></div></body></html>
