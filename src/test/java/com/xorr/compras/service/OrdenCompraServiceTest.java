@@ -63,8 +63,9 @@ class OrdenCompraServiceTest {
 
     @BeforeEach
     void preparar() {
-        servicio = new OrdenCompraService(
-                ordenes, new ContextoActual(), proveedorService, productoService, proveedorProductoService);
+        ContextoActual contexto = new ContextoActual();
+        servicio = new OrdenCompraService(ordenes, contexto, productoService,
+                new ArmadorDeOrden(contexto, proveedorService, productoService, proveedorProductoService));
     }
 
     // ---- crear (RN-03, RN-05, RN-09) ----
