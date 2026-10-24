@@ -1,0 +1,11 @@
+﻿== Copias de la validación de producto repetido ==
+FacturaService.java : línea 43
+FacturaService.java : línea 63
+
+== Líneas idénticas entre AuthService y UsuarioService ==
+private final UsuarioRepository usuarios;
+private final PasswordEncoder passwordEncoder;
+this.usuarios = usuarios;
+this.passwordEncoder = passwordEncoder;
+String correo = CorreoUsuario.normalizar(request.correo());
+CorreoUsuario.validarLibre(usuarios, correo);
