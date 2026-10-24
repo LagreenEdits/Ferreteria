@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.xorr.common.ContextoActual;
-import com.xorr.common.OperacionInvalidaException;
+import com.xorr.common.LineasDeProducto;
 import com.xorr.common.RecursoNoEncontradoException;
 import com.xorr.inventario.dto.ProductoResponse;
 import com.xorr.inventario.service.ProductoService;
@@ -40,7 +40,10 @@ public class FacturaService {
     // se revierte completa y no se guarda nada.
     @Transactional
     public FacturaResponse crear(FacturaRequest datos) {
-        validarSinProductosRepetidos(datos.detalles());
+        // RN-15: un producto solo puede aparecer en una línea de la factura.
+        LineasDeProducto.validarSinRepetidos(
+                datos.detalles().stream().map(DetalleFacturaRequest::idProducto).toList(),
+                "La factura repite un producto en varias líneas; usa una sola línea con la cantidad total");
         Factura factura = nuevaFactura();
         datos.detalles().forEach(linea -> factura.getDetalles().add(armarDetalle(linea)));
         factura.setTotal(sumarSubtotales(factura));
@@ -57,15 +60,6 @@ public class FacturaService {
     @Transactional(readOnly = true)
     public FacturaResponse obtener(Long idFactura) {
         return FacturaResponse.desde(buscarFactura(idFactura));
-    }
-
-    // RN-15: un producto solo puede aparecer en una línea de la factura.
-    private void validarSinProductosRepetidos(List<DetalleFacturaRequest> lineas) {
-        long distintos = lineas.stream().map(DetalleFacturaRequest::idProducto).distinct().count();
-        if (distintos != lineas.size()) {
-            throw new OperacionInvalidaException(
-                    "La factura repite un producto en varias líneas; usa una sola línea con la cantidad total");
-        }
     }
 
     private Factura nuevaFactura() {

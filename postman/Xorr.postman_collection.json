@@ -946,6 +946,64 @@
               }
             }
           ]
+        },
+        {
+          "name": "RN-15 · Factura con el mismo producto en dos líneas -> 400",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/facturas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "facturas"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"detalles\": [\n    { \"idProducto\": {{productoId}}, \"cantidad\": 1 },\n    { \"idProducto\": {{productoId}}, \"cantidad\": 1 }\n  ]\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Dice que se repite el producto', () => pm.expect(pm.response.json().mensaje).to.include('repite un producto'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "RN-16 · Orden de compra con el mismo producto en dos líneas -> 400",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/ordenes-compra",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ordenes-compra"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idProveedor\": {{proveedorId}},\n  \"detalles\": [\n    { \"idProducto\": {{productoId}}, \"cantidad\": 2 },\n    { \"idProducto\": {{productoId}}, \"cantidad\": 3 }\n  ]\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Dice que se repite el producto', () => pm.expect(pm.response.json().mensaje).to.include('repite un producto'));"
+                ]
+              }
+            }
+          ]
         }
       ]
     },
