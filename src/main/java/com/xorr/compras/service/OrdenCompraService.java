@@ -44,6 +44,7 @@ public class OrdenCompraService {
 
     @Transactional
     public OrdenCompraResponse crear(OrdenCompraRequest datos) {
+        validarSinProductosRepetidos(datos.detalles());
         proveedorService.obtener(datos.idProveedor());
         OrdenCompra orden = nuevaOrdenPendiente(datos.idProveedor());
         datos.detalles().forEach(linea -> orden.getDetalles().add(armarDetalle(datos.idProveedor(), linea)));
@@ -112,6 +113,15 @@ public class OrdenCompraService {
         return orden.getDetalles().stream()
                 .map(DetalleOrdenCompra::getSubtotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    // RN-16: un producto solo puede aparecer en una línea de la orden.
+    private void validarSinProductosRepetidos(List<DetalleOrdenCompraRequest> lineas) {
+        long distintos = lineas.stream().map(DetalleOrdenCompraRequest::idProducto).distinct().count();
+        if (distintos != lineas.size()) {
+            throw new OperacionInvalidaException(
+                    "La orden repite un producto en varias líneas; usa una sola línea con la cantidad total");
+        }
     }
 
     // RN-08: una orden solo se recibe o se cancela mientras está PENDIENTE.

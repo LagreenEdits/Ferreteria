@@ -127,6 +127,19 @@ class OrdenCompraServiceTest {
         verify(ordenes, never()).save(any());
     }
 
+    // RN-16 (M2, ROJO): una orden no puede repetir un producto en dos líneas.
+    @Test
+    void crear_conElMismoProductoEnDosLineas_seRechazaYNoGuarda() {
+        OrdenCompraRequest peticion = new OrdenCompraRequest(ID_PROVEEDOR, List.of(
+                new DetalleOrdenCompraRequest(ID_PRODUCTO, 2),
+                new DetalleOrdenCompraRequest(ID_PRODUCTO, 3)));
+
+        assertThrows(OperacionInvalidaException.class, () -> servicio.crear(peticion));
+
+        verify(ordenes, never()).save(any());
+        verifyNoInteractions(proveedorService);
+    }
+
     // ---- recibir (RN-02, RN-06, RN-08) ----
 
     @Test
