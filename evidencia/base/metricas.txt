@@ -1,0 +1,86 @@
+﻿MÉTRICAS DE DISEÑO (análisis estático propio, no herramienta estándar)
+Archivos analizados: 71 | LOC no vacías: 2190
+
+Clase                               LOC  CBO  DIT  LCOM4
+OrdenCompraService                  114   13    1      1
+AuthService                          54   11    1      1
+FacturaService                       92   11    1      1
+ProductoService                     130   11    1      1
+ProveedorProductoService            103    9    1      1
+ProveedorService                     80    9    1      1
+UsuarioService                       47    7    1      1
+AuthController                       29    5    1      1
+GlobalExceptionHandler               38    4    1      1
+FacturaController                    36    3    1      1
+JwtService                           65    3    1      2
+MovimientosCompraService             30    3    1      1
+MovimientosVentaService              25    3    1      1
+OrdenCompraController                44    3    1      1
+OrdenCompraResponse                  25    3    1      1
+ProductoController                   50    3    1      1
+ProveedorController                  46    3    1      1
+ProveedorProductoController          47    3    1      1
+SecurityConfig                       84    3    1      1
+UsuarioController                    30    3    1      1
+CorreoUsuario                        21    2    1      1
+EmpresaService                       19    2    1      1
+FacturaResponse                      20    2    1      1
+JwtAuthenticationFilter              49    2    3      2
+OrdenCompra                          81    2    1      1
+UsuarioResponse                       9    2    1      1
+ContextoActual                       27    1    1      1
+DatosToken                            4    1    1      1
+DetalleFacturaResponse               16    1    1      1
+DetalleOrdenCompraResponse           16    1    1      1
+EmpresaRepository                     5    1    1      1
+Factura                              62    1    1      1
+FacturaRepository                    16    1    1      1
+FacturaRequest                        7    1    1      1
+LoginResponse                         4    1    1      1
+OrdenCompraRepository                18    1    1      1
+OrdenCompraRequest                    9    1    1      1
+ProductoRepository                   13    1    1      1
+ProductoResponse                     18    1    1      1
+ProveedorProductoRepository          16    1    1      1
+ProveedorProductoResponse            16    1    1      1
+ProveedorRepository                   9    1    1      1
+ProveedorResponse                    13    1    1      1
+Usuario                              62    1    1      1
+UsuarioRepository                    12    1    1      1
+CrearEmpleadoRequest                 11    0    1      1
+CredencialesInvalidasException        7    0    4      1
+DetalleFactura                       50    0    1      1
+DetalleFacturaRequest                 8    0    1      1
+DetalleOrdenCompra                   50    0    1      1
+DetalleOrdenCompraRequest             7    0    1      1
+Empresa                              26    0    1      1
+EstadoOrdenCompra                     6    0    1      1
+LoginRequest                          6    0    1      1
+ManejadorErroresSeguridad            39    0    1      1
+MovimientosCompra                    10    0    1      1
+MovimientosVenta                      8    0    1      1
+OpenApiConfig                        21    0    1      1
+OperacionInvalidaException            6    0    4      1
+PasswordConfig                       12    0    1      1
+Producto                             58    0    1      1
+ProductoRequest                      12    0    1      1
+Proveedor                            40    0    1      1
+ProveedorProducto                    50    0    1      1
+ProveedorProductoRequest              9    0    1      1
+ProveedorRequest                      6    0    1      1
+RecursoNoEncontradoException          6    0    4      1
+RegistroAdminRequest                 11    0    1      1
+Rol                                   5    0    1      1
+StockInsuficienteException            6    0    4      1
+XorrApplication                       9    0    1      1
+
+Servicios (11): CBO medio 7.5, máximo 13
+DIT máximo: 4
+LCOM4 > 1: JwtAuthenticationFilter, JwtService
+
+Dependencias entre módulos: 7
+  compras -> common, inventario
+  inventario -> common
+  seguridad -> common, negocio
+  ventas -> common, inventario
+Ciclos entre módulos: 0

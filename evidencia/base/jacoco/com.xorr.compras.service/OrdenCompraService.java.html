@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OrdenCompraService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xorr</a> &gt; <a href="index.source.html" class="el_package">com.xorr.compras.service</a> &gt; <span class="el_source">OrdenCompraService.java</span></div><h1>OrdenCompraService.java</h1><pre class="source lang-java linenums">package com.xorr.compras.service;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.xorr.common.ContextoActual;
+import com.xorr.common.OperacionInvalidaException;
+import com.xorr.common.RecursoNoEncontradoException;
+import com.xorr.compras.dto.DetalleOrdenCompraRequest;
+import com.xorr.compras.dto.OrdenCompraRequest;
+import com.xorr.compras.dto.OrdenCompraResponse;
+import com.xorr.compras.entity.DetalleOrdenCompra;
+import com.xorr.compras.entity.EstadoOrdenCompra;
+import com.xorr.compras.entity.OrdenCompra;
+import com.xorr.compras.repository.OrdenCompraRepository;
+import com.xorr.inventario.service.ProductoService;
+import com.xorr.inventario.service.ProveedorProductoService;
+import com.xorr.inventario.service.ProveedorService;
+
+@Service
+public class OrdenCompraService {
+
+    private final OrdenCompraRepository ordenes;
+    private final ContextoActual contexto;
+    private final ProveedorService proveedorService;
+    private final ProductoService productoService;
+    private final ProveedorProductoService proveedorProductoService;
+
+    public OrdenCompraService(OrdenCompraRepository ordenes,
+            ContextoActual contexto,
+            ProveedorService proveedorService,
+            ProductoService productoService,
+<span class="fc" id="L37">            ProveedorProductoService proveedorProductoService) {</span>
+<span class="fc" id="L38">        this.ordenes = ordenes;</span>
+<span class="fc" id="L39">        this.contexto = contexto;</span>
+<span class="fc" id="L40">        this.proveedorService = proveedorService;</span>
+<span class="fc" id="L41">        this.productoService = productoService;</span>
+<span class="fc" id="L42">        this.proveedorProductoService = proveedorProductoService;</span>
+<span class="fc" id="L43">    }</span>
+
+    @Transactional
+    public OrdenCompraResponse crear(OrdenCompraRequest datos) {
+<span class="fc" id="L47">        proveedorService.obtener(datos.idProveedor());</span>
+<span class="fc" id="L48">        OrdenCompra orden = nuevaOrdenPendiente(datos.idProveedor());</span>
+<span class="fc" id="L49">        datos.detalles().forEach(linea -&gt; orden.getDetalles().add(armarDetalle(datos.idProveedor(), linea)));</span>
+<span class="fc" id="L50">        orden.setTotal(sumarSubtotales(orden));</span>
+<span class="fc" id="L51">        return OrdenCompraResponse.desde(ordenes.save(orden));</span>
+    }
+
+    @Transactional(readOnly = true)
+    public List&lt;OrdenCompraResponse&gt; listar() {
+<span class="fc" id="L56">        return ordenes.findByIdEmpresa(contexto.getIdEmpresa()).stream()</span>
+<span class="fc" id="L57">                .map(OrdenCompraResponse::desde)</span>
+<span class="fc" id="L58">                .toList();</span>
+    }
+
+    @Transactional(readOnly = true)
+    public OrdenCompraResponse obtener(Long idOrden) {
+<span class="nc" id="L63">        return OrdenCompraResponse.desde(buscarOrden(idOrden));</span>
+    }
+
+    // RN-02 y RN-06: si falla el aumento de stock de una línea, la transacción se
+    // revierte completa.
+    @Transactional
+    public OrdenCompraResponse recibir(Long idOrden) {
+<span class="fc" id="L70">        OrdenCompra orden = buscarOrden(idOrden);</span>
+<span class="fc" id="L71">        validarPendiente(orden, &quot;recibir&quot;);</span>
+<span class="fc" id="L72">        orden.getDetalles().forEach(</span>
+<span class="fc" id="L73">                detalle -&gt; productoService.incrementarStock(detalle.getIdProducto(), detalle.getCantidad()));</span>
+<span class="fc" id="L74">        orden.setEstado(EstadoOrdenCompra.RECIBIDA);</span>
+<span class="fc" id="L75">        return OrdenCompraResponse.desde(ordenes.save(orden));</span>
+    }
+
+    @Transactional
+    public OrdenCompraResponse cancelar(Long idOrden) {
+<span class="fc" id="L80">        OrdenCompra orden = buscarOrden(idOrden);</span>
+<span class="fc" id="L81">        validarPendiente(orden, &quot;cancelar&quot;);</span>
+<span class="fc" id="L82">        orden.setEstado(EstadoOrdenCompra.CANCELADA);</span>
+<span class="fc" id="L83">        return OrdenCompraResponse.desde(ordenes.save(orden));</span>
+    }
+
+    private OrdenCompra nuevaOrdenPendiente(Long idProveedor) {
+<span class="fc" id="L87">        OrdenCompra orden = new OrdenCompra();</span>
+<span class="fc" id="L88">        orden.setIdEmpresa(contexto.getIdEmpresa());</span>
+<span class="fc" id="L89">        orden.setIdProveedor(idProveedor);</span>
+<span class="fc" id="L90">        orden.setIdUsuario(contexto.getIdUsuario());</span>
+<span class="fc" id="L91">        orden.setFecha(LocalDateTime.now());</span>
+<span class="fc" id="L92">        orden.setEstado(EstadoOrdenCompra.PENDIENTE);</span>
+<span class="fc" id="L93">        orden.setTotal(BigDecimal.ZERO);</span>
+<span class="fc" id="L94">        return orden;</span>
+    }
+
+    // RN-05 (producto de otra empresa = no encontrado), RN-09 (precio de la
+    // asociación)
+    // y RN-03 (el subtotal lo calcula el servidor).
+    private DetalleOrdenCompra armarDetalle(Long idProveedor, DetalleOrdenCompraRequest linea) {
+<span class="fc" id="L101">        productoService.obtener(linea.idProducto());</span>
+<span class="fc" id="L102">        BigDecimal precio = proveedorProductoService.obtenerPrecioCompra(idProveedor, linea.idProducto());</span>
+<span class="fc" id="L103">        DetalleOrdenCompra detalle = new DetalleOrdenCompra();</span>
+<span class="fc" id="L104">        detalle.setIdProducto(linea.idProducto());</span>
+<span class="fc" id="L105">        detalle.setCantidad(linea.cantidad());</span>
+<span class="fc" id="L106">        detalle.setPrecioUnitario(precio);</span>
+<span class="fc" id="L107">        detalle.setSubtotal(precio.multiply(BigDecimal.valueOf(linea.cantidad())));</span>
+<span class="fc" id="L108">        return detalle;</span>
+    }
+
+    private BigDecimal sumarSubtotales(OrdenCompra orden) {
+<span class="fc" id="L112">        return orden.getDetalles().stream()</span>
+<span class="fc" id="L113">                .map(DetalleOrdenCompra::getSubtotal)</span>
+<span class="fc" id="L114">                .reduce(BigDecimal.ZERO, BigDecimal::add);</span>
+    }
+
+    // RN-08: una orden solo se recibe o se cancela mientras está PENDIENTE.
+    private void validarPendiente(OrdenCompra orden, String accion) {
+<span class="fc bfc" id="L119" title="All 2 branches covered.">        if (orden.getEstado() != EstadoOrdenCompra.PENDIENTE) {</span>
+<span class="fc" id="L120">            throw new OperacionInvalidaException(</span>
+<span class="fc" id="L121">                    &quot;No se puede &quot; + accion + &quot; una orden en estado &quot; + orden.getEstado());</span>
+        }
+<span class="fc" id="L123">    }</span>
+
+    private OrdenCompra buscarOrden(Long idOrden) {
+<span class="fc" id="L126">        return ordenes.findByIdAndIdEmpresa(idOrden, contexto.getIdEmpresa())</span>
+<span class="fc" id="L127">                .orElseThrow(() -&gt; new RecursoNoEncontradoException(</span>
+                        &quot;Orden de compra no encontrada: &quot; + idOrden));
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.15.202606040825</span></div></body></html>

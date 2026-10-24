@@ -1,0 +1,23 @@
+﻿2026-10-24 12:06:16
+commit 728f06698165c97540ebaa477babb43587a8c9cc
+Author: LagreenEdits <juandavidlaverde1441@gmail.com>
+Date:   Sat Oct 24 11:28:06 2026 -0500
+
+    Conservar el metricas.py original en tools
+base-2026-10-24
+commit 728f06698165c97540ebaa477babb43587a8c9cc
+Author: LagreenEdits <juandavidlaverde1441@gmail.com>
+Date:   Sat Oct 24 11:28:06 2026 -0500
+
+    Conservar el metricas.py original en tools
+
+ metricas.py => tools/metricas_original.py | 0
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+On branch iteracion-2
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	evidencia/
+
+nothing added to commit but untracked files present (use "git add" to track)
+* iteracion-2
+  main

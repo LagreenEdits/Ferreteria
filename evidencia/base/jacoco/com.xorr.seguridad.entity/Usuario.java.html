@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Usuario.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xorr</a> &gt; <a href="index.source.html" class="el_package">com.xorr.seguridad.entity</a> &gt; <span class="el_source">Usuario.java</span></div><h1>Usuario.java</h1><pre class="source lang-java linenums">package com.xorr.seguridad.entity;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
+import com.xorr.common.Rol;
+
+@Entity
+<span class="fc" id="L14">public class Usuario {</span>
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
+    private Long idEmpresa;
+
+    @Column(nullable = false)
+    private String nombre;
+
+    @Column(nullable = false, unique = true)
+    private String correo;
+
+    @Column(nullable = false)
+    private String passwordHash;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Rol rol;
+
+    public Long getId() {
+<span class="fc" id="L37">        return id;</span>
+    }
+
+    public void setId(Long id) {
+<span class="fc" id="L41">        this.id = id;</span>
+<span class="fc" id="L42">    }</span>
+
+    public Long getIdEmpresa() {
+<span class="fc" id="L45">        return idEmpresa;</span>
+    }
+
+    public void setIdEmpresa(Long idEmpresa) {
+<span class="fc" id="L49">        this.idEmpresa = idEmpresa;</span>
+<span class="fc" id="L50">    }</span>
+
+    public String getNombre() {
+<span class="fc" id="L53">        return nombre;</span>
+    }
+
+    public void setNombre(String nombre) {
+<span class="fc" id="L57">        this.nombre = nombre;</span>
+<span class="fc" id="L58">    }</span>
+
+    public String getCorreo() {
+<span class="fc" id="L61">        return correo;</span>
+    }
+
+    public void setCorreo(String correo) {
+<span class="fc" id="L65">        this.correo = correo;</span>
+<span class="fc" id="L66">    }</span>
+
+    public String getPasswordHash() {
+<span class="fc" id="L69">        return passwordHash;</span>
+    }
+
+    public void setPasswordHash(String passwordHash) {
+<span class="fc" id="L73">        this.passwordHash = passwordHash;</span>
+<span class="fc" id="L74">    }</span>
+
+    public Rol getRol() {
+<span class="fc" id="L77">        return rol;</span>
+    }
+
+    public void setRol(Rol rol) {
+<span class="fc" id="L81">        this.rol = rol;</span>
+<span class="fc" id="L82">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.15.202606040825</span></div></body></html>

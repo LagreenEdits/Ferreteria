@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<checkstyle version="9.3">
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\common\ContextoActual.java">
+<error line="25" column="5" severity="error" message="La complejidad ciclomática es 3 (máxima permitida es 1)." source="com.puppycrawl.tools.checkstyle.checks.metrics.CyclomaticComplexityCheck"/>
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\common\CredencialesInvalidasException.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\common\DatosToken.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\common\GlobalExceptionHandler.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\common\OperacionInvalidaException.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\common\RecursoNoEncontradoException.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\common\Rol.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\common\StockInsuficienteException.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\compras\controller\OrdenCompraController.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\compras\dto\DetalleOrdenCompraRequest.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\compras\dto\DetalleOrdenCompraResponse.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\compras\dto\OrdenCompraRequest.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\compras\dto\OrdenCompraResponse.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\compras\entity\DetalleOrdenCompra.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\compras\entity\EstadoOrdenCompra.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\compras\entity\OrdenCompra.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\compras\repository\OrdenCompraRepository.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\compras\service\MovimientosCompraService.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\compras\service\OrdenCompraService.java">
+<error line="118" column="5" severity="error" message="La complejidad ciclomática es 2 (máxima permitida es 1)." source="com.puppycrawl.tools.checkstyle.checks.metrics.CyclomaticComplexityCheck"/>
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\inventario\controller\ProductoController.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\inventario\controller\ProveedorController.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\inventario\controller\ProveedorProductoController.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\inventario\dto\ProductoRequest.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\inventario\dto\ProductoResponse.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\inventario\dto\ProveedorProductoRequest.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\inventario\dto\ProveedorProductoResponse.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\inventario\dto\ProveedorRequest.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\inventario\dto\ProveedorResponse.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\inventario\entity\Producto.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\inventario\entity\Proveedor.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\inventario\entity\ProveedorProducto.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\inventario\repository\ProductoRepository.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\inventario\repository\ProveedorProductoRepository.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\inventario\repository\ProveedorRepository.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\inventario\service\MovimientosCompra.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\inventario\service\MovimientosVenta.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\inventario\service\ProductoService.java">
+<error line="109" column="5" severity="error" message="La complejidad ciclomática es 2 (máxima permitida es 1)." source="com.puppycrawl.tools.checkstyle.checks.metrics.CyclomaticComplexityCheck"/>
+<error line="115" column="5" severity="error" message="La complejidad ciclomática es 2 (máxima permitida es 1)." source="com.puppycrawl.tools.checkstyle.checks.metrics.CyclomaticComplexityCheck"/>
+<error line="124" column="5" severity="error" message="La complejidad ciclomática es 2 (máxima permitida es 1)." source="com.puppycrawl.tools.checkstyle.checks.metrics.CyclomaticComplexityCheck"/>
+<error line="133" column="5" severity="error" message="La complejidad ciclomática es 2 (máxima permitida es 1)." source="com.puppycrawl.tools.checkstyle.checks.metrics.CyclomaticComplexityCheck"/>
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\inventario\service\ProveedorProductoService.java">
+<error line="105" column="5" severity="error" message="La complejidad ciclomática es 2 (máxima permitida es 1)." source="com.puppycrawl.tools.checkstyle.checks.metrics.CyclomaticComplexityCheck"/>
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\inventario\service\ProveedorService.java">
+<error line="82" column="5" severity="error" message="La complejidad ciclomática es 2 (máxima permitida es 1)." source="com.puppycrawl.tools.checkstyle.checks.metrics.CyclomaticComplexityCheck"/>
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\negocio\entity\Empresa.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\negocio\repository\EmpresaRepository.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\negocio\service\EmpresaService.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\seguridad\config\JwtAuthenticationFilter.java">
+<error line="47" column="5" severity="error" message="La complejidad ciclomática es 3 (máxima permitida es 1)." source="com.puppycrawl.tools.checkstyle.checks.metrics.CyclomaticComplexityCheck"/>
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\seguridad\config\ManejadorErroresSeguridad.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\seguridad\config\OpenApiConfig.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\seguridad\config\PasswordConfig.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\seguridad\config\SecurityConfig.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\seguridad\controller\AuthController.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\seguridad\controller\UsuarioController.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\seguridad\dto\CrearEmpleadoRequest.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\seguridad\dto\LoginRequest.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\seguridad\dto\LoginResponse.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\seguridad\dto\RegistroAdminRequest.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\seguridad\dto\UsuarioResponse.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\seguridad\entity\Usuario.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\seguridad\repository\UsuarioRepository.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\seguridad\service\AuthService.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\seguridad\service\CorreoUsuario.java">
+<error line="22" column="5" severity="error" message="La complejidad ciclomática es 2 (máxima permitida es 1)." source="com.puppycrawl.tools.checkstyle.checks.metrics.CyclomaticComplexityCheck"/>
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\seguridad\service\JwtService.java">
+<error line="55" column="5" severity="error" message="La complejidad ciclomática es 2 (máxima permitida es 1)." source="com.puppycrawl.tools.checkstyle.checks.metrics.CyclomaticComplexityCheck"/>
+<error line="72" column="5" severity="error" message="La complejidad ciclomática es 3 (máxima permitida es 1)." source="com.puppycrawl.tools.checkstyle.checks.metrics.CyclomaticComplexityCheck"/>
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\seguridad\service\UsuarioService.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\ventas\controller\FacturaController.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\ventas\dto\DetalleFacturaRequest.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\ventas\dto\DetalleFacturaResponse.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\ventas\dto\FacturaRequest.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\ventas\dto\FacturaResponse.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\ventas\entity\DetalleFactura.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\ventas\entity\Factura.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\ventas\repository\FacturaRepository.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\ventas\service\FacturaService.java">
+<error line="63" column="5" severity="error" message="La complejidad ciclomática es 2 (máxima permitida es 1)." source="com.puppycrawl.tools.checkstyle.checks.metrics.CyclomaticComplexityCheck"/>
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\ventas\service\MovimientosVentaService.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\java\com\xorr\XorrApplication.java">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\resources\application-dev.properties">
+</file>
+<file name="C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\main\resources\application.properties">
+</file>
+</checkstyle>

@@ -1,0 +1,106 @@
+﻿   1: package com.xorr.ventas.service;
+   2: 
+   3: import java.math.BigDecimal;
+   4: import java.time.LocalDateTime;
+   5: import java.util.List;
+   6: 
+   7: import org.springframework.stereotype.Service;
+   8: import org.springframework.transaction.annotation.Transactional;
+   9: 
+  10: import com.xorr.common.ContextoActual;
+  11: import com.xorr.common.OperacionInvalidaException;
+  12: import com.xorr.common.RecursoNoEncontradoException;
+  13: import com.xorr.inventario.dto.ProductoResponse;
+  14: import com.xorr.inventario.service.ProductoService;
+  15: import com.xorr.ventas.dto.DetalleFacturaRequest;
+  16: import com.xorr.ventas.dto.FacturaRequest;
+  17: import com.xorr.ventas.dto.FacturaResponse;
+  18: import com.xorr.ventas.entity.DetalleFactura;
+  19: import com.xorr.ventas.entity.Factura;
+  20: import com.xorr.ventas.repository.FacturaRepository;
+  21: 
+  22: // RN-11: no hay anulación ni borrado de facturas, por eso este servicio solo
+  23: // tiene crear, listar y obtener.
+  24: @Service
+  25: public class FacturaService {
+  26: 
+  27:     private final FacturaRepository facturas;
+  28:     private final ContextoActual contexto;
+  29:     private final ProductoService productoService;
+  30: 
+  31:     public FacturaService(FacturaRepository facturas,
+  32:             ContextoActual contexto,
+  33:             ProductoService productoService) {
+  34:         this.facturas = facturas;
+  35:         this.contexto = contexto;
+  36:         this.productoService = productoService;
+  37:     }
+  38: 
+  39:     // RN-06: si falla el descuento de stock de una línea (RN-01), la transacción
+  40:     // se revierte completa y no se guarda nada.
+  41:     @Transactional
+  42:     public FacturaResponse crear(FacturaRequest datos) {
+  43:         validarSinProductosRepetidos(datos.detalles());
+  44:         Factura factura = nuevaFactura();
+  45:         datos.detalles().forEach(linea -> factura.getDetalles().add(armarDetalle(linea)));
+  46:         factura.setTotal(sumarSubtotales(factura));
+  47:         return FacturaResponse.desde(facturas.save(factura));
+  48:     }
+  49: 
+  50:     @Transactional(readOnly = true)
+  51:     public List<FacturaResponse> listar() {
+  52:         return facturas.findByIdEmpresa(contexto.getIdEmpresa()).stream()
+  53:                 .map(FacturaResponse::desde)
+  54:                 .toList();
+  55:     }
+  56: 
+  57:     @Transactional(readOnly = true)
+  58:     public FacturaResponse obtener(Long idFactura) {
+  59:         return FacturaResponse.desde(buscarFactura(idFactura));
+  60:     }
+  61: 
+  62:     // RN-15: un producto solo puede aparecer en una línea de la factura.
+  63:     private void validarSinProductosRepetidos(List<DetalleFacturaRequest> lineas) {
+  64:         long distintos = lineas.stream().map(DetalleFacturaRequest::idProducto).distinct().count();
+  65:         if (distintos != lineas.size()) {
+  66:             throw new OperacionInvalidaException(
+  67:                     "La factura repite un producto en varias líneas; usa una sola línea con la cantidad total");
+  68:         }
+  69:     }
+  70: 
+  71:     private Factura nuevaFactura() {
+  72:         Factura factura = new Factura();
+  73:         factura.setIdEmpresa(contexto.getIdEmpresa());
+  74:         factura.setIdUsuario(contexto.getIdUsuario());
+  75:         factura.setFecha(LocalDateTime.now());
+  76:         factura.setTotal(BigDecimal.ZERO);
+  77:         return factura;
+  78:     }
+  79: 
+  80:     // RN-05 (producto de otra empresa = no encontrado), RN-10 (el precio sale de
+  81:     // Producto.precioVenta), RN-01 (el stock se valida solo en decrementarStock)
+  82:     // y RN-03 (el subtotal lo calcula el servidor).
+  83:     private DetalleFactura armarDetalle(DetalleFacturaRequest linea) {
+  84:         ProductoResponse producto = productoService.obtener(linea.idProducto());
+  85:         productoService.decrementarStock(linea.idProducto(), linea.cantidad());
+  86:         BigDecimal precio = producto.precioVenta();
+  87:         DetalleFactura detalle = new DetalleFactura();
+  88:         detalle.setIdProducto(linea.idProducto());
+  89:         detalle.setCantidad(linea.cantidad());
+  90:         detalle.setPrecioUnitario(precio);
+  91:         detalle.setSubtotal(precio.multiply(BigDecimal.valueOf(linea.cantidad())));
+  92:         return detalle;
+  93:     }
+  94: 
+  95:     private BigDecimal sumarSubtotales(Factura factura) {
+  96:         return factura.getDetalles().stream()
+  97:                 .map(DetalleFactura::getSubtotal)
+  98:                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+  99:     }
+ 100: 
+ 101:     private Factura buscarFactura(Long idFactura) {
+ 102:         return facturas.findByIdAndIdEmpresa(idFactura, contexto.getIdEmpresa())
+ 103:                 .orElseThrow(() -> new RecursoNoEncontradoException(
+ 104:                         "Factura no encontrada: " + idFactura));
+ 105:     }
+ 106: }
