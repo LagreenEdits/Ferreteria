@@ -48,13 +48,15 @@ Es un proyecto académico del curso de **Calidad de Software** (IDEAD, Universid
 | **Facturas y órdenes en PDF** | 🟡 Hecho en el navegador | Botón **Descargar factura en PDF** (tras vender, en Inicio y en Facturas) y botón **PDF** en cada orden de compra. El PDF lo arma la propia página, sin librerías ni endpoint nuevo en el servidor |
 | **Reportes y clientes** | 🔜 Fase 2 | |
 
-**Pruebas automáticas:** 209 pruebas (`BUILD SUCCESS`, 19 de octubre de 2026): todas en verde y ninguna omitida. Son 105 de la Fase 0, 98 de Seguridad y 6 de `ArquitecturaTest` (reglas de ArchUnit, todas activas), ver la [sección 12](#12-pruebas-automáticas).
+**Pruebas automáticas:** 272 pruebas (`BUILD SUCCESS`, 24 de octubre de 2026): todas en verde y ninguna omitida. Son las 209 de antes más 63 de la iteración de calidad: 59 pruebas de integración de los controladores, 1 de la regla RN-16, 2 de `LineasDeProducto` y 1 regla nueva de `ArquitecturaTest` (ahora son 7 reglas de ArchUnit, todas activas). Ver la [sección 12](#12-pruebas-automáticas).
 
-**Cobertura y complejidad (JaCoCo, releída el 19 de octubre de 2026 tras correr las 209 pruebas, ya con el refactor y la regla RN-15):** 95 % de las instrucciones (119 de 2.683 sin cubrir) y 96 % de las ramas (1 de 30); en los servicios, 98 % (inventario), 98 % (compras) y 100 % (ventas). La complejidad máxima por método, V(G), es **3** (medida con Checkstyle).
+**Cobertura y complejidad (JaCoCo, medida el 24 de octubre de 2026 tras correr las 272 pruebas):** 99,6 % de las instrucciones (11 de 2.708 sin cubrir) y 96 % de las ramas (1 de 30); los servicios (inventario, compras y ventas) y los tres controladores están en 100 %. El 100 % mide que el código se ejecuta; las pruebas además verifican el estado y el contenido de la respuesta. La complejidad máxima por método, V(G), es **3** (medida con Checkstyle).
+
+**Iteración de calidad (24 de octubre de 2026):** se midió la línea base, se mejoró el código y se volvió a medir con los mismos comandos. Los cambios fueron: la regla RN-16 (una orden de compra no repite un producto), hecha con TDD; la clase `LineasDeProducto`, que centraliza esa validación para facturas y órdenes; la clase `ArmadorDeOrden`, que baja el constructor de `OrdenCompraService` de 5 a 4 dependencias; una regla de ArchUnit que lo vigila; y las pruebas de integración de los controladores. La evidencia (reportes, capturas y cifras de antes y después) está en la carpeta `evidencia/`, y las etiquetas de Git `base-2026-10-24` y `despues-m3-2026-10-24` marcan el código de cada medición.
 
 **Verificación del frontend:** el JavaScript compila sin errores y el generador de PDF produce archivos válidos (revisados con `qpdf`, `pdftotext` y a simple vista). Además, el equipo recorrió la interfaz a mano el 19 de octubre de 2026: registrar la ferretería, crear un producto, vender y descargar el PDF, provocar el `409` por stock insuficiente, crear un empleado y entrar con él, y revisar Facturas y una orden de compra con su PDF; todo funcionó correctamente. Las pruebas automáticas y Postman cubren el backend; la página se verifica a mano.
 
-**Colección de Postman:** 44 peticiones con 74 comprobaciones automáticas, todas pasadas el 19 de octubre de 2026 (ver la [sección 7](#7-probar-la-api-paso-a-paso)).
+**Colección de Postman:** 46 peticiones con 78 comprobaciones automáticas, todas pasadas el 24 de octubre de 2026 (ver la [sección 7](#7-probar-la-api-paso-a-paso)). Incluye las reglas RN-15 y RN-16.
 
 **Base de datos:** H2 en memoria. Es una base de datos temporal que **se borra cada vez que apagas la aplicación**: también desaparecen los usuarios registrados, así que después de reiniciar hay que registrar al administrador otra vez. MySQL ya está incluido como dependencia, pero todavía no está configurado.
 
@@ -128,8 +130,9 @@ Cuando llega mercancía, el dueño marca la orden como **RECIBIDA** y el stock s
 | **HTML + JavaScript (`fetch`)** | — | El frontend: una sola página (`index.html`) que Spring Boot sirve tal cual, habla con la API y genera los PDF sin librerías externas |
 | **JUnit 5 + Mockito** | (incluido) | Pruebas automáticas |
 | **JaCoCo** | 0.8.15 | Mide qué parte del código ejecutan las pruebas (cobertura) y su complejidad |
-| **ArchUnit** | 1.4.1 (solo pruebas) | Comprueba con 6 reglas automáticas que las capas y los módulos respetan las reglas de dependencia (sección 10) |
-| **Checkstyle** | 9.3 (plugin 3.6.0) | Mide la complejidad V(G) de cada método. Se ejecuta a mano; no forma parte de `mvn test` |
+| **ArchUnit** | 1.4.1 (solo pruebas) | Comprueba con 7 reglas automáticas que las capas y los módulos respetan las reglas de dependencia (sección 10) |
+| **Checkstyle** | 9.3 (plugin 3.6.0) | Mide la complejidad V(G) y los parámetros por método. Se ejecuta a mano con los archivos `checkstyle-complejidad.xml` y `checkstyle-parametros.xml`; no forma parte de `mvn test` |
+| **Python** | 3.x (solo para medir) | Ejecuta `tools/metricas.py`, el script que calcula el acoplamiento (CBO), la herencia (DIT) y la cohesión (LCOM4). No hace falta para correr la aplicación |
 
 > **Dato técnico:** el proyecto compila para Java 17, pero se ha probado con **JDK 25**. Para que Mockito funcione en JDK 25, el `pom.xml` fuerza la versión `1.17.7` de Byte Buddy (propiedad `byte-buddy.version`). No la quites.
 
@@ -185,7 +188,7 @@ mvn test
 La primera vez tarda más porque Maven descarga las librerías (necesitas internet). Al final debes ver:
 
 ```
-Tests run: 209, Failures: 0, Errors: 0, Skipped: 0
+Tests run: 272, Failures: 0, Errors: 0, Skipped: 0
 BUILD SUCCESS
 ```
 
@@ -339,14 +342,14 @@ Respuesta: `201`. Fíjate: **no envías precios**. El servidor toma el precio de
 
 **Paso 10 · Hacer el mismo recorrido con Postman**
 
-La colección `postman/Xorr.postman_collection.json` (44 peticiones, con la variable `baseUrl` = `http://localhost:8081`) repite este recorrido de forma automática. Impórtala en Postman y ejecútala con el **Collection Runner**, en el orden en que aparecen las peticiones. Cada corrida crea datos nuevos (la base es en memoria) y registra su propio administrador y su propio empleado, así que no necesitas iniciar sesión a mano.
+La colección `postman/Xorr.postman_collection.json` (46 peticiones, con la variable `baseUrl` = `http://localhost:8081`) repite este recorrido de forma automática. Impórtala en Postman y ejecútala con el **Collection Runner**, en el orden en que aparecen las peticiones. Cada corrida crea datos nuevos (la base es en memoria) y registra su propio administrador y su propio empleado, así que no necesitas iniciar sesión a mano.
 
 - **Carpeta 0 · Autenticación (3 pasos):** registra un administrador con una empresa nueva, inicia sesión y guarda el token (las demás carpetas lo envían solas), y comprueba que sin token se responde `401`.
 - **Carpeta 1 · Flujo principal (11 pasos):** crear producto y proveedor, asociarlos, crear y recibir una orden, vender, comprobar el stock, el stock bajo y las facturas.
-- **Carpeta 2 · Reglas y protecciones (20 casos):** los errores `400`, `404`, `405` y `409` de las tablas anteriores, el límite del stock bajo (un producto con stock igual al mínimo no aparece) y los valores negativos (stock, precios y cantidades).
+- **Carpeta 2 · Reglas y protecciones (22 casos):** los errores `400`, `404`, `405` y `409` de las tablas anteriores, el límite del stock bajo (un producto con stock igual al mínimo no aparece), los valores negativos (stock, precios y cantidades) y el rechazo de un producto repetido en una factura (RN-15) y en una orden de compra (RN-16).
 - **Carpeta 3 · Usuarios y roles (10 pasos):** el administrador crea un empleado y lista los usuarios de su empresa; el empleado inicia sesión y se comprueba que recibe `403` en `/api/usuarios` y al crear productos, pero puede ver productos y vender.
 
-Resultado esperado: **74 comprobaciones pasadas, 0 fallos**. La colección guarda el token del administrador (`token`) y el del empleado (`tokenEmpleado`) y los envía en `Authorization: Bearer`.
+Resultado esperado: **78 comprobaciones pasadas, 0 fallos**. La colección guarda el token del administrador (`token`) y el del empleado (`tokenEmpleado`) y los envía en `Authorization: Bearer`.
 
 **Paso 11 · Registrar un administrador e iniciar sesión** → `POST /api/auth/registro-admin`
 
@@ -430,7 +433,13 @@ Xorr/
 ├── .gitignore                       ← Archivos que Git no sube (target/, .idea/, .vscode/, .env...)
 ├── README.md                        ← Este archivo
 ├── postman/
-│   └── Xorr.postman_collection.json ← Colección de Postman (44 peticiones, 74 comprobaciones)
+│   └── Xorr.postman_collection.json ← Colección de Postman (46 peticiones, 78 comprobaciones)
+├── tools/
+│   ├── metricas.py                  ← Calcula CBO, DIT, LCOM4 y dependencias entre módulos (`python tools/metricas.py src/main/java`)
+│   └── metricas_original.py         ← El script que el equipo tenía antes; se conserva solo como referencia
+├── checkstyle-complejidad.xml       ← Configuración de Checkstyle para medir V(G)
+├── checkstyle-parametros.xml        ← Configuración de Checkstyle para contar parámetros por método
+├── evidencia/                       ← Reportes, capturas y cifras de las mediciones de antes y después (base/, despues/, despues-m3/)
 ├── .github/modernize/               ← Lo generó una herramienta de VS Code (actualización de Java); no es parte del proyecto y no se sube a GitHub (está en `.gitignore`)
 │
 └── src/
@@ -448,6 +457,7 @@ Xorr/
     │       │   ├── ContextoActual.java            ← Da el idEmpresa y el idUsuario que vienen en el token
     │       │   ├── DatosToken.java                ← Lo que viaja dentro del token (usuario, empresa, rol)
     │       │   ├── Rol.java                       ← ADMIN, EMPLEADO
+│       │   ├── LineasDeProducto.java          ← Regla única de «producto repetido» en facturas (RN-15) y órdenes de compra (RN-16)
     │       │   ├── GlobalExceptionHandler.java    ← Convierte los errores en respuestas JSON
     │       │   ├── RecursoNoEncontradoException.java   ← Error 404
     │       │   ├── OperacionInvalidaException.java     ← Error 400
@@ -483,6 +493,7 @@ Xorr/
     │           │   └── OrdenCompraController.java
     │           ├── service/
     │           │   ├── OrdenCompraService.java         ← Crear, recibir, cancelar, consultar
+│           │   ├── ArmadorDeOrden.java             ← Arma las líneas de la orden (precio de la asociación, RN-09 y RN-16); lo usa OrdenCompraService
     │           │   └── MovimientosCompraService.java   ← Implementa MovimientosCompra de Inventario (RN-12)
     │           ├── repository/
     │           │   └── OrdenCompraRepository.java
@@ -542,13 +553,15 @@ Xorr/
     │               └── CrearEmpleadoRequest.java
     │
     └── test/java/com/xorr/                   ← Pruebas automáticas (misma estructura de paquetes)
+        ├── IntegracionBase.java                      ← Apoyo (no es una prueba): clase base de las pruebas de controlador; arranca la aplicación real y ofrece atajos para registrar una empresa, crear un empleado y preparar productos, proveedores y órdenes
         ├── RollbackIntegracionTest.java              ← 3 pruebas de integración (rollback real, RN-06)
         ├── SesionDePrueba.java                       ← Abre una sesión simulada (empresa 1, usuario 1, ADMIN) en las pruebas unitarias
         ├── arquitectura/
-        │   └── ArquitecturaTest.java                 ← 6 pruebas (ArchUnit: reglas de dependencia entre capas y módulos)
+        │   └── ArquitecturaTest.java                 ← 7 pruebas (ArchUnit: reglas de dependencia entre capas y módulos y límite de dependencias del constructor)
         ├── common/
         │   ├── ValidacionDtoTest.java                ← 22 pruebas (validación de los DTO, RN-07)
-        │   └── ContextoActualTest.java               ← 3 pruebas (empresa y usuario del token: con sesión, sin sesión y principal ajeno)
+        │   ├── ContextoActualTest.java               ← 3 pruebas (empresa y usuario del token: con sesión, sin sesión y principal ajeno)
+        │   └── LineasDeProductoTest.java             ← 2 pruebas (producto repetido: rechazo y caso válido)
         ├── negocio/service/
         │   └── EmpresaServiceTest.java               ← 1 prueba
         ├── seguridad/
@@ -564,20 +577,31 @@ Xorr/
         │   ├── SeguridadIntegracionTest.java         ← 26 pruebas con la aplicación real en un puerto (401, 403, rutas abiertas, 405)
         │   ├── AislamientoEmpresasIntegracionTest.java ← 5 pruebas con dos empresas reales (RN-05)
         │   ├── UsuariosIntegracionTest.java          ← 10 pruebas con la aplicación real (401, 403, alta de empleados, aislamiento entre empresas)
-        │   └── ClienteHttp.java                      ← Apoyo (no es una prueba): cliente HTTP real de Java para las pruebas de integración
-        ├── compras/service/
-        │   ├── OrdenCompraServiceTest.java           ← 14 pruebas
-        │   └── MovimientosCompraServiceTest.java     ← 4 pruebas
-        ├── ventas/service/
-        │   ├── FacturaServiceTest.java               ← 12 pruebas (incluye RN-15)
-        │   └── MovimientosVentaServiceTest.java      ← 2 pruebas
-        ├── inventario/repository/
-        │   └── ProductoRepositoryTest.java           ← 4 pruebas con H2 (consulta de stock bajo, RN-04)
-        └── inventario/service/
-            ├── ProductoServiceTest.java              ← 19 pruebas
-            ├── ProductoServiceCrudTest.java          ← 6 pruebas
-            ├── ProveedorServiceTest.java             ← 8 pruebas
-            └── ProveedorProductoServiceTest.java     ← 11 pruebas
+        │   └── ClienteHttp.java                      ← Apoyo (no es una prueba): cliente HTTP real de Java para las pruebas de integración y de controlador
+        ├── compras/
+        │   ├── controller/
+        │   │   └── OrdenCompraControllerIntegracionTest.java ← 12 pruebas con la aplicación real (crear, listar, recibir, cancelar; `400`, `401`, `403` y `404`)
+        │   └── service/
+        │       ├── OrdenCompraServiceTest.java       ← 15 pruebas (incluye RN-16)
+        │       └── MovimientosCompraServiceTest.java ← 4 pruebas
+        ├── ventas/
+        │   ├── controller/
+        │   │   └── FacturaControllerIntegracionTest.java ← 10 pruebas con la aplicación real (incluye el `409` por stock y RN-15)
+        │   └── service/
+        │       ├── FacturaServiceTest.java           ← 12 pruebas (incluye RN-15)
+        │       └── MovimientosVentaServiceTest.java  ← 2 pruebas
+        └── inventario/
+            ├── controller/
+            │   ├── ProductoControllerIntegracionTest.java            ← 13 pruebas con la aplicación real
+            │   ├── ProveedorControllerIntegracionTest.java           ← 12 pruebas con la aplicación real
+            │   └── ProveedorProductoControllerIntegracionTest.java   ← 12 pruebas con la aplicación real
+            ├── repository/
+            │   └── ProductoRepositoryTest.java       ← 4 pruebas con H2 (consulta de stock bajo, RN-04)
+            └── service/
+                ├── ProductoServiceTest.java          ← 19 pruebas
+                ├── ProductoServiceCrudTest.java      ← 6 pruebas
+                ├── ProveedorServiceTest.java         ← 8 pruebas
+                └── ProveedorProductoServiceTest.java ← 11 pruebas
 ```
 
 **Carpetas que aparecen al compilar y que no se suben a GitHub:** `target/` (el código compilado, los reportes de pruebas y el de cobertura en `target/site/jacoco/`). Si la borras, Maven la vuelve a crear.
@@ -698,7 +722,7 @@ Reglas de convivencia entre módulos:
 
 - La API **siempre** usa DTO, **nunca** entidades.
 - El frontend (`static/index.html`) **solo habla con la API** por `fetch`; no usa clases del backend.
-- Un servicio usa **solo los repositorios de su módulo**. Si necesita datos de otro módulo, llama al **servicio** de ese módulo (por ejemplo, `OrdenCompraService` llama a `ProductoService`, no a `ProductoRepository`).
+- Un servicio usa **solo los repositorios de su módulo**. Si necesita datos de otro módulo, llama al **servicio** de ese módulo (por ejemplo, `OrdenCompraService` y su ayudante `ArmadorDeOrden` llaman a `ProductoService`, no a `ProductoRepository`). Un servicio tampoco debe tener más de 4 dependencias en su constructor (lo vigila `ArquitecturaTest`; `ProductoService`, con 5, es una excepción declarada).
 - Dependencias permitidas: **Seguridad → Negocio** (crear la empresa al registrar al administrador), **Compras → Inventario**, **Ventas → Inventario** y todos → **common**. No hay ciclos entre módulos: Inventario no conoce a Compras ni a Ventas; define las interfaces `MovimientosCompra` y `MovimientosVenta` (consultas de lectura para impedir borrar productos o proveedores con órdenes o facturas) y Compras y Ventas las implementan (inversión de dependencias). `DatosToken` y `Rol` viven en `common`, así que `common` no depende de `seguridad`. Lo comprueba `ArquitecturaTest`.
 
 ### El "contexto actual"
@@ -735,7 +759,8 @@ Las reglas viven en los **servicios** y están probadas con pruebas automáticas
 | RN-12 | No se elimina un producto o proveedor con movimientos | ✅ órdenes de compra y facturas |
 | RN-13 | No puede haber dos asociaciones con el mismo proveedor y producto | ✅ |
 | RN-14 | Al eliminar un producto o proveedor se eliminan sus asociaciones | ✅ |
-| RN-15 | Una factura no puede repetir un producto en dos líneas: responde `400` con «La factura repite un producto en varias líneas; usa una sola línea con la cantidad total» y no descuenta stock. En las órdenes de compra todavía no se aplica (el formulario web sí suma las cantidades repetidas en una sola línea) | ✅ en facturas |
+| RN-15 | Una factura no puede repetir un producto en dos líneas: responde `400` con «La factura repite un producto en varias líneas; usa una sola línea con la cantidad total» y no descuenta stock. La validación vive en `LineasDeProducto` y la usan las facturas y las órdenes de compra (RN-16) | ✅ en facturas |
+| RN-16 | Una orden de compra no puede repetir un producto en dos líneas: responde `400` con «La orden repite un producto en varias líneas; usa una sola línea con la cantidad total» y no crea la orden. Es la misma regla que RN-15, aplicada a las órdenes (el formulario web suma las cantidades repetidas en una sola línea) | ✅ en órdenes de compra |
 
 ---
 
@@ -749,7 +774,7 @@ Estas son **pruebas unitarias de los servicios**: usan **JUnit 5** (para escribi
 
 | Clase de prueba | Pruebas | Qué cubre |
 |---|---|---|
-| `OrdenCompraServiceTest` | 14 | Crear, recibir, cancelar, consultar; precios y totales; estados; multi-tenant |
+| `OrdenCompraServiceTest` | 15 | Crear, recibir, cancelar, consultar; precios y totales; estados; multi-tenant; rechazo del mismo producto en dos líneas (RN-16) |
 | `MovimientosCompraServiceTest` | 4 | Consulta de órdenes por producto y por proveedor |
 | `ProductoServiceTest` | 19 | Subir y bajar stock, cantidades inválidas, stock bajo, eliminar (con órdenes y con facturas), multi-tenant |
 | `ProductoServiceCrudTest` | 6 | Crear, listar, obtener y actualizar; un producto de otra empresa se trata como no encontrado |
@@ -772,12 +797,18 @@ Estas son **pruebas unitarias de los servicios**: usan **JUnit 5** (para escribi
 | `UsuarioServiceTest` | 6 | Alta de empleados (rol `EMPLEADO`, empresa del token, hash BCrypt, correo en minúsculas, correo repetido sin guardar) y listado por empresa |
 | `ValidacionCrearEmpleadoRequestTest` | 12 | Validación del alta de empleados: nombre y correo obligatorios, correo mal escrito, contraseña nula, corta o larga |
 | `UsuariosIntegracionTest` | 10 | Con la aplicación real: `401` sin token, `403` para EMPLEADO, el ADMIN lista usuarios, el empleado creado inicia sesión, `400` por datos inválidos y aislamiento entre empresas |
-| `ArquitecturaTest` | 6 | ArchUnit: 6 reglas activas (todas pasan), incluidas «sin ciclos entre módulos» y «`common` no depende de `seguridad`» |
-| **Total** | **209** | Todas en verde y ninguna omitida (`mvn clean test`, 19-10-2026) |
+| `ArquitecturaTest` | 7 | ArchUnit: 7 reglas activas (todas pasan), incluidas «sin ciclos entre módulos», «`common` no depende de `seguridad`» y «un servicio tiene como máximo 4 dependencias en el constructor» |
+| `LineasDeProductoTest` | 2 | La validación de producto repetido (RN-15 y RN-16): rechaza repetidos y acepta una lista sin repetidos |
+| `OrdenCompraControllerIntegracionTest` | 12 | Con la aplicación real: crear una orden (`201` y total), producto repetido (RN-16) y producto no asociado `400`, `401` sin token, `403` para EMPLEADO, listar, consultar (la orden de otra empresa da `404`), recibir (el stock sube y la segunda vez da `400`) y cancelar |
+| `ProductoControllerIntegracionTest` | 13 | Con la aplicación real: validación `400`, listar, `404`, stock bajo (incluido el límite), actualizar, eliminar (`204`, `400` con órdenes o con facturas, y en cascada las asociaciones) y el EMPLEADO que lee pero no escribe |
+| `ProveedorControllerIntegracionTest` | 12 | Con la aplicación real: crear, validar, `403` para EMPLEADO, listar, consultar (el de otra empresa da `404`), actualizar y eliminar (`400` si tiene órdenes, RN-12) |
+| `ProveedorProductoControllerIntegracionTest` | 12 | Con la aplicación real: crear con precio de compra, duplicado `400` (RN-13), proveedor o producto inexistente `404`, precio negativo `400`, `403` para EMPLEADO, listar, consultar, actualizar y eliminar |
+| `FacturaControllerIntegracionTest` | 10 | Con la aplicación real: crear una factura (`201`, total y el stock baja), `409` por stock insuficiente (RN-01), producto repetido (RN-15) o sin líneas `400`, producto inexistente `404`, `401` sin token, el EMPLEADO puede vender, listar y consultar (la factura de otra empresa da `404`) |
+| **Total** | **272** | Todas en verde y ninguna omitida (`mvn clean test`, 24-10-2026) |
 
-**Por nivel**, las 209 pruebas se reparten así (contadas por clase en `target/surefire-reports`): 108 unitarias con Mockito, 47 de validación de DTO, 48 de integración (con H2 o con la aplicación completa) y 6 de arquitectura.
+**Por nivel**, las 272 pruebas se reparten así (contadas por clase en `target/surefire-reports`): 111 unitarias (109 con Mockito y 2 de `LineasDeProducto`), 47 de validación de DTO, 107 de integración (con H2 o con la aplicación completa, 59 de ellas de controladores) y 7 de arquitectura.
 
-`ArquitecturaTest` (ArchUnit 1.4.1) comprueba las reglas de dependencia de la sección 10: los controladores no usan repositorios ni entidades, las entidades no dependen de servicios ni controladores, cada servicio usa solo los repositorios de su módulo, no hay ciclos entre módulos y `common` no depende de `seguridad`. Las dos últimas estuvieron desactivadas con `@ArchIgnore` como deuda conocida; el refactor del 19-10-2026 las dejó activas y las 6 reglas pasan.
+`ArquitecturaTest` (ArchUnit 1.4.1) comprueba las reglas de dependencia de la sección 10: los controladores no usan repositorios ni entidades, las entidades no dependen de servicios ni controladores, cada servicio usa solo los repositorios de su módulo, no hay ciclos entre módulos, `common` no depende de `seguridad` y un servicio no tiene más de 4 dependencias en su constructor (`ProductoService` queda fuera a propósito, como deuda declarada). Dos de ellas estuvieron desactivadas con `@ArchIgnore` como deuda conocida; el refactor del 19-10-2026 las dejó activas. La regla del constructor se escribió el 24-10-2026: primero falló a propósito sobre `OrdenCompraService` (5 dependencias) y pasó a verde al extraer `ArmadorDeOrden`. Las 7 reglas pasan.
 
 ### Cobertura y complejidad (JaCoCo)
 
@@ -785,12 +816,15 @@ Estas son **pruebas unitarias de los servicios**: usan **JUnit 5** (para escribi
 
 | Medida | Resultado |
 |---|---|
-| Instrucciones cubiertas (total) | 95 % (119 de 2.683 sin cubrir) |
+| Instrucciones cubiertas (total) | 99,6 % (11 de 2.708 sin cubrir) |
 | Ramas cubiertas | 96 % (1 de 30 sin cubrir) |
-| Servicios de inventario / compras / ventas | 98 % / 98 % / 100 % |
+| Servicios de inventario / compras / ventas | 100 % / 100 % / 100 % |
+| Controladores de inventario / compras / ventas | 100 % / 100 % / 100 % |
 | Complejidad máxima por método, V(G) (meta: 10 o menos) | 3 (Checkstyle; 3 métodos con 3, 10 con 2, el resto con 1) |
+| Métodos con más de 4 parámetros (meta: 0) | 1 (el constructor de `ProductoService`, con 5; deuda declarada) |
+| Acoplamiento CBO de los servicios (medido con `tools/metricas.py`) | media 7,2 y máximo 11 (meta orientativa: 8 o menos; no se cumple) |
 
-Los controladores no tienen pruebas unitarias propias (inventario 45 %, compras 33 %, ventas 50 %): su comportamiento se verifica con la colección de Postman y con las pruebas de integración de seguridad. Estas cifras se leyeron en el reporte de JaCoCo el 19 de octubre de 2026 tras correr las 209 pruebas (con el refactor de inversión de dependencias y la regla RN-15 ya incluidos); la clase `FacturaService` queda al 100 % de instrucciones y de ramas.
+Los controladores tienen pruebas de integración propias desde el 24 de octubre de 2026 (antes: inventario 45 %, compras 33 %, ventas 50 %; ahora 100 % los tres): cada una arranca la aplicación real, hace peticiones HTTP y comprueba el código de estado y el contenido de la respuesta. **El 100 % mide que el código se ejecuta**, no que no tenga defectos. Las 11 instrucciones sin cubrir están en `XorrApplication` (5) y en las entidades `DetalleOrdenCompra` y `DetalleFactura` (3 cada una). Estas cifras se leyeron en el reporte de JaCoCo el 24 de octubre de 2026 tras correr las 272 pruebas.
 
 ### Comandos útiles
 
@@ -800,11 +834,24 @@ mvn test -Dtest=OrdenCompraServiceTest          # corre una sola clase
 mvn test -Dtest=OrdenCompraServiceTest#cancelar_ordenPendiente_quedaCanceladaSinTocarElStock   # corre una sola prueba
 ```
 
+### Cómo medir la calidad del código
+
+Son los mismos comandos que se usaron para las mediciones de antes y después (se ejecutan desde la raíz del proyecto; el último necesita Python):
+
+```bash
+mvn clean test                                                                   # pruebas y cobertura (target/site/jacoco/index.html)
+mvn org.apache.maven.plugins:maven-checkstyle-plugin:3.6.0:checkstyle "-Dcheckstyle.config.location=checkstyle-complejidad.xml"   # V(G) por método (target/checkstyle-result.xml)
+mvn org.apache.maven.plugins:maven-checkstyle-plugin:3.6.0:checkstyle "-Dcheckstyle.config.location=checkstyle-parametros.xml"    # parámetros por método
+python tools/metricas.py src/main/java                                           # CBO, DIT, LCOM4 y dependencias entre módulos
+```
+
+`mvn clean` borra `target/`, incluido el reporte de JaCoCo: copia lo que necesites guardar antes de volver a correrlo. Las cifras guardadas de cada medición están en `evidencia/`.
+
 Los reportes detallados quedan en `target/surefire-reports/`.
 
 ### Lo que las pruebas unitarias **no** cubren (y se comprueba en Swagger o con Postman)
 
-Como no usan base de datos real, no ejecutan: las consultas de los repositorios (por ejemplo, el `<` estricto del stock bajo), la validación de los DTO (campos obligatorios, números negativos) ni el "deshacer" (rollback) de las transacciones. Esos tres puntos los cubren tres clases de integración (`ProductoRepositoryTest`, `ValidacionDtoTest` y `RollbackIntegracionTest`). Además, el recorrido de la [sección 7](#7-probar-la-api-paso-a-paso) y la colección de Postman, que sí usan la aplicación real, son parte de las comprobaciones del proyecto.
+Como no usan base de datos real, no ejecutan: las consultas de los repositorios (por ejemplo, el `<` estricto del stock bajo), la validación de los DTO (campos obligatorios, números negativos) ni el "deshacer" (rollback) de las transacciones. Esos tres puntos los cubren tres clases de integración (`ProductoRepositoryTest`, `ValidacionDtoTest` y `RollbackIntegracionTest`). Los controladores se prueban aparte, con las cinco clases `*ControllerIntegracionTest`. Además, el recorrido de la [sección 7](#7-probar-la-api-paso-a-paso) y la colección de Postman, que sí usan la aplicación real, son parte de las comprobaciones del proyecto.
 
 ### Si escribes pruebas con Mockito
 
@@ -864,11 +911,13 @@ Cuando falla la validación de varios campos a la vez, el mensaje los junta: `no
 |---|---|---|
 | **Fase 0** | Inventario, Compras y Ventas en el backend, sin login | ✅ Hecho |
 | **Fase 0 (resto)** | Colección de Postman, medición de complejidad y cobertura de pruebas (JaCoCo) | ✅ Hecho |
-| **Fase 1 · MVP** | Registro y login con JWT, roles ADMIN y EMPLEADO, empresa; páginas HTML + JavaScript | 🟡 En curso: el backend de Seguridad está hecho (registro, login, token exigido, roles y alta de empleados); las pruebas de integración de usuarios y la medición de cobertura ya están hechas; el frontend ya cubre todos los módulos, descarga PDF y fue probado a mano; la duplicación de `normalizar` ya se resolvió el 19-10-2026 al extraerla a `CorreoUsuario` |
-| **Fase 2** | Reportes, clientes, logo, endpoint `GET /api/empresa` para el nombre de la ferretería (hoy vive en el navegador), RN-15 en órdenes de compra, más pruebas de integración (el refactor de inversión de dependencias ya se hizo el 19-10-2026) | Futuro |
+| **Fase 1 · MVP** | Registro y login con JWT, roles ADMIN y EMPLEADO, empresa; páginas HTML + JavaScript | 🟡 En curso: el backend de Seguridad está hecho (registro, login, token exigido, roles y alta de empleados); las pruebas de integración de usuarios y de los controladores y la medición de cobertura ya están hechas; el 24-10-2026 hubo una iteración de calidad (ver la sección 1); el frontend ya cubre todos los módulos, descarga PDF y fue probado a mano; la duplicación de `normalizar` ya se resolvió el 19-10-2026 al extraerla a `CorreoUsuario` |
+| **Fase 2** | Reportes, clientes, logo, endpoint `GET /api/empresa` para el nombre de la ferretería (hoy vive en el navegador) y más pruebas de integración (el refactor de inversión de dependencias se hizo el 19-10-2026, RN-16 y las pruebas de los controladores el 24-10-2026) | Futuro |
 | **Fase 3** | Permisos por rol en la interfaz, HTTPS, instalador, despliegue en la nube, modo sin conexión, React, app móvil | Futuro |
 
-**Limitaciones conocidas hoy:** el token se exige y los datos se filtran por la empresa del token; no hay edición ni baja de empleados; la sesión del frontend dura mientras la pestaña esté abierta; el nombre de la ferretería solo existe en el navegador donde se registró; los PDF salen de la página y no quedan guardados en el servidor; Swagger y la consola H2 están abiertos sin token (hay que cerrarlos con un perfil de producción antes de un despliegue real); el secreto del token de desarrollo está en el repositorio; la base de datos es temporal; las pruebas unitarias no usan base de datos real (las consultas, las validaciones y el rollback se cubren con clases de integración; el resto de la integración queda para la Fase 2).
+**Deuda de calidad declarada (medida el 24-10-2026):** el constructor de `ProductoService` tiene 5 parámetros (la meta es 4 o menos); el acoplamiento CBO de varios servicios sigue por encima de 8 (máximo 11); y 2 líneas de lógica se repiten entre `AuthService` y `UsuarioService` (la secuencia que normaliza el correo y valida que esté libre).
+
+**Limitaciones conocidas hoy:** el token se exige y los datos se filtran por la empresa del token; no hay edición ni baja de empleados; la sesión del frontend dura mientras la pestaña esté abierta; el nombre de la ferretería solo existe en el navegador donde se registró; los PDF salen de la página y no quedan guardados en el servidor; Swagger y la consola H2 están abiertos sin token (hay que cerrarlos con un perfil de producción antes de un despliegue real); el secreto del token de desarrollo está en el repositorio; la base de datos es temporal; las pruebas unitarias no usan base de datos real (las consultas, las validaciones, el rollback y los controladores se cubren con clases de integración).
 
 ---
 
