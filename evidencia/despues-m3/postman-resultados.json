@@ -1,0 +1,1640 @@
+{
+	"id": "a7ff34a0-fddb-4bf3-9e2e-77f2e5b53002",
+	"name": "Xorr · Fases 0 y 1 (Inventario, Compras, Ventas y Seguridad)",
+	"timestamp": "2026-10-25T00:18:04.222Z",
+	"collection_id": "43594895-9c6fbb95-e898-4621-a2b5-605123494870",
+	"folder_id": 0,
+	"environment_id": "0",
+	"totalPass": 78,
+	"delay": 0,
+	"persist": true,
+	"status": "finished",
+	"startedAt": "2026-10-25T00:17:57.798Z",
+	"totalFail": 0,
+	"results": [
+		{
+			"id": "508e6727-f6ba-47fc-bd73-aa6af28b288c",
+			"name": "0.1 Registrar administrador (empresa nueva)",
+			"url": "http://localhost:8081/api/auth/registro-admin",
+			"time": 755,
+			"responseCode": {
+				"code": 201,
+				"name": "Created"
+			},
+			"tests": {
+				"Responde 201": true,
+				"Es ADMIN": true,
+				"No devuelve la contraseña": true
+			},
+			"testPassFailCounts": {
+				"Responde 201": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Es ADMIN": {
+					"pass": 1,
+					"fail": 0
+				},
+				"No devuelve la contraseña": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				755
+			],
+			"allTests": [
+				{
+					"Responde 201": true,
+					"Es ADMIN": true,
+					"No devuelve la contraseña": true
+				}
+			]
+		},
+		{
+			"id": "afca4282-d7ee-4bca-b0c5-fac9c71a11ae",
+			"name": "0.2 Iniciar sesión (guarda el token)",
+			"url": "http://localhost:8081/api/auth/login",
+			"time": 235,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Responde 200": true,
+				"Devuelve un token": true,
+				"El usuario es ADMIN": true
+			},
+			"testPassFailCounts": {
+				"Responde 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Devuelve un token": {
+					"pass": 1,
+					"fail": 0
+				},
+				"El usuario es ADMIN": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				235
+			],
+			"allTests": [
+				{
+					"Responde 200": true,
+					"Devuelve un token": true,
+					"El usuario es ADMIN": true
+				}
+			]
+		},
+		{
+			"id": "10876999-1504-4960-8604-4d786c51ed1d",
+			"name": "0.3 Sin token -> 401",
+			"url": "http://localhost:8081/api/productos",
+			"time": 8,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Responde 401": true,
+				"Pide iniciar sesión": true
+			},
+			"testPassFailCounts": {
+				"Responde 401": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Pide iniciar sesión": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				8
+			],
+			"allTests": [
+				{
+					"Responde 401": true,
+					"Pide iniciar sesión": true
+				}
+			]
+		},
+		{
+			"id": "a062903e-2f6d-437d-a8d6-ab34aace6b69",
+			"name": "1. Crear producto (stock 0)",
+			"url": "http://localhost:8081/api/productos",
+			"time": 106,
+			"responseCode": {
+				"code": 201,
+				"name": "Created"
+			},
+			"tests": {
+				"Responde 201": true,
+				"Guarda el id del producto": true
+			},
+			"testPassFailCounts": {
+				"Responde 201": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Guarda el id del producto": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				106
+			],
+			"allTests": [
+				{
+					"Responde 201": true,
+					"Guarda el id del producto": true
+				}
+			]
+		},
+		{
+			"id": "96ea4067-b382-447c-933a-fefa6555d1d5",
+			"name": "2. Crear proveedor",
+			"url": "http://localhost:8081/api/proveedores",
+			"time": 19,
+			"responseCode": {
+				"code": 201,
+				"name": "Created"
+			},
+			"tests": {
+				"Responde 201": true
+			},
+			"testPassFailCounts": {
+				"Responde 201": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				19
+			],
+			"allTests": [
+				{
+					"Responde 201": true
+				}
+			]
+		},
+		{
+			"id": "3294059a-5cc5-4c7d-8919-c3810879aee7",
+			"name": "3. Asociar producto a proveedor (precio de compra 9000)",
+			"url": "http://localhost:8081/api/proveedor-productos",
+			"time": 60,
+			"responseCode": {
+				"code": 201,
+				"name": "Created"
+			},
+			"tests": {
+				"Responde 201": true
+			},
+			"testPassFailCounts": {
+				"Responde 201": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				60
+			],
+			"allTests": [
+				{
+					"Responde 201": true
+				}
+			]
+		},
+		{
+			"id": "705da875-1548-4d74-adac-544fd6ae5821",
+			"name": "4. Crear orden de compra (10 unidades)",
+			"url": "http://localhost:8081/api/ordenes-compra",
+			"time": 167,
+			"responseCode": {
+				"code": 201,
+				"name": "Created"
+			},
+			"tests": {
+				"Responde 201": true,
+				"Queda PENDIENTE": true,
+				"Total = 10 x 9000 (RN-03, RN-09)": true
+			},
+			"testPassFailCounts": {
+				"Responde 201": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Queda PENDIENTE": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Total = 10 x 9000 (RN-03, RN-09)": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				167
+			],
+			"allTests": [
+				{
+					"Responde 201": true,
+					"Queda PENDIENTE": true,
+					"Total = 10 x 9000 (RN-03, RN-09)": true
+				}
+			]
+		},
+		{
+			"id": "f3761965-098a-42c2-833b-9613b8214d0f",
+			"name": "5. Recibir la orden (sube el stock)",
+			"url": "http://localhost:8081/api/ordenes-compra/1/recibir",
+			"time": 50,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Responde 200": true,
+				"Queda RECIBIDA (RN-02)": true
+			},
+			"testPassFailCounts": {
+				"Responde 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Queda RECIBIDA (RN-02)": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				50
+			],
+			"allTests": [
+				{
+					"Responde 200": true,
+					"Queda RECIBIDA (RN-02)": true
+				}
+			]
+		},
+		{
+			"id": "2290f327-47c0-4f81-b089-8a1f54061699",
+			"name": "6. Ver producto: stock 10",
+			"url": "http://localhost:8081/api/productos/1",
+			"time": 11,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Responde 200": true,
+				"Stock = 10 tras recibir": true
+			},
+			"testPassFailCounts": {
+				"Responde 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Stock = 10 tras recibir": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				11
+			],
+			"allTests": [
+				{
+					"Responde 200": true,
+					"Stock = 10 tras recibir": true
+				}
+			]
+		},
+		{
+			"id": "37f75b82-8fbd-4ba2-ab0a-6a3d9e1fc5c5",
+			"name": "7. Vender 8 unidades (crear factura)",
+			"url": "http://localhost:8081/api/facturas",
+			"time": 53,
+			"responseCode": {
+				"code": 201,
+				"name": "Created"
+			},
+			"tests": {
+				"Responde 201": true,
+				"Total = 8 x 15000 (RN-03, RN-10)": true
+			},
+			"testPassFailCounts": {
+				"Responde 201": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Total = 8 x 15000 (RN-03, RN-10)": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				53
+			],
+			"allTests": [
+				{
+					"Responde 201": true,
+					"Total = 8 x 15000 (RN-03, RN-10)": true
+				}
+			]
+		},
+		{
+			"id": "3f4e8c97-356a-4f22-96b4-513fe4050660",
+			"name": "8. Ver producto: stock 2",
+			"url": "http://localhost:8081/api/productos/1",
+			"time": 11,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Responde 200": true,
+				"Stock = 2 tras vender (RN-01)": true
+			},
+			"testPassFailCounts": {
+				"Responde 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Stock = 2 tras vender (RN-01)": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				11
+			],
+			"allTests": [
+				{
+					"Responde 200": true,
+					"Stock = 2 tras vender (RN-01)": true
+				}
+			]
+		},
+		{
+			"id": "b4818df9-6754-47d8-9ee6-2fe2a0991cbd",
+			"name": "9. Stock bajo incluye el producto (2 < 5)",
+			"url": "http://localhost:8081/api/productos/stock-bajo",
+			"time": 20,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Responde 200": true,
+				"El producto aparece (RN-04)": true
+			},
+			"testPassFailCounts": {
+				"Responde 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"El producto aparece (RN-04)": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				20
+			],
+			"allTests": [
+				{
+					"Responde 200": true,
+					"El producto aparece (RN-04)": true
+				}
+			]
+		},
+		{
+			"id": "4471d67f-3507-4c2b-92c5-01da98988fac",
+			"name": "10. Ver la factura",
+			"url": "http://localhost:8081/api/facturas/1",
+			"time": 16,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Responde 200": true
+			},
+			"testPassFailCounts": {
+				"Responde 200": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				16
+			],
+			"allTests": [
+				{
+					"Responde 200": true
+				}
+			]
+		},
+		{
+			"id": "d7aff97d-46a9-4246-b1d7-942e7be42e3d",
+			"name": "11. Listar facturas",
+			"url": "http://localhost:8081/api/facturas",
+			"time": 12,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Responde 200": true,
+				"Es una lista": true
+			},
+			"testPassFailCounts": {
+				"Responde 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Es una lista": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				12
+			],
+			"allTests": [
+				{
+					"Responde 200": true,
+					"Es una lista": true
+				}
+			]
+		},
+		{
+			"id": "2553390a-957c-4e3f-8e42-c575e8b543d0",
+			"name": "Vender más de lo que hay (3 con stock 2) -> 409",
+			"url": "http://localhost:8081/api/facturas",
+			"time": 22,
+			"responseCode": {
+				"code": 409,
+				"name": "Conflict"
+			},
+			"tests": {
+				"Responde 409": true
+			},
+			"testPassFailCounts": {
+				"Responde 409": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				22
+			],
+			"allTests": [
+				{
+					"Responde 409": true
+				}
+			]
+		},
+		{
+			"id": "f2875de6-1f43-4dc0-b747-638f4e45e8e1",
+			"name": "Vender cantidad 0 -> 400",
+			"url": "http://localhost:8081/api/facturas",
+			"time": 44,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {
+				"Responde 400": true
+			},
+			"testPassFailCounts": {
+				"Responde 400": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				44
+			],
+			"allTests": [
+				{
+					"Responde 400": true
+				}
+			]
+		},
+		{
+			"id": "ea3c5b06-45c2-43dc-9773-efecc1e1dc43",
+			"name": "Vender con detalles vacíos -> 400",
+			"url": "http://localhost:8081/api/facturas",
+			"time": 11,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {
+				"Responde 400": true
+			},
+			"testPassFailCounts": {
+				"Responde 400": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				11
+			],
+			"allTests": [
+				{
+					"Responde 400": true
+				}
+			]
+		},
+		{
+			"id": "7b20683e-ec44-4610-a51d-94ed4fe0b159",
+			"name": "Vender un producto que no existe -> 404",
+			"url": "http://localhost:8081/api/facturas",
+			"time": 13,
+			"responseCode": {
+				"code": 404,
+				"name": "Not Found"
+			},
+			"tests": {
+				"Responde 404": true
+			},
+			"testPassFailCounts": {
+				"Responde 404": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				13
+			],
+			"allTests": [
+				{
+					"Responde 404": true
+				}
+			]
+		},
+		{
+			"id": "8237ed7d-8b91-4ca6-8182-6995041b3308",
+			"name": "Eliminar el producto con órdenes y facturas -> 400 (RN-12)",
+			"url": "http://localhost:8081/api/productos/1",
+			"time": 54,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {
+				"Responde 400": true
+			},
+			"testPassFailCounts": {
+				"Responde 400": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				54
+			],
+			"allTests": [
+				{
+					"Responde 400": true
+				}
+			]
+		},
+		{
+			"id": "f54291c4-8b6a-4b91-bc43-1e3ebd654b91",
+			"name": "Eliminar el proveedor con órdenes -> 400 (RN-12)",
+			"url": "http://localhost:8081/api/proveedores/1",
+			"time": 27,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {
+				"Responde 400": true
+			},
+			"testPassFailCounts": {
+				"Responde 400": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				27
+			],
+			"allTests": [
+				{
+					"Responde 400": true
+				}
+			]
+		},
+		{
+			"id": "e9d6c611-a6d7-4baf-878f-8e229a14c7cd",
+			"name": "Modificar una factura (PUT) -> 405 (RN-11)",
+			"url": "http://localhost:8081/api/facturas/1",
+			"time": 32,
+			"responseCode": {
+				"code": 405,
+				"name": "Method Not Allowed"
+			},
+			"tests": {
+				"Responde 405": true
+			},
+			"testPassFailCounts": {
+				"Responde 405": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				32
+			],
+			"allTests": [
+				{
+					"Responde 405": true
+				}
+			]
+		},
+		{
+			"id": "ce648fde-4e21-4be6-83a5-7d7ceeec4eb8",
+			"name": "Borrar una factura (DELETE) -> 405 (RN-11)",
+			"url": "http://localhost:8081/api/facturas/1",
+			"time": 10,
+			"responseCode": {
+				"code": 405,
+				"name": "Method Not Allowed"
+			},
+			"tests": {
+				"Responde 405": true
+			},
+			"testPassFailCounts": {
+				"Responde 405": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				10
+			],
+			"allTests": [
+				{
+					"Responde 405": true
+				}
+			]
+		},
+		{
+			"id": "f679f6c3-0bf8-4db9-96a7-f79dea1f5157",
+			"name": "Recibir otra vez la orden -> 400 (RN-08)",
+			"url": "http://localhost:8081/api/ordenes-compra/1/recibir",
+			"time": 15,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {
+				"Responde 400": true
+			},
+			"testPassFailCounts": {
+				"Responde 400": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				15
+			],
+			"allTests": [
+				{
+					"Responde 400": true
+				}
+			]
+		},
+		{
+			"id": "2ccca4e0-5ddd-4aa0-a83b-f363b1a05a13",
+			"name": "Cancelar una orden ya recibida -> 400 (RN-08)",
+			"url": "http://localhost:8081/api/ordenes-compra/1/cancelar",
+			"time": 24,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {
+				"Responde 400": true
+			},
+			"testPassFailCounts": {
+				"Responde 400": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				24
+			],
+			"allTests": [
+				{
+					"Responde 400": true
+				}
+			]
+		},
+		{
+			"id": "e64c2e60-62f6-4694-a85e-25d6e946e099",
+			"name": "Orden con cantidad 0 -> 400 (RN-07)",
+			"url": "http://localhost:8081/api/ordenes-compra",
+			"time": 19,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {
+				"Responde 400": true
+			},
+			"testPassFailCounts": {
+				"Responde 400": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				19
+			],
+			"allTests": [
+				{
+					"Responde 400": true
+				}
+			]
+		},
+		{
+			"id": "5ada8347-63ea-4613-99fd-e82816d0ca4a",
+			"name": "Asociación duplicada -> 400 (RN-13)",
+			"url": "http://localhost:8081/api/proveedor-productos",
+			"time": 21,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {
+				"Responde 400": true,
+				"Mensaje de duplicado": true
+			},
+			"testPassFailCounts": {
+				"Responde 400": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Mensaje de duplicado": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				21
+			],
+			"allTests": [
+				{
+					"Responde 400": true,
+					"Mensaje de duplicado": true
+				}
+			]
+		},
+		{
+			"id": "31e5750b-13c3-4be0-a745-70549313616b",
+			"name": "Producto inexistente -> 404 (RN-05)",
+			"url": "http://localhost:8081/api/productos/999999",
+			"time": 16,
+			"responseCode": {
+				"code": 404,
+				"name": "Not Found"
+			},
+			"tests": {
+				"Responde 404": true
+			},
+			"testPassFailCounts": {
+				"Responde 404": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				16
+			],
+			"allTests": [
+				{
+					"Responde 404": true
+				}
+			]
+		},
+		{
+			"id": "eb5fafaa-efec-4004-aeaf-79dd16ff96ec",
+			"name": "RN-04 · Crear producto con stock = stockMínimo (5 = 5)",
+			"url": "http://localhost:8081/api/productos",
+			"time": 15,
+			"responseCode": {
+				"code": 201,
+				"name": "Created"
+			},
+			"tests": {
+				"Responde 201": true
+			},
+			"testPassFailCounts": {
+				"Responde 201": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				15
+			],
+			"allTests": [
+				{
+					"Responde 201": true
+				}
+			]
+		},
+		{
+			"id": "d81ec080-a59d-4c58-aaac-ecf38c277899",
+			"name": "RN-04 · Stock bajo NO incluye el producto con stock = mínimo",
+			"url": "http://localhost:8081/api/productos/stock-bajo",
+			"time": 13,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Responde 200": true,
+				"Con stock igual al mínimo no aparece (RN-04, límite estricto)": true
+			},
+			"testPassFailCounts": {
+				"Responde 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Con stock igual al mínimo no aparece (RN-04, límite estricto)": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				13
+			],
+			"allTests": [
+				{
+					"Responde 200": true,
+					"Con stock igual al mínimo no aparece (RN-04, límite estricto)": true
+				}
+			]
+		},
+		{
+			"id": "23b2c698-8553-4393-ac62-56c527904fa6",
+			"name": "RN-07 · Producto con stock -1 -> 400",
+			"url": "http://localhost:8081/api/productos",
+			"time": 12,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {
+				"Responde 400": true,
+				"El mensaje nombra el campo": true
+			},
+			"testPassFailCounts": {
+				"Responde 400": {
+					"pass": 1,
+					"fail": 0
+				},
+				"El mensaje nombra el campo": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				12
+			],
+			"allTests": [
+				{
+					"Responde 400": true,
+					"El mensaje nombra el campo": true
+				}
+			]
+		},
+		{
+			"id": "d551522e-4541-4627-a3bd-26c90ea84d64",
+			"name": "RN-07 · Producto con precioVenta -1 -> 400",
+			"url": "http://localhost:8081/api/productos",
+			"time": 16,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {
+				"Responde 400": true,
+				"El mensaje nombra el campo": true
+			},
+			"testPassFailCounts": {
+				"Responde 400": {
+					"pass": 1,
+					"fail": 0
+				},
+				"El mensaje nombra el campo": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				16
+			],
+			"allTests": [
+				{
+					"Responde 400": true,
+					"El mensaje nombra el campo": true
+				}
+			]
+		},
+		{
+			"id": "3588292f-9dc4-4878-ab0a-99e058f50fd8",
+			"name": "RN-07 · Asociación con precioCompra -1 -> 400",
+			"url": "http://localhost:8081/api/proveedor-productos",
+			"time": 9,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {
+				"Responde 400": true,
+				"El mensaje nombra el campo": true
+			},
+			"testPassFailCounts": {
+				"Responde 400": {
+					"pass": 1,
+					"fail": 0
+				},
+				"El mensaje nombra el campo": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				9
+			],
+			"allTests": [
+				{
+					"Responde 400": true,
+					"El mensaje nombra el campo": true
+				}
+			]
+		},
+		{
+			"id": "452a1b92-28f0-4296-8cdf-18c1f4e0c8ac",
+			"name": "RN-07 · Orden con cantidad -1 -> 400",
+			"url": "http://localhost:8081/api/ordenes-compra",
+			"time": 11,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {
+				"Responde 400": true,
+				"El mensaje nombra el campo": true
+			},
+			"testPassFailCounts": {
+				"Responde 400": {
+					"pass": 1,
+					"fail": 0
+				},
+				"El mensaje nombra el campo": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				11
+			],
+			"allTests": [
+				{
+					"Responde 400": true,
+					"El mensaje nombra el campo": true
+				}
+			]
+		},
+		{
+			"id": "38361008-c99f-42cf-9878-3dfeca28855e",
+			"name": "RN-07 · Venta con cantidad -1 -> 400",
+			"url": "http://localhost:8081/api/facturas",
+			"time": 12,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {
+				"Responde 400": true,
+				"El mensaje nombra el campo": true
+			},
+			"testPassFailCounts": {
+				"Responde 400": {
+					"pass": 1,
+					"fail": 0
+				},
+				"El mensaje nombra el campo": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				12
+			],
+			"allTests": [
+				{
+					"Responde 400": true,
+					"El mensaje nombra el campo": true
+				}
+			]
+		},
+		{
+			"id": "83d66293-a44f-41c0-9637-b958c0768800",
+			"name": "RN-15 · Factura con el mismo producto en dos líneas -> 400",
+			"url": "http://localhost:8081/api/facturas",
+			"time": 12,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {
+				"Responde 400": true,
+				"Dice que se repite el producto": true
+			},
+			"testPassFailCounts": {
+				"Responde 400": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Dice que se repite el producto": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				12
+			],
+			"allTests": [
+				{
+					"Responde 400": true,
+					"Dice que se repite el producto": true
+				}
+			]
+		},
+		{
+			"id": "ceb4fcc0-eccf-47b9-8b53-7fbe24b2f60e",
+			"name": "RN-16 · Orden de compra con el mismo producto en dos líneas -> 400",
+			"url": "http://localhost:8081/api/ordenes-compra",
+			"time": 14,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {
+				"Responde 400": true,
+				"Dice que se repite el producto": true
+			},
+			"testPassFailCounts": {
+				"Responde 400": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Dice que se repite el producto": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				14
+			],
+			"allTests": [
+				{
+					"Responde 400": true,
+					"Dice que se repite el producto": true
+				}
+			]
+		},
+		{
+			"id": "111b3ed6-ee83-4e02-8cdc-2974d88fc648",
+			"name": "3.1 ADMIN crea un empleado -> 201",
+			"url": "http://localhost:8081/api/usuarios",
+			"time": 96,
+			"responseCode": {
+				"code": 201,
+				"name": "Created"
+			},
+			"tests": {
+				"Responde 201": true,
+				"El rol es EMPLEADO (lo decide el servidor)": true,
+				"No devuelve contraseña ni hash": true
+			},
+			"testPassFailCounts": {
+				"Responde 201": {
+					"pass": 1,
+					"fail": 0
+				},
+				"El rol es EMPLEADO (lo decide el servidor)": {
+					"pass": 1,
+					"fail": 0
+				},
+				"No devuelve contraseña ni hash": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				96
+			],
+			"allTests": [
+				{
+					"Responde 201": true,
+					"El rol es EMPLEADO (lo decide el servidor)": true,
+					"No devuelve contraseña ni hash": true
+				}
+			]
+		},
+		{
+			"id": "fb457906-499d-4558-82e6-181fa8fa7800",
+			"name": "3.2 Crear el mismo empleado otra vez -> 400",
+			"url": "http://localhost:8081/api/usuarios",
+			"time": 11,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {
+				"Responde 400": true,
+				"Mensaje de correo repetido": true
+			},
+			"testPassFailCounts": {
+				"Responde 400": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Mensaje de correo repetido": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				11
+			],
+			"allTests": [
+				{
+					"Responde 400": true,
+					"Mensaje de correo repetido": true
+				}
+			]
+		},
+		{
+			"id": "d4b36bc5-a8af-4105-adfd-981d3f7fc1d8",
+			"name": "3.3 Empleado con contraseña corta -> 400",
+			"url": "http://localhost:8081/api/usuarios",
+			"time": 11,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {
+				"Responde 400": true,
+				"El mensaje nombra el campo": true
+			},
+			"testPassFailCounts": {
+				"Responde 400": {
+					"pass": 1,
+					"fail": 0
+				},
+				"El mensaje nombra el campo": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				11
+			],
+			"allTests": [
+				{
+					"Responde 400": true,
+					"El mensaje nombra el campo": true
+				}
+			]
+		},
+		{
+			"id": "fb2001dd-0b07-4216-9e91-1910920cbd3b",
+			"name": "3.4 ADMIN lista los usuarios de su empresa",
+			"url": "http://localhost:8081/api/usuarios",
+			"time": 21,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Responde 200": true,
+				"Aparecen el admin y el empleado": true,
+				"No expone el hash": true
+			},
+			"testPassFailCounts": {
+				"Responde 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Aparecen el admin y el empleado": {
+					"pass": 1,
+					"fail": 0
+				},
+				"No expone el hash": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				21
+			],
+			"allTests": [
+				{
+					"Responde 200": true,
+					"Aparecen el admin y el empleado": true,
+					"No expone el hash": true
+				}
+			]
+		},
+		{
+			"id": "06f3c29b-207c-44a4-bb5f-7b584dc3a100",
+			"name": "3.5 Login del empleado (guarda tokenEmpleado)",
+			"url": "http://localhost:8081/api/auth/login",
+			"time": 100,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Responde 200": true,
+				"El usuario es EMPLEADO": true,
+				"Devuelve un token": true
+			},
+			"testPassFailCounts": {
+				"Responde 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"El usuario es EMPLEADO": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Devuelve un token": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				100
+			],
+			"allTests": [
+				{
+					"Responde 200": true,
+					"El usuario es EMPLEADO": true,
+					"Devuelve un token": true
+				}
+			]
+		},
+		{
+			"id": "e23af79e-2fa7-43df-aa3c-3562d1b18ca5",
+			"name": "3.6 EMPLEADO lista usuarios -> 403",
+			"url": "http://localhost:8081/api/usuarios",
+			"time": 6,
+			"responseCode": {
+				"code": 403,
+				"name": "Forbidden"
+			},
+			"tests": {
+				"Responde 403": true,
+				"Mensaje de permiso": true
+			},
+			"testPassFailCounts": {
+				"Responde 403": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Mensaje de permiso": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				6
+			],
+			"allTests": [
+				{
+					"Responde 403": true,
+					"Mensaje de permiso": true
+				}
+			]
+		},
+		{
+			"id": "253c216f-bfc2-44a8-ba05-8e45ddf1b1c0",
+			"name": "3.7 EMPLEADO crea un usuario -> 403",
+			"url": "http://localhost:8081/api/usuarios",
+			"time": 5,
+			"responseCode": {
+				"code": 403,
+				"name": "Forbidden"
+			},
+			"tests": {
+				"Responde 403": true
+			},
+			"testPassFailCounts": {
+				"Responde 403": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				5
+			],
+			"allTests": [
+				{
+					"Responde 403": true
+				}
+			]
+		},
+		{
+			"id": "8915011a-022e-4287-9423-09647d094cb2",
+			"name": "3.8 EMPLEADO lee productos -> 200",
+			"url": "http://localhost:8081/api/productos",
+			"time": 12,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Responde 200": true
+			},
+			"testPassFailCounts": {
+				"Responde 200": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				12
+			],
+			"allTests": [
+				{
+					"Responde 200": true
+				}
+			]
+		},
+		{
+			"id": "86f9dee3-f222-4c48-8772-2df62def91c7",
+			"name": "3.9 EMPLEADO crea un producto -> 403",
+			"url": "http://localhost:8081/api/productos",
+			"time": 5,
+			"responseCode": {
+				"code": 403,
+				"name": "Forbidden"
+			},
+			"tests": {
+				"Responde 403": true
+			},
+			"testPassFailCounts": {
+				"Responde 403": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				5
+			],
+			"allTests": [
+				{
+					"Responde 403": true
+				}
+			]
+		},
+		{
+			"id": "2f71fba1-4aa3-4855-a198-6e28e90438f7",
+			"name": "3.10 EMPLEADO vende (producto con stock 5) -> 201",
+			"url": "http://localhost:8081/api/facturas",
+			"time": 18,
+			"responseCode": {
+				"code": 201,
+				"name": "Created"
+			},
+			"tests": {
+				"Responde 201": true
+			},
+			"testPassFailCounts": {
+				"Responde 201": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				18
+			],
+			"allTests": [
+				{
+					"Responde 201": true
+				}
+			]
+		}
+	],
+	"count": 1,
+	"totalTime": 2230,
+	"collection": {
+		"requests": [
+			{
+				"id": "508e6727-f6ba-47fc-bd73-aa6af28b288c",
+				"method": "POST"
+			},
+			{
+				"id": "afca4282-d7ee-4bca-b0c5-fac9c71a11ae",
+				"method": "POST"
+			},
+			{
+				"id": "10876999-1504-4960-8604-4d786c51ed1d",
+				"method": "GET"
+			},
+			{
+				"id": "a062903e-2f6d-437d-a8d6-ab34aace6b69",
+				"method": "POST"
+			},
+			{
+				"id": "96ea4067-b382-447c-933a-fefa6555d1d5",
+				"method": "POST"
+			},
+			{
+				"id": "3294059a-5cc5-4c7d-8919-c3810879aee7",
+				"method": "POST"
+			},
+			{
+				"id": "705da875-1548-4d74-adac-544fd6ae5821",
+				"method": "POST"
+			},
+			{
+				"id": "f3761965-098a-42c2-833b-9613b8214d0f",
+				"method": "PUT"
+			},
+			{
+				"id": "2290f327-47c0-4f81-b089-8a1f54061699",
+				"method": "GET"
+			},
+			{
+				"id": "37f75b82-8fbd-4ba2-ab0a-6a3d9e1fc5c5",
+				"method": "POST"
+			},
+			{
+				"id": "3f4e8c97-356a-4f22-96b4-513fe4050660",
+				"method": "GET"
+			},
+			{
+				"id": "b4818df9-6754-47d8-9ee6-2fe2a0991cbd",
+				"method": "GET"
+			},
+			{
+				"id": "4471d67f-3507-4c2b-92c5-01da98988fac",
+				"method": "GET"
+			},
+			{
+				"id": "d7aff97d-46a9-4246-b1d7-942e7be42e3d",
+				"method": "GET"
+			},
+			{
+				"id": "2553390a-957c-4e3f-8e42-c575e8b543d0",
+				"method": "POST"
+			},
+			{
+				"id": "f2875de6-1f43-4dc0-b747-638f4e45e8e1",
+				"method": "POST"
+			},
+			{
+				"id": "ea3c5b06-45c2-43dc-9773-efecc1e1dc43",
+				"method": "POST"
+			},
+			{
+				"id": "7b20683e-ec44-4610-a51d-94ed4fe0b159",
+				"method": "POST"
+			},
+			{
+				"id": "8237ed7d-8b91-4ca6-8182-6995041b3308",
+				"method": "DELETE"
+			},
+			{
+				"id": "f54291c4-8b6a-4b91-bc43-1e3ebd654b91",
+				"method": "DELETE"
+			},
+			{
+				"id": "e9d6c611-a6d7-4baf-878f-8e229a14c7cd",
+				"method": "PUT"
+			},
+			{
+				"id": "ce648fde-4e21-4be6-83a5-7d7ceeec4eb8",
+				"method": "DELETE"
+			},
+			{
+				"id": "f679f6c3-0bf8-4db9-96a7-f79dea1f5157",
+				"method": "PUT"
+			},
+			{
+				"id": "2ccca4e0-5ddd-4aa0-a83b-f363b1a05a13",
+				"method": "PUT"
+			},
+			{
+				"id": "e64c2e60-62f6-4694-a85e-25d6e946e099",
+				"method": "POST"
+			},
+			{
+				"id": "5ada8347-63ea-4613-99fd-e82816d0ca4a",
+				"method": "POST"
+			},
+			{
+				"id": "31e5750b-13c3-4be0-a745-70549313616b",
+				"method": "GET"
+			},
+			{
+				"id": "eb5fafaa-efec-4004-aeaf-79dd16ff96ec",
+				"method": "POST"
+			},
+			{
+				"id": "d81ec080-a59d-4c58-aaac-ecf38c277899",
+				"method": "GET"
+			},
+			{
+				"id": "23b2c698-8553-4393-ac62-56c527904fa6",
+				"method": "POST"
+			},
+			{
+				"id": "d551522e-4541-4627-a3bd-26c90ea84d64",
+				"method": "POST"
+			},
+			{
+				"id": "3588292f-9dc4-4878-ab0a-99e058f50fd8",
+				"method": "POST"
+			},
+			{
+				"id": "452a1b92-28f0-4296-8cdf-18c1f4e0c8ac",
+				"method": "POST"
+			},
+			{
+				"id": "38361008-c99f-42cf-9878-3dfeca28855e",
+				"method": "POST"
+			},
+			{
+				"id": "83d66293-a44f-41c0-9637-b958c0768800",
+				"method": "POST"
+			},
+			{
+				"id": "ceb4fcc0-eccf-47b9-8b53-7fbe24b2f60e",
+				"method": "POST"
+			},
+			{
+				"id": "111b3ed6-ee83-4e02-8cdc-2974d88fc648",
+				"method": "POST"
+			},
+			{
+				"id": "fb457906-499d-4558-82e6-181fa8fa7800",
+				"method": "POST"
+			},
+			{
+				"id": "d4b36bc5-a8af-4105-adfd-981d3f7fc1d8",
+				"method": "POST"
+			},
+			{
+				"id": "fb2001dd-0b07-4216-9e91-1910920cbd3b",
+				"method": "GET"
+			},
+			{
+				"id": "06f3c29b-207c-44a4-bb5f-7b584dc3a100",
+				"method": "POST"
+			},
+			{
+				"id": "e23af79e-2fa7-43df-aa3c-3562d1b18ca5",
+				"method": "GET"
+			},
+			{
+				"id": "253c216f-bfc2-44a8-ba05-8e45ddf1b1c0",
+				"method": "POST"
+			},
+			{
+				"id": "8915011a-022e-4287-9423-09647d094cb2",
+				"method": "GET"
+			},
+			{
+				"id": "86f9dee3-f222-4c48-8772-2df62def91c7",
+				"method": "POST"
+			},
+			{
+				"id": "2f71fba1-4aa3-4855-a198-6e28e90438f7",
+				"method": "POST"
+			}
+		]
+	}
+}

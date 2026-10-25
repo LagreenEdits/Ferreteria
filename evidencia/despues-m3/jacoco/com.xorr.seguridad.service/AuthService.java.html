@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuthService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xorr</a> &gt; <a href="index.source.html" class="el_package">com.xorr.seguridad.service</a> &gt; <span class="el_source">AuthService.java</span></div><h1>AuthService.java</h1><pre class="source lang-java linenums">package com.xorr.seguridad.service;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.xorr.common.CredencialesInvalidasException;
+import com.xorr.common.Rol;
+import com.xorr.negocio.service.EmpresaService;
+import com.xorr.seguridad.dto.LoginRequest;
+import com.xorr.seguridad.dto.LoginResponse;
+import com.xorr.seguridad.dto.RegistroAdminRequest;
+import com.xorr.seguridad.dto.UsuarioResponse;
+import com.xorr.seguridad.entity.Usuario;
+import com.xorr.seguridad.repository.UsuarioRepository;
+
+@Service
+public class AuthService {
+
+    // Mismo mensaje si falla el correo o la contraseña: no revela cuál de los dos
+    // existe.
+    private static final String MENSAJE_LOGIN_INVALIDO = &quot;Correo o contraseña incorrectos&quot;;
+
+    private final UsuarioRepository usuarios;
+    private final EmpresaService empresaService;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
+
+    public AuthService(UsuarioRepository usuarios, EmpresaService empresaService, PasswordEncoder passwordEncoder,
+<span class="fc" id="L30">            JwtService jwtService) {</span>
+<span class="fc" id="L31">        this.usuarios = usuarios;</span>
+<span class="fc" id="L32">        this.empresaService = empresaService;</span>
+<span class="fc" id="L33">        this.passwordEncoder = passwordEncoder;</span>
+<span class="fc" id="L34">        this.jwtService = jwtService;</span>
+<span class="fc" id="L35">    }</span>
+
+    // Empresa y admin se crean juntos: si algo falla, no queda ninguno (RN-06).
+    @Transactional
+    public UsuarioResponse registrarAdmin(RegistroAdminRequest request) {
+<span class="fc" id="L40">        String correo = CorreoUsuario.normalizar(request.correo());</span>
+<span class="fc" id="L41">        CorreoUsuario.validarLibre(usuarios, correo);</span>
+<span class="fc" id="L42">        Long idEmpresa = empresaService.crear(request.nombreEmpresa());</span>
+<span class="fc" id="L43">        return UsuarioResponse.desde(usuarios.save(nuevoAdmin(idEmpresa, correo, request)));</span>
+    }
+
+    @Transactional(readOnly = true)
+    public LoginResponse login(LoginRequest request) {
+<span class="fc" id="L48">        Usuario usuario = usuarios.findByCorreo(CorreoUsuario.normalizar(request.correo()))</span>
+<span class="fc" id="L49">                .filter(encontrado -&gt; passwordEncoder.matches(request.password(), encontrado.getPasswordHash()))</span>
+<span class="fc" id="L50">                .orElseThrow(() -&gt; new CredencialesInvalidasException(MENSAJE_LOGIN_INVALIDO));</span>
+<span class="fc" id="L51">        return new LoginResponse(jwtService.generar(usuario), UsuarioResponse.desde(usuario));</span>
+    }
+
+    private Usuario nuevoAdmin(Long idEmpresa, String correo, RegistroAdminRequest request) {
+<span class="fc" id="L55">        Usuario admin = new Usuario();</span>
+<span class="fc" id="L56">        admin.setIdEmpresa(idEmpresa);</span>
+<span class="fc" id="L57">        admin.setNombre(request.nombre());</span>
+<span class="fc" id="L58">        admin.setCorreo(correo);</span>
+<span class="fc" id="L59">        admin.setPasswordHash(passwordEncoder.encode(request.password()));</span>
+<span class="fc" id="L60">        admin.setRol(Rol.ADMIN);</span>
+<span class="fc" id="L61">        return admin;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.15.202606040825</span></div></body></html>

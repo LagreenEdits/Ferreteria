@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProveedorProductoService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xorr</a> &gt; <a href="index.source.html" class="el_package">com.xorr.inventario.service</a> &gt; <span class="el_source">ProveedorProductoService.java</span></div><h1>ProveedorProductoService.java</h1><pre class="source lang-java linenums">package com.xorr.inventario.service;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.xorr.common.ContextoActual;
+import com.xorr.common.OperacionInvalidaException;
+import com.xorr.common.RecursoNoEncontradoException;
+import com.xorr.inventario.dto.ProveedorProductoRequest;
+import com.xorr.inventario.dto.ProveedorProductoResponse;
+import com.xorr.inventario.entity.ProveedorProducto;
+import com.xorr.inventario.repository.ProveedorProductoRepository;
+
+@Service
+public class ProveedorProductoService {
+
+    private static final String MENSAJE_DUPLICADA = &quot;Ya existe esa asociación&quot;;
+
+    private final ProveedorProductoRepository repositorio;
+    private final ContextoActual contexto;
+    private final ProveedorService proveedorService;
+    private final ProductoService productoService;
+
+    public ProveedorProductoService(ProveedorProductoRepository repositorio,
+            ContextoActual contexto,
+            ProveedorService proveedorService,
+<span class="fc" id="L30">            ProductoService productoService) {</span>
+<span class="fc" id="L31">        this.repositorio = repositorio;</span>
+<span class="fc" id="L32">        this.contexto = contexto;</span>
+<span class="fc" id="L33">        this.proveedorService = proveedorService;</span>
+<span class="fc" id="L34">        this.productoService = productoService;</span>
+<span class="fc" id="L35">    }</span>
+
+    @Transactional
+    public ProveedorProductoResponse crear(ProveedorProductoRequest datos) {
+<span class="fc" id="L39">        validarReferencias(datos);</span>
+<span class="fc" id="L40">        validarSinDuplicado(datos);</span>
+<span class="fc" id="L41">        ProveedorProducto asociacion = new ProveedorProducto();</span>
+<span class="fc" id="L42">        asociacion.setIdEmpresa(contexto.getIdEmpresa());</span>
+<span class="fc" id="L43">        copiarDatos(asociacion, datos);</span>
+<span class="fc" id="L44">        return ProveedorProductoResponse.desde(repositorio.save(asociacion));</span>
+    }
+
+    @Transactional(readOnly = true)
+    public List&lt;ProveedorProductoResponse&gt; listar() {
+<span class="fc" id="L49">        return repositorio.findByIdEmpresa(contexto.getIdEmpresa()).stream()</span>
+<span class="fc" id="L50">                .map(ProveedorProductoResponse::desde)</span>
+<span class="fc" id="L51">                .toList();</span>
+    }
+
+    @Transactional(readOnly = true)
+    public ProveedorProductoResponse obtener(Long idAsociacion) {
+<span class="fc" id="L56">        return ProveedorProductoResponse.desde(buscarAsociacion(idAsociacion));</span>
+    }
+
+    // RN-09: solo se compran productos asociados al proveedor, al precio de esa
+    // asociación.
+    @Transactional(readOnly = true)
+    public BigDecimal obtenerPrecioCompra(Long idProveedor, Long idProducto) {
+<span class="fc" id="L63">        return repositorio.findByIdEmpresaAndIdProveedorAndIdProducto(</span>
+<span class="fc" id="L64">                contexto.getIdEmpresa(), idProveedor, idProducto)</span>
+<span class="fc" id="L65">                .map(ProveedorProducto::getPrecioCompra)</span>
+<span class="fc" id="L66">                .orElseThrow(() -&gt; new OperacionInvalidaException(</span>
+                        &quot;El producto &quot; + idProducto + &quot; no está asociado al proveedor &quot; + idProveedor));
+    }
+
+    @Transactional
+    public ProveedorProductoResponse actualizar(Long idAsociacion, ProveedorProductoRequest datos) {
+<span class="fc" id="L72">        ProveedorProducto asociacion = buscarAsociacion(idAsociacion);</span>
+<span class="fc" id="L73">        validarReferencias(datos);</span>
+<span class="fc" id="L74">        validarSinDuplicadoAlActualizar(datos, idAsociacion);</span>
+<span class="fc" id="L75">        copiarDatos(asociacion, datos);</span>
+<span class="fc" id="L76">        return ProveedorProductoResponse.desde(repositorio.save(asociacion));</span>
+    }
+
+    @Transactional
+    public void eliminar(Long idAsociacion) {
+<span class="fc" id="L81">        repositorio.delete(buscarAsociacion(idAsociacion));</span>
+<span class="fc" id="L82">    }</span>
+
+    // RN-05: los servicios lanzan &quot;no encontrado&quot; si el proveedor o el producto son
+    // de otra empresa.
+    private void validarReferencias(ProveedorProductoRequest datos) {
+<span class="fc" id="L87">        proveedorService.obtener(datos.idProveedor());</span>
+<span class="fc" id="L88">        productoService.obtener(datos.idProducto());</span>
+<span class="fc" id="L89">    }</span>
+
+    private void validarSinDuplicado(ProveedorProductoRequest datos) {
+<span class="fc" id="L92">        boolean existe = repositorio.existsByIdEmpresaAndIdProveedorAndIdProducto(</span>
+<span class="fc" id="L93">                contexto.getIdEmpresa(), datos.idProveedor(), datos.idProducto());</span>
+<span class="fc" id="L94">        rechazarSiExiste(existe);</span>
+<span class="fc" id="L95">    }</span>
+
+    // Al actualizar se excluye la propia fila: cambiar solo el precio no es un
+    // duplicado.
+    private void validarSinDuplicadoAlActualizar(ProveedorProductoRequest datos, Long idAsociacion) {
+<span class="fc" id="L100">        boolean existe = repositorio.existsByIdEmpresaAndIdProveedorAndIdProductoAndIdNot(</span>
+<span class="fc" id="L101">                contexto.getIdEmpresa(), datos.idProveedor(), datos.idProducto(), idAsociacion);</span>
+<span class="fc" id="L102">        rechazarSiExiste(existe);</span>
+<span class="fc" id="L103">    }</span>
+
+    private void rechazarSiExiste(boolean existe) {
+<span class="fc bfc" id="L106" title="All 2 branches covered.">        if (existe) {</span>
+<span class="fc" id="L107">            throw new OperacionInvalidaException(MENSAJE_DUPLICADA);</span>
+        }
+<span class="fc" id="L109">    }</span>
+
+    private ProveedorProducto buscarAsociacion(Long idAsociacion) {
+<span class="fc" id="L112">        return repositorio.findByIdAndIdEmpresa(idAsociacion, contexto.getIdEmpresa())</span>
+<span class="fc" id="L113">                .orElseThrow(() -&gt; new RecursoNoEncontradoException(</span>
+                        &quot;Asociación proveedor-producto no encontrada: &quot; + idAsociacion));
+    }
+
+    private void copiarDatos(ProveedorProducto asociacion, ProveedorProductoRequest datos) {
+<span class="fc" id="L118">        asociacion.setIdProveedor(datos.idProveedor());</span>
+<span class="fc" id="L119">        asociacion.setIdProducto(datos.idProducto());</span>
+<span class="fc" id="L120">        asociacion.setPrecioCompra(datos.precioCompra());</span>
+<span class="fc" id="L121">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.15.202606040825</span></div></body></html>

@@ -1,0 +1,26 @@
+﻿
+Paquete                        SinCubrir Cubiertas Porcentaje
+-------                        --------- --------- ----------
+com.xorr                               5         3       37,5
+com.xorr.common                        0       140        100
+com.xorr.compras.controller            0        30        100
+com.xorr.compras.dto                   0        91        100
+com.xorr.compras.entity                3       108       97,3
+com.xorr.compras.service               0       283        100
+com.xorr.inventario.controller         0        97        100
+com.xorr.inventario.dto                0       117        100
+com.xorr.inventario.entity             0       102        100
+com.xorr.inventario.service            0       552        100
+com.xorr.negocio.entity                0        17        100
+com.xorr.negocio.service               0        20        100
+com.xorr.seguridad.config              0       348        100
+com.xorr.seguridad.controller          0        37        100
+com.xorr.seguridad.dto                 0        72        100
+com.xorr.seguridad.entity              0        45        100
+com.xorr.seguridad.service             0       288        100
+com.xorr.ventas.controller             0        20        100
+com.xorr.ventas.dto                    0        78        100
+com.xorr.ventas.entity                 3        73       96,1
+com.xorr.ventas.service                0       176        100
+
+

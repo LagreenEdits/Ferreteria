@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JwtService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xorr</a> &gt; <a href="index.source.html" class="el_package">com.xorr.seguridad.service</a> &gt; <span class="el_source">JwtService.java</span></div><h1>JwtService.java</h1><pre class="source lang-java linenums">package com.xorr.seguridad.service;
+
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.util.Date;
+import java.util.Optional;
+
+import javax.crypto.SecretKey;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import com.xorr.common.DatosToken;
+import com.xorr.common.Rol;
+import com.xorr.seguridad.entity.Usuario;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+
+@Service
+public class JwtService {
+
+    private static final int LONGITUD_MINIMA_SECRETO = 32;
+    private static final String ID_USUARIO = &quot;idUsuario&quot;;
+    private static final String ID_EMPRESA = &quot;idEmpresa&quot;;
+    private static final String ROL = &quot;rol&quot;;
+
+    private final SecretKey clave;
+    private final long expiracionMillis;
+
+    public JwtService(@Value(&quot;${xorr.jwt.secret}&quot;) String secreto,
+<span class="fc" id="L34">            @Value(&quot;${xorr.jwt.expiracion-minutos}&quot;) long expiracionMinutos) {</span>
+<span class="fc" id="L35">        validarSecreto(secreto);</span>
+<span class="fc" id="L36">        this.clave = Keys.hmacShaKeyFor(secreto.getBytes(StandardCharsets.UTF_8));</span>
+<span class="fc" id="L37">        this.expiracionMillis = Duration.ofMinutes(expiracionMinutos).toMillis();</span>
+<span class="fc" id="L38">    }</span>
+
+    public String generar(Usuario usuario) {
+<span class="fc" id="L41">        Date ahora = new Date();</span>
+<span class="fc" id="L42">        return Jwts.builder()</span>
+<span class="fc" id="L43">                .claim(ID_USUARIO, usuario.getId())</span>
+<span class="fc" id="L44">                .claim(ID_EMPRESA, usuario.getIdEmpresa())</span>
+<span class="fc" id="L45">                .claim(ROL, usuario.getRol().name())</span>
+<span class="fc" id="L46">                .issuedAt(ahora)</span>
+<span class="fc" id="L47">                .expiration(new Date(ahora.getTime() + expiracionMillis))</span>
+<span class="fc" id="L48">                .signWith(clave)</span>
+<span class="fc" id="L49">                .compact();</span>
+    }
+
+    // Token vacío, alterado, firmado con otra clave o vencido: todos dan Optional
+    // vacío.
+    // El filtro (paso 1c) lo traduce a 401; aquí no hace falta distinguir la causa.
+    public Optional&lt;DatosToken&gt; leer(String token) {
+        try {
+<span class="fc" id="L57">            Claims datos = Jwts.parser().verifyWith(clave).build().parseSignedClaims(token).getPayload();</span>
+<span class="fc" id="L58">            return Optional.of(new DatosToken(</span>
+<span class="fc" id="L59">                    numero(datos, ID_USUARIO),</span>
+<span class="fc" id="L60">                    numero(datos, ID_EMPRESA),</span>
+<span class="fc" id="L61">                    Rol.valueOf((String) datos.get(ROL))));</span>
+<span class="fc" id="L62">        } catch (JwtException | IllegalArgumentException ex) {</span>
+<span class="fc" id="L63">            return Optional.empty();</span>
+        }
+    }
+
+    // El JSON puede devolver Integer o Long según el tamaño del número.
+    private static Long numero(Claims datos, String nombre) {
+<span class="fc" id="L69">        return ((Number) datos.get(nombre)).longValue();</span>
+    }
+
+    private static void validarSecreto(String secreto) {
+<span class="fc bfc" id="L73" title="All 4 branches covered.">        if (secreto == null || secreto.getBytes(StandardCharsets.UTF_8).length &lt; LONGITUD_MINIMA_SECRETO) {</span>
+<span class="fc" id="L74">            throw new IllegalStateException(</span>
+                    &quot;xorr.jwt.secret debe tener al menos &quot; + LONGITUD_MINIMA_SECRETO + &quot; caracteres&quot;);
+        }
+<span class="fc" id="L77">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.15.202606040825</span></div></body></html>

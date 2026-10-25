@@ -1,0 +1,297 @@
+﻿mvn : WARNING: A restricted method in java.lang.System has been called
+En línea: 2 Carácter: 1
++ mvn clean test 2>&1 | Tee-Object -FilePath "evidencia\despues\mvn-m3. ...
++ ~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (WARNING: A rest...has been called:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+WARNING: java.lang.System::load has been called by org.fusesource.jansi.internal.JansiLoader in an unnamed module 
+(file:/C:/Program%20Files/apache-maven-3.9.9/lib/jansi-2.4.1.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::objectFieldOffset has been called by 
+com.google.common.util.concurrent.AbstractFuture$UnsafeAtomicHelper 
+(file:/C:/Program%20Files/apache-maven-3.9.9/lib/guava-33.2.1-jre.jar)
+WARNING: Please consider reporting this to the maintainers of class 
+com.google.common.util.concurrent.AbstractFuture$UnsafeAtomicHelper
+WARNING: sun.misc.Unsafe::objectFieldOffset will be removed in a future release
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ---------------------------< com.xorr:xorr >----------------------------
+[INFO] Building xorr 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.3.2:clean (default-clean) @ xorr ---
+[INFO] Deleting C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\target
+[INFO] 
+[INFO] --- jacoco:0.8.15:prepare-agent (prepare-agent) @ xorr ---
+[INFO] argLine set to "-javaagent:C:\\Users\\LENOVO\\.m2\\repository\\org\\jacoco\\org.jacoco.agent\\0.8.15\\org.jacoco.agent-0.8.15-runtime.jar=destfile=C:\\Users\\LENOVO\\OneDrive\\Escritorio\\Semestre VIII\\2- CALIDAD DE SOFTWARE\\Proyecto\\Xorr\\target\\jacoco.exec"
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ xorr ---
+[INFO] Copying 2 resources from src\main\resources to target\classes
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ xorr ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 73 source files with javac [debug parameters release 17] to target\classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ xorr ---
+[INFO] skip non existing resourceDirectory C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ xorr ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 33 source files with javac [debug parameters release 17] to target\test-classes
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ xorr ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.xorr.common.ContextoActualTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.161 s -- in com.xorr.common.ContextoActualTest
+[INFO] Running com.xorr.common.LineasDeProductoTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.017 s -- in com.xorr.common.LineasDeProductoTest
+[INFO] Running com.xorr.common.ValidacionDtoTest
+18:52:26.518 [main] INFO org.hibernate.validator.internal.util.Version -- HV000001: Hibernate Validator 8.0.1.Final
+[INFO] Tests run: 22, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.974 s -- in com.xorr.common.ValidacionDtoTest
+[INFO] Running com.xorr.compras.controller.OrdenCompraControllerIntegracionTest
+18:52:28.441 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.xorr.compras.controller.OrdenCompraControllerIntegracionTest]: OrdenCompraControllerIntegracionTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+18:52:28.761 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.xorr.XorrApplication for test class com.xorr.compras.controller.OrdenCompraControllerIntegracionTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.5)
+
+2026-10-24T18:52:29.897-05:00  INFO 5020 --- [xorr] [           main] c.c.OrdenCompraControllerIntegracionTest : Starting OrdenCompraControllerIntegracionTest using Java 25 with PID 5020 (started by LENOVO in C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr)
+2026-10-24T18:52:29.900-05:00  INFO 5020 --- [xorr] [           main] c.c.OrdenCompraControllerIntegracionTest : The following 1 profile is active: "dev"
+2026-10-24T18:52:31.977-05:00  INFO 5020 --- [xorr] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-24T18:52:32.172-05:00  INFO 5020 --- [xorr] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 171 ms. Found 7 JPA repository interfaces.
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by org.apache.tomcat.jni.Library in an unnamed module 
+(file:/C:/Users/LENOVO/.m2/repository/org/apache/tomcat/embed/tomcat-embed-core/10.1.31/tomcat-embed-core-10.1.31.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+2026-10-24T18:52:33.908-05:00  INFO 5020 --- [xorr] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 0 (http)
+2026-10-24T18:52:33.947-05:00  INFO 5020 --- [xorr] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-10-24T18:52:33.948-05:00  INFO 5020 --- [xorr] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.31]
+2026-10-24T18:52:34.100-05:00  INFO 5020 --- [xorr] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-10-24T18:52:34.101-05:00  INFO 5020 --- [xorr] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 4127 ms
+2026-10-24T18:52:34.167-05:00  INFO 5020 --- [xorr] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-10-24T18:52:34.840-05:00  INFO 5020 --- [xorr] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:xorr user=SA
+2026-10-24T18:52:34.844-05:00  INFO 5020 --- [xorr] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-10-24T18:52:34.869-05:00  INFO 5020 --- [xorr] [           main] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:h2:mem:xorr'
+2026-10-24T18:52:35.356-05:00  INFO 5020 --- [xorr] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-10-24T18:52:35.571-05:00  INFO 5020 --- [xorr] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.5.3.Final
+2026-10-24T18:52:35.695-05:00  INFO 5020 --- [xorr] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-10-24T18:52:36.501-05:00  INFO 5020 --- [xorr] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-24T18:52:39.452-05:00  INFO 5020 --- [xorr] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-10-24T18:52:39.779-05:00  INFO 5020 --- [xorr] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-24T18:52:40.548-05:00  INFO 5020 --- [xorr] [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-10-24T18:52:42.199-05:00  WARN 5020 --- [xorr] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-10-24T18:52:42.234-05:00  WARN 5020 --- [xorr] [           main] .s.s.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: 39d8e38c-3f48-45b2-8d49-1cbab4048520
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-10-24T18:52:42.257-05:00  INFO 5020 --- [xorr] [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-10-24T18:52:42.456-05:00  INFO 5020 --- [xorr] [           main] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page: class path resource [static/index.html]
+2026-10-24T18:52:43.617-05:00  INFO 5020 --- [xorr] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 17558 (http) with context path '/'
+2026-10-24T18:52:43.628-05:00  INFO 5020 --- [xorr] [           main] c.c.OrdenCompraControllerIntegracionTest : Started OrdenCompraControllerIntegracionTest in 14.412 seconds (process running for 21.49)
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been 
+appended
+WARNING: A Java agent has been loaded dynamically 
+(C:\Users\LENOVO\.m2\repository\net\bytebuddy\byte-buddy-agent\1.17.7\byte-buddy-agent-1.17.7.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::objectFieldOffset has been called by 
+net.bytebuddy.dynamic.loading.ClassInjector$UsingUnsafe$Dispatcher$CreationAction 
+(file:/C:/Users/LENOVO/.m2/repository/net/bytebuddy/byte-buddy/1.17.7/byte-buddy-1.17.7.jar)
+WARNING: Please consider reporting this to the maintainers of class 
+net.bytebuddy.dynamic.loading.ClassInjector$UsingUnsafe$Dispatcher$CreationAction
+WARNING: sun.misc.Unsafe::objectFieldOffset will be removed in a future release
+2026-10-24T18:52:44.622-05:00  INFO 5020 --- [xorr] [o-auto-1-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-10-24T18:52:44.623-05:00  INFO 5020 --- [xorr] [o-auto-1-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-10-24T18:52:44.624-05:00  INFO 5020 --- [xorr] [o-auto-1-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+[INFO] Tests run: 12, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 20.70 s -- in com.xorr.compras.controller.OrdenCompraControllerIntegracionTest
+[INFO] Running com.xorr.compras.service.MovimientosCompraServiceTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.610 s -- in com.xorr.compras.service.MovimientosCompraServiceTest
+[INFO] Running com.xorr.compras.service.OrdenCompraServiceTest
+[INFO] Tests run: 15, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.757 s -- in com.xorr.compras.service.OrdenCompraServiceTest
+[INFO] Running com.xorr.inventario.controller.ProductoControllerIntegracionTest
+2026-10-24T18:52:50.315-05:00  INFO 5020 --- [xorr] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.xorr.inventario.controller.ProductoControllerIntegracionTest]: ProductoControllerIntegracionTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-24T18:52:50.489-05:00  INFO 5020 --- [xorr] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.xorr.XorrApplication for test class com.xorr.inventario.controller.ProductoControllerIntegracionTest
+[INFO] Tests run: 13, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.582 s -- in com.xorr.inventario.controller.ProductoControllerIntegracionTest
+[INFO] Running com.xorr.inventario.controller.ProveedorControllerIntegracionTest
+2026-10-24T18:52:53.891-05:00  INFO 5020 --- [xorr] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.xorr.inventario.controller.ProveedorControllerIntegracionTest]: ProveedorControllerIntegracionTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-24T18:52:53.896-05:00  INFO 5020 --- [xorr] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.xorr.XorrApplication for test class com.xorr.inventario.controller.ProveedorControllerIntegracionTest
+[INFO] Tests run: 12, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.558 s -- in com.xorr.inventario.controller.ProveedorControllerIntegracionTest
+[INFO] Running com.xorr.inventario.controller.ProveedorProductoControllerIntegracionTest
+2026-10-24T18:52:56.451-05:00  INFO 5020 --- [xorr] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.xorr.inventario.controller.ProveedorProductoControllerIntegracionTest]: ProveedorProductoControllerIntegracionTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-24T18:52:56.454-05:00  INFO 5020 --- [xorr] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.xorr.XorrApplication for test class com.xorr.inventario.controller.ProveedorProductoControllerIntegracionTest
+[INFO] Tests run: 12, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.677 s -- in com.xorr.inventario.controller.ProveedorProductoControllerIntegracionTest
+[INFO] Running com.xorr.inventario.repository.ProductoRepositoryTest
+2026-10-24T18:52:59.134-05:00  INFO 5020 --- [xorr] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.xorr.inventario.repository.ProductoRepositoryTest]: ProductoRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-24T18:52:59.208-05:00  INFO 5020 --- [xorr] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.xorr.XorrApplication for test class com.xorr.inventario.repository.ProductoRepositoryTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.5)
+
+2026-10-24T18:52:59.331-05:00  INFO 5020 --- [xorr] [           main] c.x.i.repository.ProductoRepositoryTest  : Starting ProductoRepositoryTest using Java 25 with PID 5020 (started by LENOVO in C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr)
+2026-10-24T18:52:59.331-05:00  INFO 5020 --- [xorr] [           main] c.x.i.repository.ProductoRepositoryTest  : The following 1 profile is active: "dev"
+2026-10-24T18:52:59.691-05:00  INFO 5020 --- [xorr] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-24T18:52:59.767-05:00  INFO 5020 --- [xorr] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 74 ms. Found 7 JPA repository interfaces.
+2026-10-24T18:52:59.803-05:00  INFO 5020 --- [xorr] [           main] beddedDataSourceBeanFactoryPostProcessor : Replacing 'dataSource' DataSource bean with embedded version
+2026-10-24T18:52:59.881-05:00  INFO 5020 --- [xorr] [           main] o.s.j.d.e.EmbeddedDatabaseFactory        : Starting embedded database: url='jdbc:h2:mem:a719b4d6-a3d5-48b5-b4da-b7e2bce17fca;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=false', username='sa'
+2026-10-24T18:52:59.981-05:00  INFO 5020 --- [xorr] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-10-24T18:52:59.996-05:00  INFO 5020 --- [xorr] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-10-24T18:53:00.048-05:00  INFO 5020 --- [xorr] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-24T18:53:00.506-05:00  INFO 5020 --- [xorr] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+Hibernate: create table detalle_factura (id bigint generated by default as identity, cantidad integer not null, id_producto bigint not null, precio_unitario numeric(38,2) not null, subtotal numeric(38,2) not null, id_factura bigint not null, primary key (id))
+Hibernate: create table detalle_orden_compra (id bigint generated by default as identity, cantidad integer not null, id_producto bigint not null, precio_unitario numeric(38,2) not null, subtotal numeric(38,2) not null, id_orden bigint not null, primary key (id))
+Hibernate: create table empresa (id bigint generated by default as identity, nombre varchar(255) not null, primary key (id))
+Hibernate: create table factura (id bigint generated by default as identity, fecha timestamp(6) not null, id_empresa bigint not null, id_usuario bigint not null, total numeric(38,2) not null, primary key (id))
+Hibernate: create table orden_compra (id bigint generated by default as identity, estado enum ('CANCELADA','PENDIENTE','RECIBIDA') not null, fecha timestamp(6) not null, id_empresa bigint not null, id_proveedor bigint not null, id_usuario bigint not null, total numeric(38,2) not null, primary key (id))
+Hibernate: create table producto (id bigint generated by default as identity, id_empresa bigint not null, nombre varchar(255) not null, precio_venta numeric(38,2) not null, stock integer not null, stock_minimo integer not null, primary key (id))
+Hibernate: create table proveedor (id bigint generated by default as identity, id_empresa bigint not null, nombre varchar(255) not null, telefono varchar(255), primary key (id))
+Hibernate: create table proveedor_producto (id bigint generated by default as identity, id_empresa bigint not null, id_producto bigint not null, id_proveedor bigint not null, precio_compra numeric(38,2) not null, primary key (id))
+Hibernate: create table usuario (id bigint generated by default as identity, correo varchar(255) not null, id_empresa bigint not null, nombre varchar(255) not null, password_hash varchar(255) not null, rol enum ('ADMIN','EMPLEADO') not null, primary key (id))
+Hibernate: alter table if exists usuario drop constraint if exists UK2mlfr087gb1ce55f2j87o74t
+Hibernate: alter table if exists usuario add constraint UK2mlfr087gb1ce55f2j87o74t unique (correo)
+Hibernate: alter table if exists detalle_factura add constraint FKhc4e7swi6aa3e6uom3bwm2x6x foreign key (id_factura) references factura
+Hibernate: alter table if exists detalle_orden_compra add constraint FKqyabmvbnt2g07lhhiqhqhfdrd foreign key (id_orden) references orden_compra
+2026-10-24T18:53:00.539-05:00  INFO 5020 --- [xorr] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-24T18:53:00.779-05:00  INFO 5020 --- [xorr] [           main] c.x.i.repository.ProductoRepositoryTest  : Started ProductoRepositoryTest in 1.564 seconds (process running for 38.642)
+Hibernate: insert into producto (id_empresa,nombre,precio_venta,stock,stock_minimo,id) values (?,?,?,?,?,default)
+Hibernate: insert into producto (id_empresa,nombre,precio_venta,stock,stock_minimo,id) values (?,?,?,?,?,default)
+Hibernate: select p1_0.id,p1_0.id_empresa,p1_0.nombre,p1_0.precio_venta,p1_0.stock,p1_0.stock_minimo from producto p1_0 where p1_0.id_empresa=? and p1_0.stock<p1_0.stock_minimo
+Hibernate: insert into producto (id_empresa,nombre,precio_venta,stock,stock_minimo,id) values (?,?,?,?,?,default)
+Hibernate: insert into producto (id_empresa,nombre,precio_venta,stock,stock_minimo,id) values (?,?,?,?,?,default)
+Hibernate: insert into producto (id_empresa,nombre,precio_venta,stock,stock_minimo,id) values (?,?,?,?,?,default)
+Hibernate: select p1_0.id,p1_0.id_empresa,p1_0.nombre,p1_0.precio_venta,p1_0.stock,p1_0.stock_minimo from producto p1_0 where p1_0.id_empresa=? and p1_0.stock<p1_0.stock_minimo
+Hibernate: insert into producto (id_empresa,nombre,precio_venta,stock,stock_minimo,id) values (?,?,?,?,?,default)
+Hibernate: select p1_0.id,p1_0.id_empresa,p1_0.nombre,p1_0.precio_venta,p1_0.stock,p1_0.stock_minimo from producto p1_0 where p1_0.id_empresa=? and p1_0.stock<p1_0.stock_minimo
+Hibernate: insert into producto (id_empresa,nombre,precio_venta,stock,stock_minimo,id) values (?,?,?,?,?,default)
+Hibernate: select p1_0.id,p1_0.id_empresa,p1_0.nombre,p1_0.precio_venta,p1_0.stock,p1_0.stock_minimo from producto p1_0 where p1_0.id=? and p1_0.id_empresa=?
+Hibernate: select p1_0.id,p1_0.id_empresa,p1_0.nombre,p1_0.precio_venta,p1_0.stock,p1_0.stock_minimo from producto p1_0 where p1_0.id=? and p1_0.id_empresa=?
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.727 s -- in com.xorr.inventario.repository.ProductoRepositoryTest
+[INFO] Running com.xorr.inventario.service.ProductoServiceCrudTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.638 s -- in com.xorr.inventario.service.ProductoServiceCrudTest
+[INFO] Running com.xorr.inventario.service.ProductoServiceTest
+[INFO] Tests run: 19, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.104 s -- in com.xorr.inventario.service.ProductoServiceTest
+[INFO] Running com.xorr.inventario.service.ProveedorProductoServiceTest
+[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.066 s -- in com.xorr.inventario.service.ProveedorProductoServiceTest
+[INFO] Running com.xorr.inventario.service.ProveedorServiceTest
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.297 s -- in com.xorr.inventario.service.ProveedorServiceTest
+[INFO] Running com.xorr.negocio.service.EmpresaServiceTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.267 s -- in com.xorr.negocio.service.EmpresaServiceTest
+[INFO] Running com.xorr.RollbackIntegracionTest
+2026-10-24T18:53:02.246-05:00  INFO 5020 --- [xorr] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.xorr.RollbackIntegracionTest]: RollbackIntegracionTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-24T18:53:02.285-05:00  INFO 5020 --- [xorr] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.xorr.XorrApplication for test class com.xorr.RollbackIntegracionTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.5)
+
+2026-10-24T18:53:02.379-05:00  INFO 5020 --- [xorr] [           main] com.xorr.RollbackIntegracionTest         : Starting RollbackIntegracionTest using Java 25 with PID 5020 (started by LENOVO in C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr)
+2026-10-24T18:53:02.380-05:00  INFO 5020 --- [xorr] [           main] com.xorr.RollbackIntegracionTest         : The following 1 profile is active: "dev"
+2026-10-24T18:53:03.088-05:00  INFO 5020 --- [xorr] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-24T18:53:03.165-05:00  INFO 5020 --- [xorr] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 76 ms. Found 7 JPA repository interfaces.
+2026-10-24T18:53:03.381-05:00  INFO 5020 --- [xorr] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-10-24T18:53:03.386-05:00  INFO 5020 --- [xorr] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-10-24T18:53:03.406-05:00  INFO 5020 --- [xorr] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-24T18:53:03.407-05:00  INFO 5020 --- [xorr] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
+2026-10-24T18:53:03.409-05:00  INFO 5020 --- [xorr] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Added connection conn17: url=jdbc:h2:mem:xorr user=SA
+2026-10-24T18:53:03.410-05:00  INFO 5020 --- [xorr] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
+2026-10-24T18:53:03.648-05:00  INFO 5020 --- [xorr] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-10-24T18:53:03.715-05:00  INFO 5020 --- [xorr] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-24T18:53:04.041-05:00  WARN 5020 --- [xorr] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-10-24T18:53:04.050-05:00  WARN 5020 --- [xorr] [           main] .s.s.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: 4c1c2856-dfb3-45f7-ad91-ffbf788ecfa1
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-10-24T18:53:04.052-05:00  INFO 5020 --- [xorr] [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-10-24T18:53:04.062-05:00  INFO 5020 --- [xorr] [           main] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page: class path resource [static/index.html]
+2026-10-24T18:53:04.308-05:00  INFO 5020 --- [xorr] [           main] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:h2:mem:xorr'
+2026-10-24T18:53:04.338-05:00  INFO 5020 --- [xorr] [           main] com.xorr.RollbackIntegracionTest         : Started RollbackIntegracionTest in 2.017 seconds (process running for 42.2)
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.479 s -- in com.xorr.RollbackIntegracionTest
+[INFO] Running com.xorr.seguridad.AislamientoEmpresasIntegracionTest
+2026-10-24T18:53:04.728-05:00  INFO 5020 --- [xorr] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.xorr.seguridad.AislamientoEmpresasIntegracionTest]: AislamientoEmpresasIntegracionTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-24T18:53:04.762-05:00  INFO 5020 --- [xorr] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.xorr.XorrApplication for test class com.xorr.seguridad.AislamientoEmpresasIntegracionTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.801 s -- in com.xorr.seguridad.AislamientoEmpresasIntegracionTest
+[INFO] Running com.xorr.seguridad.dto.ValidacionCrearEmpleadoRequestTest
+[INFO] Tests run: 12, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.032 s -- in com.xorr.seguridad.dto.ValidacionCrearEmpleadoRequestTest
+[INFO] Running com.xorr.seguridad.dto.ValidacionLoginTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.030 s -- in com.xorr.seguridad.dto.ValidacionLoginTest
+[INFO] Running com.xorr.seguridad.dto.ValidacionRegistroAdminTest
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.076 s -- in com.xorr.seguridad.dto.ValidacionRegistroAdminTest
+[INFO] Running com.xorr.seguridad.SeguridadIntegracionTest
+2026-10-24T18:53:06.673-05:00  INFO 5020 --- [xorr] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.xorr.seguridad.SeguridadIntegracionTest]: SeguridadIntegracionTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-24T18:53:06.676-05:00  INFO 5020 --- [xorr] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.xorr.XorrApplication for test class com.xorr.seguridad.SeguridadIntegracionTest
+2026-10-24T18:53:08.096-05:00  INFO 5020 --- [xorr] [-auto-1-exec-13] o.springdoc.api.AbstractOpenApiResource  : Init duration for springdoc-openapi is: 1051 ms
+2026-10-24T18:53:08.269-05:00  WARN 5020 --- [xorr] [o-auto-1-exec-8] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.HttpRequestMethodNotSupportedException: Request method 'PUT' is not supported]
+2026-10-24T18:53:08.300-05:00  WARN 5020 --- [xorr] [o-auto-1-exec-6] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.HttpRequestMethodNotSupportedException: Request method 'DELETE' is not supported]
+[INFO] Tests run: 26, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.686 s -- in com.xorr.seguridad.SeguridadIntegracionTest
+[INFO] Running com.xorr.seguridad.service.AuthServiceTest
+[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.328 s -- in com.xorr.seguridad.service.AuthServiceTest
+[INFO] Running com.xorr.seguridad.service.CorreoUsuarioTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.009 s -- in com.xorr.seguridad.service.CorreoUsuarioTest
+[INFO] Running com.xorr.seguridad.service.JwtServiceTest
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.025 s -- in com.xorr.seguridad.service.JwtServiceTest
+[INFO] Running com.xorr.seguridad.service.UsuarioServiceTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.424 s -- in com.xorr.seguridad.service.UsuarioServiceTest
+[INFO] Running com.xorr.seguridad.UsuariosIntegracionTest
+2026-10-24T18:53:10.155-05:00  INFO 5020 --- [xorr] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.xorr.seguridad.UsuariosIntegracionTest]: UsuariosIntegracionTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-24T18:53:10.158-05:00  INFO 5020 --- [xorr] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.xorr.XorrApplication for test class com.xorr.seguridad.UsuariosIntegracionTest
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.536 s -- in com.xorr.seguridad.UsuariosIntegracionTest
+[INFO] Running com.xorr.ventas.controller.FacturaControllerIntegracionTest
+2026-10-24T18:53:14.690-05:00  INFO 5020 --- [xorr] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.xorr.ventas.controller.FacturaControllerIntegracionTest]: FacturaControllerIntegracionTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-24T18:53:14.715-05:00  INFO 5020 --- [xorr] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.xorr.XorrApplication for test class com.xorr.ventas.controller.FacturaControllerIntegracionTest
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.047 s -- in com.xorr.ventas.controller.FacturaControllerIntegracionTest
+[INFO] Running com.xorr.ventas.service.FacturaServiceTest
+[INFO] Tests run: 12, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.189 s -- in com.xorr.ventas.service.FacturaServiceTest
+[INFO] Running com.xorr.ventas.service.MovimientosVentaServiceTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.008 s -- in com.xorr.ventas.service.MovimientosVentaServiceTest
+[INFO] Running com.xorr.arquitectura.ArquitecturaTest
+2026-10-24T18:53:16.988-05:00  INFO 5020 --- [xorr] [           main] com.tngtech.archunit.core.PluginLoader   : Detected Java version 25
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.933 s -- in com.xorr.arquitectura.ArquitecturaTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 272, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- jacoco:0.8.15:report (report) @ xorr ---
+[INFO] Loading execution data file C:\Users\LENOVO\OneDrive\Escritorio\Semestre VIII\2- CALIDAD DE SOFTWARE\Proyecto\Xorr\target\jacoco.exec
+[INFO] Analyzed bundle 'xorr' with 64 classes
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  01:14 min
+[INFO] Finished at: 2026-10-24T18:53:22-05:00
+[INFO] ------------------------------------------------------------------------

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Factura.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xorr</a> &gt; <a href="index.source.html" class="el_package">com.xorr.ventas.entity</a> &gt; <span class="el_source">Factura.java</span></div><h1>Factura.java</h1><pre class="source lang-java linenums">package com.xorr.ventas.entity;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = &quot;factura&quot;)
+<span class="fc" id="L20">public class Factura {</span>
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = &quot;id_empresa&quot;, nullable = false)
+    private Long idEmpresa;
+
+    @Column(name = &quot;id_usuario&quot;, nullable = false)
+    private Long idUsuario;
+
+    @Column(nullable = false)
+    private LocalDateTime fecha;
+
+    @Column(nullable = false)
+    private BigDecimal total;
+
+<span class="fc" id="L38">    @OneToMany(cascade = CascadeType.ALL)</span>
+    @JoinColumn(name = &quot;id_factura&quot;, nullable = false)
+    private List&lt;DetalleFactura&gt; detalles = new ArrayList&lt;&gt;();
+
+    public Long getId() {
+<span class="fc" id="L43">        return id;</span>
+    }
+
+    public Long getIdEmpresa() {
+<span class="fc" id="L47">        return idEmpresa;</span>
+    }
+
+    public void setIdEmpresa(Long idEmpresa) {
+<span class="fc" id="L51">        this.idEmpresa = idEmpresa;</span>
+<span class="fc" id="L52">    }</span>
+
+    public Long getIdUsuario() {
+<span class="fc" id="L55">        return idUsuario;</span>
+    }
+
+    public void setIdUsuario(Long idUsuario) {
+<span class="fc" id="L59">        this.idUsuario = idUsuario;</span>
+<span class="fc" id="L60">    }</span>
+
+    public LocalDateTime getFecha() {
+<span class="fc" id="L63">        return fecha;</span>
+    }
+
+    public void setFecha(LocalDateTime fecha) {
+<span class="fc" id="L67">        this.fecha = fecha;</span>
+<span class="fc" id="L68">    }</span>
+
+    public BigDecimal getTotal() {
+<span class="fc" id="L71">        return total;</span>
+    }
+
+    public void setTotal(BigDecimal total) {
+<span class="fc" id="L75">        this.total = total;</span>
+<span class="fc" id="L76">    }</span>
+
+    public List&lt;DetalleFactura&gt; getDetalles() {
+<span class="fc" id="L79">        return detalles;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.15.202606040825</span></div></body></html>

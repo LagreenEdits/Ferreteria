@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.xorr.inventario.controller.ProveedorProductoControllerIntegracionTest
+-------------------------------------------------------------------------------
+Tests run: 12, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.677 s -- in com.xorr.inventario.controller.ProveedorProductoControllerIntegracionTest

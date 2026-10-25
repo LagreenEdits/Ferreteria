@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProveedorService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xorr</a> &gt; <a href="index.source.html" class="el_package">com.xorr.inventario.service</a> &gt; <span class="el_source">ProveedorService.java</span></div><h1>ProveedorService.java</h1><pre class="source lang-java linenums">package com.xorr.inventario.service;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.xorr.common.ContextoActual;
+import com.xorr.common.OperacionInvalidaException;
+import com.xorr.common.RecursoNoEncontradoException;
+import com.xorr.inventario.dto.ProveedorRequest;
+import com.xorr.inventario.dto.ProveedorResponse;
+import com.xorr.inventario.entity.Proveedor;
+import com.xorr.inventario.repository.ProveedorProductoRepository;
+import com.xorr.inventario.repository.ProveedorRepository;
+
+@Service
+public class ProveedorService {
+
+    private final ProveedorRepository repositorio;
+    private final ProveedorProductoRepository asociaciones;
+    private final MovimientosCompra movimientosCompra;
+    private final ContextoActual contexto;
+
+    public ProveedorService(ProveedorRepository repositorio,
+            ProveedorProductoRepository asociaciones,
+            MovimientosCompra movimientosCompra,
+<span class="fc" id="L28">            ContextoActual contexto) {</span>
+<span class="fc" id="L29">        this.repositorio = repositorio;</span>
+<span class="fc" id="L30">        this.asociaciones = asociaciones;</span>
+<span class="fc" id="L31">        this.movimientosCompra = movimientosCompra;</span>
+<span class="fc" id="L32">        this.contexto = contexto;</span>
+<span class="fc" id="L33">    }</span>
+
+    @Transactional
+    public ProveedorResponse crear(ProveedorRequest datos) {
+<span class="fc" id="L37">        Proveedor proveedor = new Proveedor();</span>
+<span class="fc" id="L38">        proveedor.setIdEmpresa(contexto.getIdEmpresa());</span>
+<span class="fc" id="L39">        copiarDatos(proveedor, datos);</span>
+<span class="fc" id="L40">        return ProveedorResponse.desde(repositorio.save(proveedor));</span>
+    }
+
+    @Transactional(readOnly = true)
+    public List&lt;ProveedorResponse&gt; listar() {
+<span class="fc" id="L45">        return repositorio.findByIdEmpresa(contexto.getIdEmpresa()).stream()</span>
+<span class="fc" id="L46">                .map(ProveedorResponse::desde)</span>
+<span class="fc" id="L47">                .toList();</span>
+    }
+
+    @Transactional(readOnly = true)
+    public ProveedorResponse obtener(Long idProveedor) {
+<span class="fc" id="L52">        return ProveedorResponse.desde(buscarProveedor(idProveedor));</span>
+    }
+
+    @Transactional
+    public ProveedorResponse actualizar(Long idProveedor, ProveedorRequest datos) {
+<span class="fc" id="L57">        Proveedor proveedor = buscarProveedor(idProveedor);</span>
+<span class="fc" id="L58">        copiarDatos(proveedor, datos);</span>
+<span class="fc" id="L59">        return ProveedorResponse.desde(repositorio.save(proveedor));</span>
+    }
+
+    // RN-12: no se elimina un proveedor con movimientos. RN-14: las asociaciones
+    // guardan solo el id del proveedor (sin clave foránea), por eso se borran aquí
+    // para no dejarlas apuntando a un proveedor que ya no existe.
+    @Transactional
+    public void eliminar(Long idProveedor) {
+<span class="fc" id="L67">        Proveedor proveedor = buscarProveedor(idProveedor);</span>
+<span class="fc" id="L68">        validarSinOrdenesDeCompra(idProveedor, proveedor);</span>
+<span class="fc" id="L69">        asociaciones.deleteByIdEmpresaAndIdProveedor(contexto.getIdEmpresa(), idProveedor);</span>
+<span class="fc" id="L70">        repositorio.delete(proveedor);</span>
+<span class="fc" id="L71">    }</span>
+
+    // RN-05: un proveedor de otra empresa se trata como no encontrado.
+    private Proveedor buscarProveedor(Long idProveedor) {
+<span class="fc" id="L75">        return repositorio.findByIdAndIdEmpresa(idProveedor, contexto.getIdEmpresa())</span>
+<span class="fc" id="L76">                .orElseThrow(() -&gt; new RecursoNoEncontradoException(</span>
+                        &quot;Proveedor no encontrado: &quot; + idProveedor));
+    }
+
+    // RN-12: las facturas no llevan proveedor, así que solo cuentan las órdenes de
+    // compra.
+    private void validarSinOrdenesDeCompra(Long idProveedor, Proveedor proveedor) {
+<span class="fc bfc" id="L83" title="All 2 branches covered.">        if (movimientosCompra.proveedorTieneOrdenes(idProveedor)) {</span>
+<span class="fc" id="L84">            throw new OperacionInvalidaException(</span>
+<span class="fc" id="L85">                    &quot;No se puede eliminar el proveedor '&quot; + proveedor.getNombre()</span>
+                            + &quot;' porque tiene órdenes de compra&quot;);
+        }
+<span class="fc" id="L88">    }</span>
+
+    private void copiarDatos(Proveedor proveedor, ProveedorRequest datos) {
+<span class="fc" id="L91">        proveedor.setNombre(datos.nombre());</span>
+<span class="fc" id="L92">        proveedor.setTelefono(datos.telefono());</span>
+<span class="fc" id="L93">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.15.202606040825</span></div></body></html>

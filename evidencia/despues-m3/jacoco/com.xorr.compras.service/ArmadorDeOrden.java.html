@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ArmadorDeOrden.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xorr</a> &gt; <a href="index.source.html" class="el_package">com.xorr.compras.service</a> &gt; <span class="el_source">ArmadorDeOrden.java</span></div><h1>ArmadorDeOrden.java</h1><pre class="source lang-java linenums">package com.xorr.compras.service;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+import org.springframework.stereotype.Component;
+
+import com.xorr.common.ContextoActual;
+import com.xorr.common.LineasDeProducto;
+import com.xorr.compras.dto.DetalleOrdenCompraRequest;
+import com.xorr.compras.dto.OrdenCompraRequest;
+import com.xorr.compras.entity.DetalleOrdenCompra;
+import com.xorr.compras.entity.EstadoOrdenCompra;
+import com.xorr.compras.entity.OrdenCompra;
+import com.xorr.inventario.service.ProductoService;
+import com.xorr.inventario.service.ProveedorProductoService;
+import com.xorr.inventario.service.ProveedorService;
+
+@Component
+class ArmadorDeOrden {
+
+    private final ContextoActual contexto;
+    private final ProveedorService proveedorService;
+    private final ProductoService productoService;
+    private final ProveedorProductoService proveedorProductoService;
+
+    ArmadorDeOrden(ContextoActual contexto, ProveedorService proveedorService,
+<span class="fc" id="L28">            ProductoService productoService, ProveedorProductoService proveedorProductoService) {</span>
+<span class="fc" id="L29">        this.contexto = contexto;</span>
+<span class="fc" id="L30">        this.proveedorService = proveedorService;</span>
+<span class="fc" id="L31">        this.productoService = productoService;</span>
+<span class="fc" id="L32">        this.proveedorProductoService = proveedorProductoService;</span>
+<span class="fc" id="L33">    }</span>
+
+    OrdenCompra armar(OrdenCompraRequest datos) {
+        // RN-16: un producto solo puede aparecer en una línea de la orden.
+<span class="fc" id="L37">        LineasDeProducto.validarSinRepetidos(</span>
+<span class="fc" id="L38">                datos.detalles().stream().map(DetalleOrdenCompraRequest::idProducto).toList(),</span>
+                &quot;La orden repite un producto en varias líneas; usa una sola línea con la cantidad total&quot;);
+<span class="fc" id="L40">        proveedorService.obtener(datos.idProveedor());</span>
+<span class="fc" id="L41">        OrdenCompra orden = nuevaOrdenPendiente(datos.idProveedor());</span>
+<span class="fc" id="L42">        datos.detalles().forEach(linea -&gt; orden.getDetalles().add(armarDetalle(datos.idProveedor(), linea)));</span>
+<span class="fc" id="L43">        orden.setTotal(sumarSubtotales(orden));</span>
+<span class="fc" id="L44">        return orden;</span>
+    }
+
+    private OrdenCompra nuevaOrdenPendiente(Long idProveedor) {
+<span class="fc" id="L48">        OrdenCompra orden = new OrdenCompra();</span>
+<span class="fc" id="L49">        orden.setIdEmpresa(contexto.getIdEmpresa());</span>
+<span class="fc" id="L50">        orden.setIdProveedor(idProveedor);</span>
+<span class="fc" id="L51">        orden.setIdUsuario(contexto.getIdUsuario());</span>
+<span class="fc" id="L52">        orden.setFecha(LocalDateTime.now());</span>
+<span class="fc" id="L53">        orden.setEstado(EstadoOrdenCompra.PENDIENTE);</span>
+<span class="fc" id="L54">        orden.setTotal(BigDecimal.ZERO);</span>
+<span class="fc" id="L55">        return orden;</span>
+    }
+
+    // RN-05 (producto de otra empresa = no encontrado), RN-09 (precio de la
+    // asociación)
+    // y RN-03 (el subtotal lo calcula el servidor).
+    private DetalleOrdenCompra armarDetalle(Long idProveedor, DetalleOrdenCompraRequest linea) {
+<span class="fc" id="L62">        productoService.obtener(linea.idProducto());</span>
+<span class="fc" id="L63">        BigDecimal precio = proveedorProductoService.obtenerPrecioCompra(idProveedor, linea.idProducto());</span>
+<span class="fc" id="L64">        DetalleOrdenCompra detalle = new DetalleOrdenCompra();</span>
+<span class="fc" id="L65">        detalle.setIdProducto(linea.idProducto());</span>
+<span class="fc" id="L66">        detalle.setCantidad(linea.cantidad());</span>
+<span class="fc" id="L67">        detalle.setPrecioUnitario(precio);</span>
+<span class="fc" id="L68">        detalle.setSubtotal(precio.multiply(BigDecimal.valueOf(linea.cantidad())));</span>
+<span class="fc" id="L69">        return detalle;</span>
+    }
+
+    private BigDecimal sumarSubtotales(OrdenCompra orden) {
+<span class="fc" id="L73">        return orden.getDetalles().stream()</span>
+<span class="fc" id="L74">                .map(DetalleOrdenCompra::getSubtotal)</span>
+<span class="fc" id="L75">                .reduce(BigDecimal.ZERO, BigDecimal::add);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.15.202606040825</span></div></body></html>

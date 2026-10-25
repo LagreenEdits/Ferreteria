@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ManejadorErroresSeguridad.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xorr</a> &gt; <a href="index.source.html" class="el_package">com.xorr.seguridad.config</a> &gt; <span class="el_source">ManejadorErroresSeguridad.java</span></div><h1>ManejadorErroresSeguridad.java</h1><pre class="source lang-java linenums">package com.xorr.seguridad.config;
+
+import java.io.IOException;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.stereotype.Component;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+/**
+ * Los errores de seguridad ocurren en el filtro, antes del controlador, así que
+ * GlobalExceptionHandler no los ve. Esta clase los devuelve con el mismo
+ * formato
+ * JSON del resto de la API: {&quot;mensaje&quot;: &quot;...&quot;}.
+ */
+@Component
+<span class="fc" id="L23">public class ManejadorErroresSeguridad implements AuthenticationEntryPoint, AccessDeniedHandler {</span>
+
+    // 401: no hay token, es inválido o está vencido.
+    @Override
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException ex)
+            throws IOException {
+<span class="fc" id="L29">        escribir(response, HttpStatus.UNAUTHORIZED, &quot;Debes iniciar sesión con un token válido&quot;);</span>
+<span class="fc" id="L30">    }</span>
+
+    // 403: hay sesión, pero el rol no alcanza para esta operación.
+    @Override
+    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException ex)
+            throws IOException {
+<span class="fc" id="L36">        escribir(response, HttpStatus.FORBIDDEN, &quot;No tienes permiso para esta operación&quot;);</span>
+<span class="fc" id="L37">    }</span>
+
+    private static void escribir(HttpServletResponse response, HttpStatus estado, String mensaje)
+            throws IOException {
+<span class="fc" id="L41">        response.setStatus(estado.value());</span>
+<span class="fc" id="L42">        response.setContentType(MediaType.APPLICATION_JSON_VALUE);</span>
+<span class="fc" id="L43">        response.setCharacterEncoding(&quot;UTF-8&quot;);</span>
+<span class="fc" id="L44">        response.getWriter().write(&quot;{\&quot;mensaje\&quot;:\&quot;&quot; + mensaje + &quot;\&quot;}&quot;);</span>
+<span class="fc" id="L45">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.15.202606040825</span></div></body></html>
